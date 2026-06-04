@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ara.agent.server &#8212; ara 0.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css?v=27fed22d" />
+    <script src="../../../_static/documentation_options.js?v=01f34227"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for ara.agent.server</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Agent API server for the Ara engine.</span>
+
+<span class="sd">Uses a UNIX socket with newline-delimited JSON (NDJSON) for request/response.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">contextlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">io</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">socketserver</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ara.agent.debug_bridge</span><span class="w"> </span><span class="kn">import</span> <span class="n">StructuredDebugBridge</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ara.agent.state</span><span class="w"> </span><span class="kn">import</span> <span class="n">engine_to_dict</span><span class="p">,</span> <span class="n">story_to_dict</span><span class="p">,</span> <span class="n">scene_to_dict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ara.agent.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentRequest</span><span class="p">,</span> <span class="n">AgentResponse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ara.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">AraSettings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ara.llm.client</span><span class="w"> </span><span class="kn">import</span> <span class="n">LLMClient</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ara.memory.chroma</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChromaStore</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ara.utils.debug</span><span class="w"> </span><span class="kn">import</span> <span class="n">_DebugState</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ara.world.story</span><span class="w"> </span><span class="kn">import</span> <span class="n">Story</span>
+
+
+<div class="viewcode-block" id="ThreadingUnixStreamServer">
+<a class="viewcode-back" href="../../../api/ara.agent.html#ara.agent.ThreadingUnixStreamServer">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ThreadingUnixStreamServer</span><span class="p">(</span>
+    <span class="n">socketserver</span><span class="o">.</span><span class="n">ThreadingMixIn</span><span class="p">,</span> <span class="n">socketserver</span><span class="o">.</span><span class="n">UnixStreamServer</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Thread-per-connection UNIX socket server.&quot;&quot;&quot;</span>
+
+    <span class="n">daemon_threads</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">allow_reuse_address</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+
+
+<span class="n">_ANSI_RE</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\x1B(?:[@-Z\-_]|\[[0-?]*[ -/]*[@-~])&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_strip_ansi</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">_ANSI_RE</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="AgentServer">
+<a class="viewcode-back" href="../../../api/ara.agent.html#ara.agent.AgentServer">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AgentServer</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;JSON-over-UNIX-socket server exposing the story engine to agents.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">story</span><span class="p">:</span> <span class="n">Story</span><span class="p">,</span>
+        <span class="n">socket_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;/tmp/ara_agent.sock&quot;</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">story</span> <span class="o">=</span> <span class="n">story</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">socket_path</span> <span class="o">=</span> <span class="n">socket_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_server</span><span class="p">:</span> <span class="n">ThreadingUnixStreamServer</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1"># ------------------------------------------------------------------ #</span>
+    <span class="c1"># Request dispatch</span>
+    <span class="c1"># ------------------------------------------------------------------ #</span>
+
+<div class="viewcode-block" id="AgentServer.handle_request">
+<a class="viewcode-back" href="../../../api/ara.agent.html#ara.agent.AgentServer.handle_request">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">handle_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">AgentRequest</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AgentResponse</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dispatch</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">method</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">AgentResponse</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">result</span><span class="o">=</span><span class="n">result</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">AgentResponse</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_dispatch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;start&quot;</span><span class="p">:</span>
+            <span class="n">scene_id</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;scene_id&quot;</span><span class="p">)</span>
+            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">story</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="n">scene_id</span><span class="o">=</span><span class="n">scene_id</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">story_to_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">story</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;step&quot;</span><span class="p">:</span>
+            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+                <span class="n">buf</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()</span>
+                <span class="k">with</span> <span class="n">contextlib</span><span class="o">.</span><span class="n">redirect_stdout</span><span class="p">(</span><span class="n">buf</span><span class="p">):</span>
+                    <span class="n">step</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">story</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+                <span class="n">output</span> <span class="o">=</span> <span class="n">_strip_ansi</span><span class="p">(</span><span class="n">buf</span><span class="o">.</span><span class="n">getvalue</span><span class="p">())</span>
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="s2">&quot;event&quot;</span><span class="p">:</span> <span class="n">step</span><span class="o">.</span><span class="n">event</span><span class="p">,</span>
+                <span class="s2">&quot;output&quot;</span><span class="p">:</span> <span class="n">output</span><span class="p">,</span>
+                <span class="s2">&quot;scene&quot;</span><span class="p">:</span> <span class="n">scene_to_dict</span><span class="p">(</span><span class="n">step</span><span class="o">.</span><span class="n">scene</span><span class="p">)</span> <span class="k">if</span> <span class="n">step</span><span class="o">.</span><span class="n">scene</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="s2">&quot;suggestions&quot;</span><span class="p">:</span> <span class="n">step</span><span class="o">.</span><span class="n">suggestions</span><span class="p">,</span>
+                <span class="s2">&quot;next_scene&quot;</span><span class="p">:</span> <span class="n">step</span><span class="o">.</span><span class="n">next_scene</span><span class="p">,</span>
+            <span class="p">}</span>
+
+        <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;input&quot;</span><span class="p">:</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">story</span><span class="o">.</span><span class="n">submit_player_input</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;submitted&quot;</span><span class="p">:</span> <span class="n">text</span><span class="p">}</span>
+
+        <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;state&quot;</span><span class="p">:</span>
+            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">{</span>
+                    <span class="s2">&quot;story&quot;</span><span class="p">:</span> <span class="n">story_to_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">story</span><span class="p">),</span>
+                    <span class="s2">&quot;engine&quot;</span><span class="p">:</span> <span class="n">engine_to_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">story</span><span class="o">.</span><span class="n">engine</span><span class="p">),</span>
+                <span class="p">}</span>
+
+        <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;run_until_input&quot;</span><span class="p">:</span>
+            <span class="n">outputs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">events</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">story</span><span class="o">.</span><span class="n">finished</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">story</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">needs_player_input</span><span class="p">:</span>
+                        <span class="k">break</span>
+                    <span class="n">buf</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()</span>
+                    <span class="k">with</span> <span class="n">contextlib</span><span class="o">.</span><span class="n">redirect_stdout</span><span class="p">(</span><span class="n">buf</span><span class="p">):</span>
+                        <span class="n">step</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">story</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+                    <span class="n">output</span> <span class="o">=</span> <span class="n">_strip_ansi</span><span class="p">(</span><span class="n">buf</span><span class="o">.</span><span class="n">getvalue</span><span class="p">())</span>
+                <span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+                <span class="n">events</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                    <span class="s2">&quot;event&quot;</span><span class="p">:</span> <span class="n">step</span><span class="o">.</span><span class="n">event</span><span class="p">,</span>
+                    <span class="s2">&quot;scene&quot;</span><span class="p">:</span> <span class="n">scene_to_dict</span><span class="p">(</span><span class="n">step</span><span class="o">.</span><span class="n">scene</span><span class="p">)</span> <span class="k">if</span> <span class="n">step</span><span class="o">.</span><span class="n">scene</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="s2">&quot;suggestions&quot;</span><span class="p">:</span> <span class="n">step</span><span class="o">.</span><span class="n">suggestions</span><span class="p">,</span>
+                    <span class="s2">&quot;next_scene&quot;</span><span class="p">:</span> <span class="n">step</span><span class="o">.</span><span class="n">next_scene</span><span class="p">,</span>
+                <span class="p">})</span>
+                <span class="k">if</span> <span class="n">step</span><span class="o">.</span><span class="n">event</span> <span class="ow">in</span> <span class="p">(</span>
+                    <span class="s2">&quot;needs_player_input&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;scene_ended&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;story_complete&quot;</span><span class="p">,</span>
+                <span class="p">):</span>
+                    <span class="k">break</span>
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="s2">&quot;events&quot;</span><span class="p">:</span> <span class="n">events</span><span class="p">,</span>
+                <span class="s2">&quot;output&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outputs</span><span class="p">),</span>
+            <span class="p">}</span>
+
+        <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;reset&quot;</span><span class="p">:</span>
+            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">story</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">story_to_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">story</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;skip&quot;</span><span class="p">:</span>
+            <span class="n">scene_id</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;scene_id&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+                <span class="n">step</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">story</span><span class="o">.</span><span class="n">jump_to</span><span class="p">(</span><span class="n">scene_id</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="s2">&quot;event&quot;</span><span class="p">:</span> <span class="n">step</span><span class="o">.</span><span class="n">event</span><span class="p">,</span>
+                <span class="s2">&quot;output&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;scene&quot;</span><span class="p">:</span> <span class="n">scene_to_dict</span><span class="p">(</span><span class="n">step</span><span class="o">.</span><span class="n">scene</span><span class="p">)</span> <span class="k">if</span> <span class="n">step</span><span class="o">.</span><span class="n">scene</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="s2">&quot;suggestions&quot;</span><span class="p">:</span> <span class="n">step</span><span class="o">.</span><span class="n">suggestions</span><span class="p">,</span>
+                <span class="s2">&quot;next_scene&quot;</span><span class="p">:</span> <span class="n">step</span><span class="o">.</span><span class="n">next_scene</span><span class="p">,</span>
+            <span class="p">}</span>
+
+        <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;debug&quot;</span><span class="p">:</span>
+            <span class="n">command</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;command&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;args&quot;</span><span class="p">,</span> <span class="p">[])</span>
+            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">story</span><span class="o">.</span><span class="n">current_scene</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;No scene loaded.&quot;</span><span class="p">}</span>
+                <span class="n">state</span> <span class="o">=</span> <span class="n">_DebugState</span><span class="p">(</span>
+                    <span class="n">console</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>  <span class="c1"># type: ignore[arg-type]</span>
+                    <span class="n">engine</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">story</span><span class="o">.</span><span class="n">engine</span><span class="p">,</span>
+                    <span class="n">scene</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">story</span><span class="o">.</span><span class="n">current_scene</span><span class="p">,</span>
+                    <span class="n">ctx</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">story</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">ctx</span><span class="p">,</span>
+                    <span class="n">here_chars</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">story</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">here_chars</span><span class="p">,</span>
+                    <span class="n">away_chars</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">story</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">away_chars</span><span class="p">,</span>
+                    <span class="n">loc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">story</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">loc</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">story</span><span class="o">.</span><span class="n">current_scene</span><span class="o">.</span><span class="n">starting_location</span><span class="p">,</span>
+                    <span class="n">decision</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">story</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">last_decision</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">bridge</span> <span class="o">=</span> <span class="n">StructuredDebugBridge</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">bridge</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown method: </span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># ------------------------------------------------------------------ #</span>
+    <span class="c1"># Server lifecycle</span>
+    <span class="c1"># ------------------------------------------------------------------ #</span>
+
+<div class="viewcode-block" id="AgentServer.start_listening">
+<a class="viewcode-back" href="../../../api/ara.agent.html#ara.agent.AgentServer.start_listening">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">start_listening</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">socket_path</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">socket_path</span><span class="p">)</span>
+
+        <span class="n">server_instance</span> <span class="o">=</span> <span class="bp">self</span>
+
+        <span class="k">class</span><span class="w"> </span><span class="nc">_Handler</span><span class="p">(</span><span class="n">socketserver</span><span class="o">.</span><span class="n">StreamRequestHandler</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">rfile</span><span class="p">:</span>
+                    <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="p">:</span>
+                        <span class="k">continue</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">req</span> <span class="o">=</span> <span class="n">AgentRequest</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span>
+                    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                        <span class="n">resp</span> <span class="o">=</span> <span class="n">AgentResponse</span><span class="p">(</span>
+                            <span class="nb">id</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Parse error: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">wfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">resp</span><span class="o">.</span><span class="n">to_json</span><span class="p">()</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+                        <span class="k">continue</span>
+
+                    <span class="n">resp</span> <span class="o">=</span> <span class="n">server_instance</span><span class="o">.</span><span class="n">handle_request</span><span class="p">(</span><span class="n">req</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">wfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">resp</span><span class="o">.</span><span class="n">to_json</span><span class="p">()</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">wfile</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_server</span> <span class="o">=</span> <span class="n">ThreadingUnixStreamServer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">socket_path</span><span class="p">,</span> <span class="n">_Handler</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_server</span><span class="o">.</span><span class="n">serve_forever</span><span class="p">()</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_server</span><span class="o">.</span><span class="n">server_close</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">socket_path</span><span class="p">):</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">socket_path</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AgentServer.shutdown">
+<a class="viewcode-back" href="../../../api/ara.agent.html#ara.agent.AgentServer.shutdown">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">shutdown</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_server</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_server</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span></div>
+</div>
+
+
+
+<span class="c1"># ------------------------------------------------------------------ #</span>
+<span class="c1"># CLI</span>
+<span class="c1"># ------------------------------------------------------------------ #</span>
+
+
+<div class="viewcode-block" id="main">
+<a class="viewcode-back" href="../../../api/ara.agent.html#ara.agent.main">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">argv</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Ara Agent API Server&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;--scene&quot;</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="n">Path</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;data/assets/plot/0.toml&quot;</span><span class="p">),</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Path to the initial scene TOML file&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;--socket&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;/tmp/ara_agent.sock&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;UNIX socket path for the agent API&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;--api-key&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;LLM API key (overrides config and environment)&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span>
+
+    <span class="n">settings</span> <span class="o">=</span> <span class="n">AraSettings</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">api_key</span><span class="p">:</span>
+        <span class="n">settings</span><span class="o">.</span><span class="n">api_key</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">api_key</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">settings</span><span class="o">.</span><span class="n">api_key</span><span class="p">:</span>
+        <span class="n">settings</span><span class="o">.</span><span class="n">api_key</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;DEEPSEEK_API_KEY&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+    <span class="n">db</span> <span class="o">=</span> <span class="n">ChromaStore</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span>
+    <span class="n">client</span> <span class="o">=</span> <span class="n">LLMClient</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span>
+    <span class="n">story</span> <span class="o">=</span> <span class="n">Story</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="n">db</span><span class="p">,</span> <span class="n">client</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">scene</span><span class="p">)</span>
+
+    <span class="n">server</span> <span class="o">=</span> <span class="n">AgentServer</span><span class="p">(</span><span class="n">story</span><span class="p">,</span> <span class="n">socket_path</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">socket</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[agent-server] Listening on </span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">socket</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">server</span><span class="o">.</span><span class="n">start_listening</span><span class="p">()</span>
+    <span class="k">return</span> <span class="mi">0</span></div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">ara</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/ara.html">ara package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/ara.world.html">ara.world package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/ara.agent.html">ara.agent package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/ara.llm.html">ara.llm package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/ara.memory.html">ara.memory package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/ara.utils.html">ara.utils package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/ara.config.html">ara.config module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/ara.models.html">ara.models module</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, Ara Developer.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 9.1.0</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

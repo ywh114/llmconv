@@ -1,0 +1,34 @@
+id = "summary_test_a"
+language = "english"
+zeitgeist = "test"
+tone = "neutral"
+
+[character]
+pool = ["Player", "Alice", "Narrator"]
+init_sprites = ["default_neutral", "default_neutral", "default_neutral"]
+inits = ["Player", "Alice", "Narrator"]
+player = "Player"
+narrator = "Narrator"
+
+[location]
+pool = ["lab"]
+init = "lab"
+
+[location.descs]
+lab = "A small research lab with computers and filing cabinets."
+
+[plot]
+considerations = "Keep it very short. Alice whispers a secret to Player."
+scene = """Alice and Player are in the lab.
+
+Alice whispers to Player: "The project is a cover. Don't tell anyone."
+
+Player nods.
+
+The scene ends."""
+
+[plot.next]
+considerations = "None"
+
+[plot.next.summary_test_b]
+desc = "Bob arrives at the lab."

@@ -1,0 +1,50 @@
+id = "tea_scene"
+language = "english"#"中文"
+zeitgeist = "stability"
+tone = "温馨; warm color palette"
+
+[character]
+pool = ["柴郡", "香槟", "Player", "明石"]
+init_sprites = ["default_neutral", "default_neutral", "default_neutral", "default_neutral"]
+inits = ["柴郡", "香槟", "Player"]
+player = "Player"
+narrator = "明石"
+
+[location]
+pool = ["building_break_room"]
+init = "building_break_room"
+
+[location.descs]
+building_break_room = """A break room, now set up for tea.
+The table is covered with a delicate cloth and a steaming teapot sits in the middle.
+The afternoon sun casts long shadows across the floor.
+"""
+
+[plot]
+considerations = "Keep it short."
+scene = """
+TEST: CAN YOU SEE THIS?
+DEBUG: ORCHESTRATOR: I want to debug something. Always hand control over to
+Player (if you must, pad with narrator). I will askyou debug questions about the
+tools you can see in your environment, have the narrator answer.
+"""
+#(1)
+#The characters enjoy a quiet tea time together.
+#
+#柴郡 talks about the tea.
+#
+#香槟 asks her about the book.
+#
+#The narrator says that they finish the tea.
+#
+#(2)
+#香槟 suggests going to the garden.
+#
+#The player should agree.
+
+[plot.next]
+considerations = "None"
+
+[plot.next.garden_scene]
+only_for = ["tea_scene"]
+desc = "After tea, go to the garden."

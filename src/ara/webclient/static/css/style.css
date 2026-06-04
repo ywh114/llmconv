@@ -1,0 +1,490 @@
+/* ===================================================================
+   Ara VN Frontend — Layout, transitions, and VN chrome
+   =================================================================== */
+
+@import url('theme.css');
+
+/* Reset & base */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: var(--vn-font-body);
+  background: var(--vn-bg-base);
+  color: var(--vn-text);
+  user-select: none;
+}
+
+/* -------------------------------------------------------------------
+   Background layer
+   ------------------------------------------------------------------- */
+#vn-background {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  transition: opacity var(--vn-fade-duration) ease-in-out;
+  z-index: 1;
+}
+
+#vn-background.vn-fade-out {
+  opacity: 0;
+}
+
+/* -------------------------------------------------------------------
+   Character sprite layer
+   ------------------------------------------------------------------- */
+#vn-sprites {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 180px;
+}
+
+.vn-sprite {
+  position: absolute;
+  bottom: 180px;
+  height: var(--vn-sprite-height);
+  width: auto;
+  object-fit: contain;
+  transition: opacity var(--vn-fade-duration) ease-in-out,
+              transform var(--vn-slide-duration) ease-out;
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));
+}
+
+.vn-sprite.vn-hidden {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.vn-sprite.vn-speaking {
+  filter: drop-shadow(0 0 16px var(--vn-border-glow))
+          drop-shadow(0 4px 12px rgba(0,0,0,0.4));
+  transform: translateY(-8px);
+}
+
+.vn-sprite[data-position="center"].vn-speaking {
+  transform: translateX(-50%) translateY(-8px);
+}
+
+.vn-sprite[data-position="left"]   { left: 5%; }
+.vn-sprite[data-position="center"] { left: 50%; transform: translateX(-50%); }
+.vn-sprite[data-position="right"]  { right: 5%; }
+
+/* -------------------------------------------------------------------
+   Cropped sprite (full image visible, scaled by crop region)
+   ------------------------------------------------------------------- */
+.vn-sprite-crop {
+  position: absolute;
+  bottom: 180px;
+  height: var(--vn-sprite-height);
+  transition: opacity var(--vn-fade-duration) ease-in-out;
+}
+
+.vn-sprite-crop.vn-hidden {
+  opacity: 0;
+}
+
+.vn-sprite-crop[data-position="left"]   { left: 5%; }
+.vn-sprite-crop[data-position="center"] { left: 50%; transform: translateX(-50%); }
+.vn-sprite-crop[data-position="right"]  { right: 5%; }
+
+.vn-sprite-crop img {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  transform-origin: bottom left;
+  transition: filter var(--vn-slide-duration) ease-out;
+}
+
+.vn-sprite-crop.vn-speaking img {
+  filter: drop-shadow(0 0 16px var(--vn-border-glow))
+          drop-shadow(0 4px 12px rgba(0,0,0,0.4));
+}
+
+/* -------------------------------------------------------------------
+   Dialogue box
+   ------------------------------------------------------------------- */
+#vn-dialogue {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: var(--vn-dialogue-max-width);
+  z-index: 10;
+  background: var(--vn-bg-overlay);
+  border: 2px solid var(--vn-gold-dark);
+  border-radius: var(--vn-dialogue-border-radius);
+  padding: var(--vn-dialogue-padding);
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,0.3),
+    0 8px 32px rgba(0,0,0,0.5),
+    inset 0 0 20px var(--vn-border-glow);
+  backdrop-filter: blur(4px);
+}
+
+#vn-dialogue::before {
+  content: '';
+  position: absolute;
+  top: -2px; left: 10%; right: 10%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--vn-gold), transparent);
+}
+
+#vn-name {
+  font-family: var(--vn-font-display);
+  font-size: var(--vn-font-size-name);
+  color: var(--vn-name);
+  margin-bottom: 0.5rem;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+  min-height: 1.5em;
+}
+
+#vn-text {
+  font-size: var(--vn-font-size-dialogue);
+  line-height: var(--vn-line-height);
+  color: var(--vn-text);
+  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  min-height: 3em;
+  max-height: calc(5 * var(--vn-line-height) * var(--vn-font-size-dialogue));
+  overflow: hidden;
+}
+
+#vn-text .vn-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background: var(--vn-gold);
+  vertical-align: text-bottom;
+  animation: vn-blink 1s step-end infinite;
+}
+
+@keyframes vn-blink {
+  50% { opacity: 0; }
+}
+
+/* -------------------------------------------------------------------
+   Choice menu
+   ------------------------------------------------------------------- */
+#vn-choices {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(2px);
+}
+
+#vn-choices.vn-visible {
+  display: flex;
+}
+
+.vn-choice {
+  width: 100%;
+  max-width: var(--vn-choice-max-width);
+  margin: 0.5rem 0;
+  padding: 1rem 1.5rem;
+  background: var(--vn-bg-overlay);
+  border: 1px solid var(--vn-gold-dark);
+  border-radius: var(--vn-dialogue-border-radius);
+  color: var(--vn-text);
+  font-family: var(--vn-font-body);
+  font-size: var(--vn-font-size-choice);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.vn-choice:hover {
+  border-color: var(--vn-gold);
+  box-shadow: 0 0 12px var(--vn-border-glow), 0 4px 12px rgba(0,0,0,0.3);
+  transform: translateY(-2px);
+}
+
+.vn-custom-input-row {
+  display: flex;
+  gap: 0.5rem;
+  width: 100%;
+  max-width: var(--vn-choice-max-width);
+  margin-top: 1rem;
+}
+
+.vn-custom-input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  background: var(--vn-bg-overlay);
+  border: 1px solid var(--vn-gold-dark);
+  border-radius: var(--vn-dialogue-border-radius);
+  color: var(--vn-text);
+  font-family: var(--vn-font-body);
+  font-size: var(--vn-font-size-choice);
+  outline: none;
+}
+
+.vn-custom-input:focus {
+  border-color: var(--vn-gold);
+}
+
+.vn-custom-send {
+  padding: 0.75rem 1.5rem;
+  background: var(--vn-bg-overlay);
+  border: 1px solid var(--vn-gold-dark);
+  border-radius: var(--vn-dialogue-border-radius);
+  color: var(--vn-text);
+  font-family: var(--vn-font-body);
+  font-size: var(--vn-font-size-choice);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.vn-custom-send:hover {
+  border-color: var(--vn-gold);
+  box-shadow: 0 0 12px var(--vn-border-glow);
+}
+
+/* -------------------------------------------------------------------
+   History / backlog overlay
+   ------------------------------------------------------------------- */
+#vn-history {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  display: none;
+  flex-direction: column;
+  background: rgba(10, 10, 20, 0.95);
+  padding: 2rem 3rem;
+  overflow-y: auto;
+}
+
+#vn-history.vn-visible {
+  display: flex;
+}
+
+#vn-history h2 {
+  font-family: var(--vn-font-display);
+  color: var(--vn-gold);
+  margin-bottom: 1.5rem;
+  text-align: center;
+  font-weight: normal;
+  letter-spacing: 2px;
+}
+
+.vn-history-entry {
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(201, 169, 110, 0.15);
+}
+
+.vn-history-name {
+  color: var(--vn-name);
+  font-size: 0.95rem;
+  margin-bottom: 0.25rem;
+}
+
+.vn-history-text {
+  color: var(--vn-text-muted);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+/* -------------------------------------------------------------------
+   Title screen
+   ------------------------------------------------------------------- */
+#vn-title {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, #0f0f1e 0%, #1a1a2e 50%, #0f0f1e 100%);
+}
+
+#vn-title h1 {
+  font-family: var(--vn-font-display);
+  font-size: 3.5rem;
+  color: var(--vn-gold-light);
+  text-shadow: 0 0 30px var(--vn-border-glow);
+  margin-bottom: 3rem;
+  letter-spacing: 4px;
+}
+
+.vn-title-btn {
+  width: 220px;
+  margin: 0.6rem 0;
+  padding: 0.8rem 1.5rem;
+  background: transparent;
+  border: 1px solid var(--vn-gold-dark);
+  border-radius: var(--vn-dialogue-border-radius);
+  color: var(--vn-gold);
+  font-family: var(--vn-font-body);
+  font-size: 1.1rem;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.vn-title-btn:hover {
+  background: rgba(201, 169, 110, 0.1);
+  border-color: var(--vn-gold);
+  box-shadow: 0 0 16px var(--vn-border-glow);
+}
+
+/* -------------------------------------------------------------------
+   Settings panel
+   ------------------------------------------------------------------- */
+#vn-settings {
+  position: absolute;
+  inset: 0;
+  z-index: 60;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 10, 20, 0.92);
+}
+
+#vn-settings.vn-visible {
+  display: flex;
+}
+
+#vn-settings h2 {
+  font-family: var(--vn-font-display);
+  color: var(--vn-gold);
+  margin-bottom: 2rem;
+  letter-spacing: 2px;
+}
+
+.vn-setting-row {
+  width: 320px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0.75rem 0;
+  color: var(--vn-text);
+}
+
+.vn-setting-row label {
+  font-size: 1rem;
+}
+
+.vn-setting-row input[type="range"] {
+  width: 140px;
+  accent-color: var(--vn-gold);
+}
+
+/* -------------------------------------------------------------------
+   Keybinds reference panel
+   ------------------------------------------------------------------- */
+#vn-keybinds {
+  position: absolute;
+  inset: 0;
+  z-index: 55;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 10, 20, 0.92);
+}
+
+#vn-keybinds.vn-visible {
+  display: flex;
+}
+
+#vn-keybinds h2 {
+  font-family: var(--vn-font-display);
+  color: var(--vn-gold);
+  margin-bottom: 2rem;
+  letter-spacing: 2px;
+}
+
+.vn-keybind-row {
+  width: 320px;
+  display: flex;
+  align-items: center;
+  margin: 0.5rem 0;
+  color: var(--vn-text);
+  font-size: 1rem;
+}
+
+.vn-keybind-row span:last-child {
+  margin-left: 1rem;
+}
+
+.vn-key {
+  display: inline-block;
+  min-width: 3.5rem;
+  padding: 0.2rem 0.5rem;
+  background: var(--vn-bg-overlay);
+  border: 1px solid var(--vn-gold-dark);
+  border-radius: 4px;
+  color: var(--vn-gold);
+  font-family: var(--vn-font-body);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+/* -------------------------------------------------------------------
+   Auto mode badge
+   ------------------------------------------------------------------- */
+#vn-auto-badge {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 45;
+  display: none;
+  padding: 0.25rem 0.6rem;
+  background: var(--vn-bg-overlay);
+  border: 1px solid var(--vn-gold-dark);
+  border-radius: 4px;
+  color: var(--vn-gold);
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+  pointer-events: none;
+}
+
+#vn-auto-badge.vn-visible {
+  display: block;
+}
+
+/* -------------------------------------------------------------------
+   Keybinds hint (corner widget)
+   ------------------------------------------------------------------- */
+#vn-keybinds-hint {
+  position: absolute;
+  bottom: 0.5rem;
+  right: 0.75rem;
+  z-index: 25;
+  font-size: 0.75rem;
+  color: var(--vn-text-muted);
+  opacity: 0.5;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+#vn-keybinds-hint:hover {
+  opacity: 0.85;
+}
+
+/* -------------------------------------------------------------------
+   Utility
+   ------------------------------------------------------------------- */
+.vn-hidden {
+  display: none !important;
+}

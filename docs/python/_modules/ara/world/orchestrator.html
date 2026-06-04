@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ara.world.orchestrator &#8212; ara 0.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css?v=27fed22d" />
+    <script src="../../../_static/documentation_options.js?v=01f34227"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for ara.world.orchestrator</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Orchestrator agent that decides who speaks next and how the scene advances.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ara.llm.client</span><span class="w"> </span><span class="kn">import</span> <span class="n">LLMClient</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ara.llm.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConversationContext</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ara.llm.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">ToolRegistry</span><span class="p">,</span> <span class="n">tool</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ara.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">GameRole</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ara.world.character</span><span class="w"> </span><span class="kn">import</span> <span class="n">Character</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ara.world.scene</span><span class="w"> </span><span class="kn">import</span> <span class="n">Location</span><span class="p">,</span> <span class="n">Scene</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ara.utils.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_logger</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="TurnDecision">
+<a class="viewcode-back" href="../../../api/ara.world.html#ara.world.orchestrator.TurnDecision">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TurnDecision</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Output of a single orchestrator turn.</span>
+
+<span class="sd">    :ivar next_char: The character (or narrator) selected to act next.</span>
+<span class="sd">    :ivar directive: In-universe instruction for the next speaker.  Empty</span>
+<span class="sd">        when the next speaker is the player.</span>
+<span class="sd">    :ivar suggestions: Options offered to the player.  Empty for NPC turns.</span>
+<span class="sd">    :ivar entering_chars: Characters that should enter the scene at the start</span>
+<span class="sd">        of this round.</span>
+<span class="sd">    :ivar exiting_chars: Characters that should exit the scene at the end of</span>
+<span class="sd">        this round.</span>
+<span class="sd">    :ivar switch_location: New location to switch to, or ``None``.</span>
+<span class="sd">    :ivar edit_location: Description of how the current location was modified,</span>
+<span class="sd">        or empty string if no change.</span>
+<span class="sd">    :ivar next_scene: If non-``None``, the scene ends and transitions to the</span>
+<span class="sd">        named follow-up scene.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">next_char</span><span class="p">:</span> <span class="n">Character</span>
+    <span class="n">directive</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">suggestions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">entering_chars</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">Character</span><span class="p">]</span>
+    <span class="n">exiting_chars</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">Character</span><span class="p">]</span>
+    <span class="n">switch_location</span><span class="p">:</span> <span class="n">Location</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="n">edit_location</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">next_scene</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="Orchestrator">
+<a class="viewcode-back" href="../../../api/ara.world.html#ara.world.orchestrator.Orchestrator">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Orchestrator</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Builds dynamic tool schemas and calls the LLM to direct scene flow.</span>
+
+<span class="sd">    Because the list of valid characters, locations, and scene choices changes</span>
+<span class="sd">    every turn, the ``next_round`` tool schema is regenerated on each call.</span>
+<span class="sd">    When strict mode is enabled, the schema includes ``strict: true`` so that</span>
+<span class="sd">    DeepSeek&#39;s beta endpoint guarantees JSON-schema-compliant output,</span>
+<span class="sd">    eliminating the need for fragile retry loops.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">:</span> <span class="n">LLMClient</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="n">client</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">registry</span> <span class="o">=</span> <span class="n">ToolRegistry</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_capture</span><span class="p">:</span> <span class="n">_NextRoundCapture</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_system_prompt</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">player</span><span class="p">:</span> <span class="n">Character</span><span class="p">,</span> <span class="n">narrator</span><span class="p">:</span> <span class="n">Character</span><span class="p">,</span> <span class="n">scene</span><span class="p">:</span> <span class="n">Scene</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the orchestrator system prompt.</span>
+
+<span class="sd">        :param player: Player-controlled character.</span>
+<span class="sd">        :param narrator: Narrator character.</span>
+<span class="sd">        :param scene: Current scene.</span>
+<span class="sd">        :return: Formatted system prompt string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;IMPORTANT: Give suggestions and directives in </span><span class="si">{</span><span class="n">scene</span><span class="o">.</span><span class="n">language</span><span class="si">}</span><span class="s2"> only!</span>
+<span class="s2"># Role: Visual Novel Orchestrator</span>
+<span class="s2">## Goal</span>
+<span class="s2">You are the Orchestrator/DM for a visual novel, with the player taking assuming the role of </span><span class="si">{</span><span class="n">player</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.</span>
+<span class="s2">The narrator name is </span><span class="si">{</span><span class="n">narrator</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.</span>
+<span class="s2">The zeitgeist of the plot is: </span><span class="si">{</span><span class="n">scene</span><span class="o">.</span><span class="n">zeitgeist</span><span class="si">}</span><span class="s2">.</span>
+<span class="s2">The tone of the current scene is: </span><span class="si">{</span><span class="n">scene</span><span class="o">.</span><span class="n">tone</span><span class="si">}</span><span class="s2">.</span>
+
+<span class="s2">When the scene goes off-script, use directives and the narrator to force it back.</span>
+<span class="s2">ALWAYS be pushing the plot forwards.</span>
+<span class="s2">DO NOT add any extraneous events.</span>
+
+<span class="s2">## Core Responsibilities</span>
+<span class="s2">1. **Control Narrative Flow**:</span>
+<span class="s2">   - Select next character after each dialogue turn (Character, Narrator).</span>
+<span class="s2">   - Be proactive in using switch_location to switch between locations in the scene.</span>
+<span class="s2">   - Use directives to guide characters through the scene&#39;s plot.</span>
+<span class="s2">   - Use suggestions to guide players through the scene&#39;s plot towards one of the specified outcomes.</span>
+<span class="s2">   - Choose what characters enter/exit the scene based on the scene&#39;s plot.</span>
+
+<span class="s2">2. **Principled Guidance**</span>
+<span class="s2">    - Directives must be in-universe: minimize meta-language.</span>
+<span class="s2">    - Narrator control: use for environmental shifts and scene description. The Narrator should only write one or two sentences at a time.</span>
+<span class="s2">    - End the scene when appropriate.</span>
+
+<span class="s2">3. **Tool instructions**</span>
+<span class="s2">    - Use the next_character field to specify the next character.</span>
+<span class="s2">    - Use the directive field to provide directives to the next character, if it is not the player.</span>
+<span class="s2">    - If the next character is the player, provide an array of suggestions that correspond to the possible outcomes of the scene.</span>
+<span class="s2">    - Entering characters enter at the start of the current round of conversation. However, they CANNOT BE the next speaker.</span>
+<span class="s2">    - Exiting characters exit at the end of the current round of conversation. They CAN BE the next speaker.</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Orchestrator.decide_next_turn">
+<a class="viewcode-back" href="../../../api/ara.world.html#ara.world.orchestrator.Orchestrator.decide_next_turn">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">decide_next_turn</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">scene</span><span class="p">:</span> <span class="n">Scene</span><span class="p">,</span>
+        <span class="n">ctx</span><span class="p">:</span> <span class="n">ConversationContext</span><span class="p">,</span>
+        <span class="n">here_chars</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">Character</span><span class="p">],</span>
+        <span class="n">away_chars</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">Character</span><span class="p">],</span>
+        <span class="n">prev_char</span><span class="p">:</span> <span class="n">Character</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">loc</span><span class="p">:</span> <span class="n">Location</span><span class="p">,</span>
+        <span class="n">history</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">_retries</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TurnDecision</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Ask the LLM to choose the next speaker and scene adjustments.</span>
+
+<span class="sd">        Retries automatically when the model fails to produce a valid tool call.</span>
+
+<span class="sd">        :param scene: Current scene definition.</span>
+<span class="sd">        :param ctx: Base conversation context.</span>
+<span class="sd">        :param here_chars: Characters currently present.</span>
+<span class="sd">        :param away_chars: Characters currently off-scene.</span>
+<span class="sd">        :param prev_char: The character who spoke in the previous round, or</span>
+<span class="sd">            ``None`` on the first turn.</span>
+<span class="sd">        :param loc: Current location.</span>
+<span class="sd">        :param _retries: Internal retry counter.</span>
+<span class="sd">        :return: Parsed :class:`TurnDecision`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_capture</span> <span class="o">=</span> <span class="n">_NextRoundCapture</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">registry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s2">&quot;next_round&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_capture</span><span class="o">.</span><span class="n">hook</span><span class="p">)</span>
+
+        <span class="n">list_here</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">here_chars</span><span class="p">]</span>
+        <span class="n">list_away</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">away_chars</span><span class="p">]</span>
+        <span class="n">prev_name</span> <span class="o">=</span> <span class="n">prev_char</span><span class="o">.</span><span class="n">name</span> <span class="k">if</span> <span class="n">prev_char</span> <span class="k">else</span> <span class="kc">None</span>
+
+        <span class="n">valid_next</span> <span class="o">=</span> <span class="n">list_here</span> <span class="o">+</span> <span class="p">[</span><span class="n">scene</span><span class="o">.</span><span class="n">narrator</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+        <span class="n">valid_locs</span> <span class="o">=</span> <span class="p">[</span><span class="n">loc</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">loc</span> <span class="ow">in</span> <span class="n">scene</span><span class="o">.</span><span class="n">location_pool</span><span class="p">]</span>
+        <span class="n">valid_scenes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">scene</span><span class="o">.</span><span class="n">next_choices</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+        <span class="n">next_round_tool</span> <span class="o">=</span> <span class="n">tool</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;next_round&quot;</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;&quot;&quot;Choose the next character/narrator to act, or to end the scene.</span>
+<span class="s2">If choosing an NPC/the narrator, provide a directive to guide their actions to fulfill the given plot.</span>
+<span class="s2">If choosing the player, provide suggestions.</span>
+<span class="s2">If setting end_scene to True, you can leave everything else blank.</span>
+<span class="s2">Also decide on what characters enter/exit the scene.</span>
+<span class="s2">&quot;&quot;&quot;</span><span class="p">,</span>
+            <span class="n">properties</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;next_character&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;The character to act next. Valid options: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">valid_next</span><span class="p">)</span><span class="si">}</span><span class="s2">. Avoid having </span><span class="si">{</span><span class="n">prev_name</span><span class="si">}</span><span class="s2"> act unless necessary.&quot;</span><span class="p">,</span>
+                <span class="p">},</span>
+                <span class="s2">&quot;directive&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Directive for the chosen character. Omit if the next character is the player.&quot;</span><span class="p">,</span>
+                <span class="p">},</span>
+                <span class="s2">&quot;suggestions&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;array&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;items&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
+                    <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;List of suggestions. Omit if the next character is not the player.&quot;</span><span class="p">,</span>
+                <span class="p">},</span>
+                <span class="s2">&quot;enter_characters&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;array&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;items&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
+                    <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;List of characters to enter the scene. Valid options: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">list_away</span><span class="p">)</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">list_away</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;none&#39;</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">,</span>
+                <span class="p">},</span>
+                <span class="s2">&quot;exit_characters&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;array&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;items&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
+                    <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;List of characters to exit the scene. Valid options: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">list_here</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">,</span>
+                <span class="p">},</span>
+                <span class="s2">&quot;switch_location&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;The location to switch to. Valid options: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">valid_locs</span><span class="p">)</span><span class="si">}</span><span class="s2">. Current: </span><span class="si">{</span><span class="n">loc</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">. Give empty string if no change.&quot;</span><span class="p">,</span>
+                <span class="p">},</span>
+                <span class="s2">&quot;edit_location&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;True if characters or the plot alter the environment of the current location. &quot;</span>
+                    <span class="s2">&quot;Provide a brief description of the modification (this is applied before switch_location). &quot;</span>
+                    <span class="s2">&quot;Give an empty string if there is no change.&quot;</span><span class="p">,</span>
+                <span class="p">},</span>
+                <span class="s2">&quot;next_scene&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Provide this when the current scene ends. Valid options: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">valid_scenes</span><span class="p">)</span><span class="si">}</span><span class="s2">. Provide empty string if the scene has not ended.&quot;</span><span class="p">,</span>
+                <span class="p">},</span>
+            <span class="p">},</span>
+            <span class="n">required</span><span class="o">=</span><span class="p">[</span>
+                <span class="s2">&quot;next_character&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;enter_characters&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;exit_characters&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;switch_location&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;edit_location&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;next_scene&quot;</span><span class="p">,</span>
+            <span class="p">],</span>
+            <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">plot_content</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;Plot:</span>
+<span class="si">{</span><span class="n">scene</span><span class="o">.</span><span class="n">plot_as_tool_content</span><span class="p">()</span><span class="si">}</span>
+
+<span class="s2">Characters currently here: </span><span class="si">{</span><span class="n">list_here</span><span class="si">}</span>
+<span class="s2">Info:</span>
+<span class="si">{</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1"> (</span><span class="si">{</span><span class="n">c</span><span class="o">.</span><span class="n">importance</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">): </span><span class="si">{</span><span class="n">c</span><span class="o">.</span><span class="n">card_fields</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;personality&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">)</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">c</span><span class="o">.</span><span class="n">card_fields</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;scenario&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">here_chars</span><span class="p">)</span><span class="si">}</span>
+
+<span class="s2">Characters currently away: </span><span class="si">{</span><span class="n">list_away</span><span class="si">}</span>
+
+<span class="s2">Note: ANONYMOUS characters are background extras with minimal persistence. They do not have detailed backstories or memory.</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+        <span class="n">branch</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">branch</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">branch</span><span class="o">.</span><span class="n">head</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">branch</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;role&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;assistant&quot;</span><span class="p">:</span>
+            <span class="n">branch</span><span class="o">.</span><span class="n">user_message</span><span class="p">(</span><span class="s2">&quot;Continue.&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;System&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">history</span><span class="p">:</span>
+            <span class="n">branch</span><span class="o">.</span><span class="n">user_message</span><span class="p">(</span><span class="s2">&quot;Previously, in past scenes...&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;System&quot;</span><span class="p">)</span>
+            <span class="n">branch</span><span class="o">.</span><span class="n">assistant_message</span><span class="p">(</span><span class="n">history</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;System&quot;</span><span class="p">)</span>
+
+        <span class="n">branch</span><span class="o">.</span><span class="n">user_message</span><span class="p">(</span><span class="s2">&quot;What is the current Plot?&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;System&quot;</span><span class="p">)</span>
+        <span class="n">branch</span><span class="o">.</span><span class="n">assistant_message</span><span class="p">(</span><span class="n">plot_content</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;System&quot;</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Control handed to orchestrator&quot;</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">complete</span><span class="p">(</span>
+            <span class="n">role</span><span class="o">=</span><span class="n">GameRole</span><span class="o">.</span><span class="n">ORCHESTRATOR</span><span class="p">,</span>
+            <span class="n">system_prompt</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_system_prompt</span><span class="p">(</span><span class="n">scene</span><span class="o">.</span><span class="n">player</span><span class="p">,</span> <span class="n">scene</span><span class="o">.</span><span class="n">narrator</span><span class="p">,</span> <span class="n">scene</span><span class="p">),</span>
+            <span class="n">messages</span><span class="o">=</span><span class="n">branch</span><span class="o">.</span><span class="n">to_list</span><span class="p">(),</span>
+            <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="n">next_round_tool</span><span class="p">],</span>
+            <span class="n">tool_choice</span><span class="o">=</span><span class="s2">&quot;required&quot;</span><span class="p">,</span>
+            <span class="n">stream</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">result</span><span class="o">.</span><span class="n">tool_calls</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Orchestrator returned no tool calls (content=</span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">content</span><span class="si">!r}</span><span class="s2">). &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Retries remaining: </span><span class="si">{</span><span class="n">_retries</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">_retries</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">decide_next_turn</span><span class="p">(</span>
+                    <span class="n">scene</span><span class="p">,</span> <span class="n">ctx</span><span class="p">,</span> <span class="n">here_chars</span><span class="p">,</span> <span class="n">away_chars</span><span class="p">,</span> <span class="n">prev_char</span><span class="p">,</span> <span class="n">loc</span><span class="p">,</span> <span class="n">_retries</span> <span class="o">-</span> <span class="mi">1</span>
+                <span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Orchestrator failed to produce a tool call after retries.&quot;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">tc</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">tool_calls</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">registry</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">tc</span><span class="p">[</span><span class="s2">&quot;function&quot;</span><span class="p">][</span><span class="s2">&quot;name&quot;</span><span class="p">],</span> <span class="n">tc</span><span class="p">[</span><span class="s2">&quot;function&quot;</span><span class="p">][</span><span class="s2">&quot;arguments&quot;</span><span class="p">])</span>
+
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_capture</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="n">decision</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_capture</span><span class="o">.</span><span class="n">to_decision</span><span class="p">(</span>
+            <span class="n">here_chars</span> <span class="o">|</span> <span class="p">{</span><span class="n">scene</span><span class="o">.</span><span class="n">narrator</span><span class="p">},</span>
+            <span class="n">scene</span><span class="o">.</span><span class="n">location_pool</span><span class="p">,</span>
+            <span class="n">scene</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Orchestrator decision: next=</span><span class="si">{</span><span class="n">decision</span><span class="o">.</span><span class="n">next_char</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">, &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;enter=</span><span class="si">{</span><span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">decision</span><span class="o">.</span><span class="n">entering_chars</span><span class="p">]</span><span class="si">}</span><span class="s2">, &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;exit=</span><span class="si">{</span><span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">decision</span><span class="o">.</span><span class="n">exiting_chars</span><span class="p">]</span><span class="si">}</span><span class="s2">, &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;next_scene=</span><span class="si">{</span><span class="n">decision</span><span class="o">.</span><span class="n">next_scene</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">decision</span></div>
+</div>
+
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_NextRoundCapture</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Internal helper that captures the arguments of the ``next_round`` tool.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">hook</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse and store the JSON arguments.</span>
+
+<span class="sd">        :param args: JSON-encoded argument string.</span>
+<span class="sd">        :return: Empty string (tool result is discarded for the orchestrator).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_decision</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">char_pool</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">Character</span><span class="p">],</span>
+        <span class="n">loc_pool</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">Location</span><span class="p">],</span>
+        <span class="n">scene</span><span class="p">:</span> <span class="n">Scene</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TurnDecision</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert captured JSON into a typed :class:`TurnDecision`.</span>
+
+<span class="sd">        Validates returned names against the valid pools since the tool schema</span>
+<span class="sd">        no longer uses enums.</span>
+
+<span class="sd">        :param char_pool: All characters the orchestrator could have named.</span>
+<span class="sd">        :param loc_pool: All locations the orchestrator could have selected.</span>
+<span class="sd">        :param scene: Current scene (used for fallback values).</span>
+<span class="sd">        :return: Resolved decision object.</span>
+<span class="sd">        :raises RuntimeError: If the orchestrator failed to produce data or</span>
+<span class="sd">            named an unknown character/location/scene.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Orchestrator did not produce a decision.&quot;</span><span class="p">)</span>
+
+        <span class="n">next_scene</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;next_scene&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">next_scene</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">next_scene</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">scene</span><span class="o">.</span><span class="n">next_choices</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Invalid next_scene &#39;</span><span class="si">{</span><span class="n">next_scene</span><span class="si">}</span><span class="s2">&#39;. &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Valid options: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">scene</span><span class="o">.</span><span class="n">next_choices</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+            <span class="k">return</span> <span class="n">TurnDecision</span><span class="p">(</span>
+                <span class="n">next_char</span><span class="o">=</span><span class="n">scene</span><span class="o">.</span><span class="n">player</span><span class="p">,</span>
+                <span class="n">directive</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+                <span class="n">suggestions</span><span class="o">=</span><span class="p">[],</span>
+                <span class="n">entering_chars</span><span class="o">=</span><span class="nb">set</span><span class="p">(),</span>
+                <span class="n">exiting_chars</span><span class="o">=</span><span class="nb">set</span><span class="p">(),</span>
+                <span class="n">switch_location</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">next_scene</span><span class="o">=</span><span class="n">next_scene</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="n">next_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="s2">&quot;next_character&quot;</span><span class="p">]</span>
+        <span class="n">next_char</span> <span class="o">=</span> <span class="nb">next</span><span class="p">((</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">char_pool</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">next_name</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">next_char</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Character &#39;</span><span class="si">{</span><span class="n">next_name</span><span class="si">}</span><span class="s2">&#39; not found. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Valid options: </span><span class="si">{</span><span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">char_pool</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">_find</span><span class="p">(</span><span class="n">names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">pool</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">Character</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">[</span><span class="n">Character</span><span class="p">]:</span>
+            <span class="n">result</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">Character</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+                <span class="n">char</span> <span class="o">=</span> <span class="nb">next</span><span class="p">((</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">pool</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">n</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">char</span><span class="p">:</span>
+                    <span class="n">result</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">char</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Orchestrator named unknown character &#39;</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">&#39; in &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;enter/exit list. Valid options: </span><span class="si">{</span><span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">pool</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+            <span class="k">return</span> <span class="n">result</span>
+
+        <span class="n">switch_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;switch_location&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">switch_loc</span> <span class="o">=</span> <span class="nb">next</span><span class="p">((</span><span class="n">l</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">loc_pool</span> <span class="k">if</span> <span class="n">l</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">switch_name</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">switch_name</span> <span class="ow">and</span> <span class="n">switch_loc</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Location &#39;</span><span class="si">{</span><span class="n">switch_name</span><span class="si">}</span><span class="s2">&#39; not found. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Valid options: </span><span class="si">{</span><span class="p">[</span><span class="n">l</span><span class="o">.</span><span class="n">name</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">l</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">loc_pool</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">TurnDecision</span><span class="p">(</span>
+            <span class="n">next_char</span><span class="o">=</span><span class="n">next_char</span><span class="p">,</span>
+            <span class="n">directive</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;directive&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+            <span class="n">suggestions</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;suggestions&quot;</span><span class="p">,</span> <span class="p">[]),</span>
+            <span class="n">entering_chars</span><span class="o">=</span><span class="n">_find</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;enter_characters&quot;</span><span class="p">,</span> <span class="p">[]),</span> <span class="n">char_pool</span><span class="p">),</span>
+            <span class="n">exiting_chars</span><span class="o">=</span><span class="n">_find</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;exit_characters&quot;</span><span class="p">,</span> <span class="p">[]),</span> <span class="n">char_pool</span><span class="p">),</span>
+            <span class="n">switch_location</span><span class="o">=</span><span class="n">switch_loc</span><span class="p">,</span>
+            <span class="n">edit_location</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;edit_location&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+            <span class="n">next_scene</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="p">)</span>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">ara</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/ara.html">ara package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/ara.world.html">ara.world package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/ara.agent.html">ara.agent package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/ara.llm.html">ara.llm package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/ara.memory.html">ara.memory package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/ara.utils.html">ara.utils package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/ara.config.html">ara.config module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/ara.models.html">ara.models module</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, Ara Developer.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 9.1.0</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

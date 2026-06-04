@@ -1,0 +1,26 @@
+id = "fin_scene"
+language = "english"
+zeitgeist = "stability"
+tone = "温馨; warm color palette"
+type = "fin"
+
+[character]
+pool = ["Player"]
+init_sprites = ["default_neutral"]
+inits = ["Player"]
+player = "Player"
+narrator = "Player"
+
+[location]
+pool = ["fin"]
+init = "fin"
+
+[location.descs]
+fin = "The end."
+
+[plot]
+considerations = "This is the end of the story."
+scene = """The story ends here."""
+
+[plot.next]
+considerations = "None"

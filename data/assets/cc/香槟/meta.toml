@@ -1,0 +1,7 @@
+importance = "EIGEN"
+sprites = ["default_neutral"]
+default_sprite = "default_neutral"
+
+[default_neutral]
+topleft = [0, 680]
+bottomright = [1250, 1970]

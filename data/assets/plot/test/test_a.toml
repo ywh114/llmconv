@@ -1,0 +1,35 @@
+id = "test_a"
+language = "english"
+zeitgeist = "test"
+tone = "neutral"
+
+[character]
+pool = ["Player", "Narrator"]
+init_sprites = ["default_neutral", "default_neutral"]
+inits = ["Player", "Narrator"]
+player = "Player"
+narrator = "Narrator"
+
+[location]
+pool = ["room"]
+init = "room"
+
+[location.descs]
+room = "A simple room with a table and two chairs."
+
+[plot]
+considerations = "Keep it very short."
+scene = """The Player and Narrator are in a room.
+
+Narrator says hello.
+
+Player responds.
+
+The scene ends quickly.
+"""
+
+[plot.next]
+considerations = "None"
+
+[plot.next.test_b]
+desc = "Continue to scene B."

@@ -1,0 +1,47 @@
+/* ===================================================================
+   Ara VN Theme — Centralized styling variables
+   Swap this file to change the entire visual identity.
+   =================================================================== */
+
+:root {
+  /* -----------------------------------------------------------------
+     Palette — warm, delicate, reminiscent of classic JP VNs
+     ----------------------------------------------------------------- */
+  --vn-bg-base: #1a1a2e;
+  --vn-bg-overlay: rgba(20, 20, 40, 0.92);
+  --vn-gold: #c9a96e;
+  --vn-gold-light: #e8d5a3;
+  --vn-gold-dark: #8a7040;
+  --vn-text: #f0e6d3;
+  --vn-text-muted: #b8a99a;
+  --vn-name: #ffd700;
+  --vn-accent: #d4a5a5;
+  --vn-border-glow: rgba(201, 169, 110, 0.3);
+
+  /* -----------------------------------------------------------------
+     Typography
+     ----------------------------------------------------------------- */
+  --vn-font-body: 'Georgia', 'Times New Roman', serif;
+  --vn-font-display: 'Georgia', serif;
+  --vn-font-size-dialogue: 1.25rem;
+  --vn-font-size-name: 1.1rem;
+  --vn-font-size-choice: 1.1rem;
+  --vn-line-height: 1.6;
+
+  /* -----------------------------------------------------------------
+     Timing
+     ----------------------------------------------------------------- */
+  --vn-typewriter-speed: 30ms;
+  --vn-fade-duration: 0.6s;
+  --vn-slide-duration: 0.5s;
+  --vn-auto-delay: 2500ms;
+
+  /* -----------------------------------------------------------------
+     Dimensions
+     ----------------------------------------------------------------- */
+  --vn-dialogue-max-width: 900px;
+  --vn-dialogue-padding: 1.5rem 2rem;
+  --vn-dialogue-border-radius: 4px;
+  --vn-sprite-height: 75vh;
+  --vn-choice-max-width: 600px;
+}

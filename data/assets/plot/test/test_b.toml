@@ -1,0 +1,33 @@
+id = "test_b"
+language = "english"
+zeitgeist = "test"
+tone = "neutral"
+
+[character]
+pool = ["Player", "Narrator"]
+init_sprites = ["default_neutral", "default_neutral"]
+inits = ["Player", "Narrator"]
+player = "Player"
+narrator = "Narrator"
+
+[location]
+pool = ["garden"]
+init = "garden"
+
+[location.descs]
+garden = "A sunny garden with flowers."
+
+[plot]
+considerations = "Keep it very short."
+scene = """The Player and Narrator are now in a garden.
+
+They talk about the weather.
+
+The scene ends.
+"""
+
+[plot.next]
+considerations = "None"
+
+[plot.next.fin_scene]
+desc = "End the story."

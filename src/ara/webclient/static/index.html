@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ara — Visual Novel</title>
+  <link rel="stylesheet" href="/static/css/style.css?v=7">
+</head>
+<body>
+
+  <!-- Background layer -->
+  <div id="vn-background"></div>
+
+  <!-- Character sprites -->
+  <div id="vn-sprites"></div>
+
+  <!-- Dialogue box -->
+  <div id="vn-dialogue">
+    <div id="vn-name"></div>
+    <div id="vn-text"><span class="vn-cursor"></span></div>
+  </div>
+
+  <!-- Choice menu -->
+  <div id="vn-choices"></div>
+
+  <!-- History / backlog -->
+  <div id="vn-history">
+    <h2>History</h2>
+    <div id="vn-history-list"></div>
+  </div>
+
+  <!-- Keybinds reference -->
+  <div id="vn-keybinds">
+    <h2>Keybinds</h2>
+    <div class="vn-keybind-row"><span class="vn-key">Space</span><span>Advance / skip typing</span></div>
+    <div class="vn-keybind-row"><span class="vn-key">H</span><span>Toggle history</span></div>
+    <div class="vn-keybind-row"><span class="vn-key">S</span><span>Toggle settings</span></div>
+    <div class="vn-keybind-row"><span class="vn-key">K</span><span>Toggle keybinds</span></div>
+    <div class="vn-keybind-row"><span class="vn-key">A</span><span>Toggle auto mode</span></div>
+    <div class="vn-keybind-row"><span class="vn-key">Esc</span><span>Close overlays</span></div>
+    <button class="vn-title-btn" id="btn-keybinds-close">Close</button>
+  </div>
+
+  <!-- Settings panel -->
+  <div id="vn-settings">
+    <h2>Settings</h2>
+    <div class="vn-setting-row">
+      <label>Text Speed</label>
+      <input type="range" id="setting-text-speed" min="5" max="100" value="30">
+    </div>
+    <div class="vn-setting-row">
+      <label>Auto Delay</label>
+      <input type="range" id="setting-auto-delay" min="1000" max="5000" value="2500">
+    </div>
+    <button class="vn-title-btn" id="btn-settings-close">Close</button>
+  </div>
+
+  <!-- Title screen -->
+  <div id="vn-title">
+    <h1>Ara</h1>
+    <button class="vn-title-btn" id="btn-start">Start</button>
+    <button class="vn-title-btn" id="btn-settings">Settings</button>
+    <button class="vn-title-btn" id="btn-keybinds">Keybinds</button>
+  </div>
+
+  <!-- Auto mode badge -->
+  <div id="vn-auto-badge">AUTO</div>
+
+  <!-- Keybinds hint (visible during gameplay) -->
+  <div id="vn-keybinds-hint">[K: keybinds] [A: auto]</div>
+
+  <script src="/static/js/vn.js?v=7"></script>
+  <script src="/static/js/ui.js?v=7"></script>
+</body>
+</html>

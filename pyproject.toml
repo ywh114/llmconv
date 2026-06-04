@@ -1,0 +1,52 @@
+[project]
+name = "ara"
+version = "0.1.0"
+description = "Multi-character AI roleplay engine with plot-driven conversations"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "GPL-3.0-or-later" }
+authors = [
+    { name = "Me :)" },
+]
+dependencies = [
+    "chromadb",
+    "openai>=1.0",
+    "pydantic>=2.0",
+    "pydantic-settings",
+    "sentence-transformers",
+    "torch",
+]
+
+[project.scripts]
+ara = "ara.__main__:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+]
+
+[project.optional-dependencies]
+web = [
+    "starlette>=0.35",
+    "uvicorn[standard]>=0.25",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ara"]
+
+[tool.ara]
+api_key = ""
+api_endpoint = "https://api.deepseek.com"
+api_model = "deepseek-v4-flash"
+embedding_model = "all-MiniLM-L6-v2"
+data_dir = "data"
+language = "English"
+temperature_character = 0.9
+temperature_narrator = 0.6
+temperature_orchestrator = 0.6
+temperature_summarizer = 0.4
+strict_tools = false

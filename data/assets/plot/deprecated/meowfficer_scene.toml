@@ -1,0 +1,45 @@
+id = "meowfficer_scene"
+language = "english"#"中文"
+zeitgeist = "stability"
+tone = "温馨; warm color palette"
+
+[character]
+pool = ["柴郡", "香槟", "Player", "明石", "Meowfficer"]
+init_sprites = ["default_neutral", "default_neutral", "default_neutral", "default_neutral", "cat_neutral"]
+inits = ["柴郡", "香槟", "Player", "Meowfficer"]
+player = "Player"
+narrator = "明石"
+
+[anonymous]
+Meowfficer = { desc = "A round, fluffy white cat wearing a tiny naval officer's hat with a gold emblem and a dark blue tie. It has blue eyes, pink blush marks on its cheeks, and small gold epaulettes on its shoulders. It cannot speak. It communicates only through cute bodily movements — tail wags, paw raises, head tilts, slow blinks, rolling onto its back, little paw waves, etc.", sprite = "cat_neutral" }
+
+[location]
+pool = ["garden"]
+init = "garden"
+
+[location.descs]
+garden = """The garden behind the building, bathed in golden late-afternoon light.
+Rows of osmanthus trees line the stone path.
+A small wooden bench sits beneath the largest tree.
+The afternoon breeze carries the sweet scent of blooming flowers.
+Meowfficer — a round, fluffy white cat in a tiny naval officer's hat and blue tie — sits near the bench, tail swaying gently.
+"""
+
+[plot]
+considerations = "Meowfficer is an ANONYMOUS background character defined in [anonymous]. It CANNOT speak — it only communicates through cute bodily movements. The narrator should describe Meowfficer's movements. The other characters may react to Meowfficer's adorable behavior."
+scene = """After the pleasant afternoon in the garden, the group notices Meowfficer sitting near the bench.
+
+Meowfficer does not speak. It communicates only through cute bodily movements — tail wags, paw raises, head tilts, slow blinks, rolling onto its back, little paw waves, etc.
+
+The characters react to Meowfficer's adorable behavior. 柴郡 might try to pet it. 香槟 might offer a small treat. Player can interact however they like.
+
+The narrator describes Meowfficer's movements in detail.
+
+The scene ends peacefully as the sun begins to set.
+"""
+
+[plot.next]
+considerations = "None"
+
+[plot.next.fin_scene]
+desc = "The story ends."

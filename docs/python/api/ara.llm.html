@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>ara.llm package &#8212; ara 0.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=27fed22d" />
+    <script src="../_static/documentation_options.js?v=01f34227"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="ara.memory package" href="ara.memory.html" />
+    <link rel="prev" title="ara.agent package" href="ara.agent.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-ara.llm">
+<span id="ara-llm-package"></span><h1>ara.llm package<a class="headerlink" href="#module-ara.llm" title="Link to this heading">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
+</section>
+<section id="module-ara.llm.client">
+<span id="ara-llm-client-module"></span><h2>ara.llm.client module<a class="headerlink" href="#module-ara.llm.client" title="Link to this heading">¶</a></h2>
+<p>Thin OpenAI-compatible client wrapper with DeepSeek-specific features.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="ara.llm.client.LLMClient">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">ara.llm.client.</span></span><span class="sig-name descname"><span class="pre">LLMClient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">settings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="ara.config.html#ara.config.AraSettings" title="ara.config.AraSettings"><span class="pre">AraSettings</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ara/llm/client.html#LLMClient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.llm.client.LLMClient" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Wrapper around <code class="xref py py-class docutils literal notranslate"><span class="pre">openai.OpenAI</span></code> that handles role profiles,
+streaming, tool-call accumulation, and DeepSeek-specific options.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>settings</strong> – Application settings instance.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="ara.llm.client.LLMClient.complete">
+<span class="sig-name descname"><span class="pre">complete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">role</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="ara.models.html#ara.models.GameRole" title="ara.models.GameRole"><span class="pre">GameRole</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">system_prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">messages</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">ChatCompletionDeveloperMessageParam</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ChatCompletionSystemMessageParam</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ChatCompletionUserMessageParam</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ChatCompletionAssistantMessageParam</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ChatCompletionToolMessageParam</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ChatCompletionFunctionMessageParam</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tools</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tool_choice</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stream</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_stream</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="ara.models.html#ara.models.StreamResult" title="ara.models.StreamResult"><span class="pre">StreamResult</span></a></span></span><a class="reference internal" href="../_modules/ara/llm/client.html#LLMClient.complete"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.llm.client.LLMClient.complete" title="Link to this definition">¶</a></dt>
+<dd><p>Send a chat-completion request and return a <code class="xref py py-class docutils literal notranslate"><span class="pre">StreamResult</span></code>.</p>
+<p>When <em>stream</em> is <code class="docutils literal notranslate"><span class="pre">True</span></code> the response is consumed incrementally so
+that reasoning content can be printed in real time.  Tool-call deltas
+are stitched together into complete call descriptors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>role</strong> – Role profile controlling temperature.</p></li>
+<li><p><strong>system_prompt</strong> – System message content.</p></li>
+<li><p><strong>messages</strong> – Conversation history (excludes system message).</p></li>
+<li><p><strong>tools</strong> – Optional list of tool schemas.</p></li>
+<li><p><strong>tool_choice</strong> – Optional tool-choice directive (e.g. <code class="docutils literal notranslate"><span class="pre">&quot;required&quot;</span></code>).</p></li>
+<li><p><strong>stream</strong> – Whether to stream the response.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Accumulated result containing content, reasoning content, and
+any tool calls.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ara.llm.client.LLMClient.complete_subagent">
+<span class="sig-name descname"><span class="pre">complete_subagent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system_prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'You</span> <span class="pre">are</span> <span class="pre">a</span> <span class="pre">focused</span> <span class="pre">sub-agent.</span> <span class="pre">Complete</span> <span class="pre">the</span> <span class="pre">task</span> <span class="pre">concisely.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_tokens</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">512</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../_modules/ara/llm/client.html#LLMClient.complete_subagent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.llm.client.LLMClient.complete_subagent" title="Link to this definition">¶</a></dt>
+<dd><p>Run a focused sub-agent task and return the text output.</p>
+<p>This is a simplified non-streaming completion intended for
+summarisation, reflection, and other auxiliary tasks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>task</strong> – The instruction for the sub-agent.</p></li>
+<li><p><strong>context</strong> – Supporting context to ground the task.</p></li>
+<li><p><strong>system_prompt</strong> – Optional override for the system prompt.</p></li>
+<li><p><strong>max_tokens</strong> – Cap on output length.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Generated text (empty string on failure).</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-ara.llm.context">
+<span id="ara-llm-context-module"></span><h2>ara.llm.context module<a class="headerlink" href="#module-ara.llm.context" title="Link to this heading">¶</a></h2>
+<p>Conversation context manager with slice-based entity visibility.</p>
+<p>Each entity (character) only sees messages from rounds in which they were
+present in the scene.  This mimics real-world conversations where off-scene
+characters miss dialogue.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="ara.llm.context.ConversationContext">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">ara.llm.context.</span></span><span class="sig-name descname"><span class="pre">ConversationContext</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">entities</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">injected_context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">ChatCompletionDeveloperMessageParam</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ChatCompletionSystemMessageParam</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ChatCompletionUserMessageParam</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ChatCompletionAssistantMessageParam</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ChatCompletionToolMessageParam</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ChatCompletionFunctionMessageParam</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmp_from</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Self</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ara/llm/context.html#ConversationContext"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.llm.context.ConversationContext" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Manages multi-round conversation history with per-entity visibility.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>entities</strong> – Names of all entities that may participate across the
+lifetime of this context.</p></li>
+<li><p><strong>injected_context</strong> – Messages prepended to every view (e.g. system
+prompts, plot summaries).</p></li>
+<li><p><strong>tmp_from</strong> – If given, create a temporary <em>branch</em> copying state from
+another instance.  Branches can be mutated without affecting the base.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="ara.llm.context.ConversationContext.assistant_message">
+<span class="sig-name descname"><span class="pre">assistant_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tool_calls</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'System'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reasoning_content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Self</span></span></span><a class="reference internal" href="../_modules/ara/llm/context.html#ConversationContext.assistant_message"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.llm.context.ConversationContext.assistant_message" title="Link to this definition">¶</a></dt>
+<dd><p>Append an assistant message.</p>
+<p>DeepSeek thinking-mode compliance is handled automatically:</p>
+<ul class="simple">
+<li><p>If <em>tool_calls</em> is non-empty, <code class="docutils literal notranslate"><span class="pre">reasoning_content</span></code> is <strong>preserved</strong>
+in the message dict because the API requires it on subsequent turns
+that involve tool calls.</p></li>
+<li><p>If <em>tool_calls</em> is empty, <code class="docutils literal notranslate"><span class="pre">reasoning_content</span></code> is <strong>omitted</strong>
+because the API ignores it on non-tool turns.</p></li>
+</ul>
+<p>If the previous message was from an assistant, an empty user padding
+message is inserted automatically to preserve valid API sequencing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>content</strong> – Assistant text.</p></li>
+<li><p><strong>tool_calls</strong> – List of completed tool-call descriptors.</p></li>
+<li><p><strong>name</strong> – Speaker name.</p></li>
+<li><p><strong>reasoning_content</strong> – Raw chain-of-thought text (may be empty).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Self for chaining.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ara.llm.context.ConversationContext.branch">
+<span class="sig-name descname"><span class="pre">branch</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Self</span></span></span><a class="reference internal" href="../_modules/ara/llm/context.html#ConversationContext.branch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.llm.context.ConversationContext.branch" title="Link to this definition">¶</a></dt>
+<dd><p>Return a temporary copy of this context.</p>
+<p>Changes to the branch do not affect the original.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ara.llm.context.ConversationContext.concat_context">
+<span class="sig-name descname"><span class="pre">concat_context</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">ChatCompletionDeveloperMessageParam</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ChatCompletionSystemMessageParam</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ChatCompletionUserMessageParam</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ChatCompletionAssistantMessageParam</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ChatCompletionToolMessageParam</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ChatCompletionFunctionMessageParam</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Self</span></span></span><a class="reference internal" href="../_modules/ara/llm/context.html#ConversationContext.concat_context"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.llm.context.ConversationContext.concat_context" title="Link to this definition">¶</a></dt>
+<dd><p>Replay an existing message list into this context.</p>
+<p>Each message is routed through the appropriate <code class="docutils literal notranslate"><span class="pre">*_message</span></code> method
+so that sequencing rules and reasoning-content stripping are applied.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>context</strong> – Messages to replay.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Self for chaining.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ara.llm.context.ConversationContext.context_of">
+<span class="sig-name descname"><span class="pre">context_of</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">ChatCompletionDeveloperMessageParam</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ChatCompletionSystemMessageParam</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ChatCompletionUserMessageParam</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ChatCompletionAssistantMessageParam</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ChatCompletionToolMessageParam</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ChatCompletionFunctionMessageParam</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/ara/llm/context.html#ConversationContext.context_of"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.llm.context.ConversationContext.context_of" title="Link to this definition">¶</a></dt>
+<dd><p>Return the sub-sequence of messages visible to <em>entity</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>entity</strong> – Entity name.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Filtered message list.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>RuntimeError</strong> – If <em>entity</em> is not tracked.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ara.llm.context.ConversationContext.default_sysname">
+<span class="sig-name descname"><span class="pre">default_sysname</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'System'</span></span><a class="headerlink" href="#ara.llm.context.ConversationContext.default_sysname" title="Link to this definition">¶</a></dt>
+<dd><p>Default name used for system-oriented padding messages.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ara.llm.context.ConversationContext.enter_entities">
+<span class="sig-name descname"><span class="pre">enter_entities</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">entities</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/ara/llm/context.html#ConversationContext.enter_entities"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.llm.context.ConversationContext.enter_entities" title="Link to this definition">¶</a></dt>
+<dd><p>Mark <em>entities</em> as entering the scene.</p>
+<p>From this message index onward, the entities will see new messages.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>RuntimeError</strong> – If an entity is not tracked.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ara.llm.context.ConversationContext.exit_entities">
+<span class="sig-name descname"><span class="pre">exit_entities</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">entities</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/ara/llm/context.html#ConversationContext.exit_entities"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.llm.context.ConversationContext.exit_entities" title="Link to this definition">¶</a></dt>
+<dd><p>Mark <em>entities</em> as exiting the scene.</p>
+<p>Their current visibility slice is closed at the current message index.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>RuntimeError</strong> – If an entity is not tracked.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ara.llm.context.ConversationContext.filter_to">
+<span class="sig-name descname"><span class="pre">filter_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/ara/llm/context.html#ConversationContext.filter_to"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.llm.context.ConversationContext.filter_to" title="Link to this definition">¶</a></dt>
+<dd><p>Destructively filter the working context to <em>entity</em>’s view.</p>
+<p>This is only allowed on a <a class="reference internal" href="#ara.llm.context.ConversationContext.branch" title="ara.llm.context.ConversationContext.branch"><code class="xref py py-meth docutils literal notranslate"><span class="pre">branch()</span></code></a>, not on the base context.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>RuntimeError</strong> – If called on a base context.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ara.llm.context.ConversationContext.to_list">
+<span class="sig-name descname"><span class="pre">to_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">ChatCompletionDeveloperMessageParam</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ChatCompletionSystemMessageParam</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ChatCompletionUserMessageParam</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ChatCompletionAssistantMessageParam</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ChatCompletionToolMessageParam</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ChatCompletionFunctionMessageParam</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/ara/llm/context.html#ConversationContext.to_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.llm.context.ConversationContext.to_list" title="Link to this definition">¶</a></dt>
+<dd><p>Return the full message list for an API call.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>entity</strong> – If given, only messages visible to that entity are
+included after the injected context.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Combined message list.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ara.llm.context.ConversationContext.tool_message">
+<span class="sig-name descname"><span class="pre">tool_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tool_call_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Self</span></span></span><a class="reference internal" href="../_modules/ara/llm/context.html#ConversationContext.tool_message"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.llm.context.ConversationContext.tool_message" title="Link to this definition">¶</a></dt>
+<dd><p>Append a tool-result message.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>content</strong> – Result text.</p></li>
+<li><p><strong>tool_call_id</strong> – ID of the tool call being answered.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Self for chaining.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>RuntimeError</strong> – If the previous message was not an assistant tool
+call.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ara.llm.context.ConversationContext.user_message">
+<span class="sig-name descname"><span class="pre">user_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'System'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Self</span></span></span><a class="reference internal" href="../_modules/ara/llm/context.html#ConversationContext.user_message"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.llm.context.ConversationContext.user_message" title="Link to this definition">¶</a></dt>
+<dd><p>Append a user message.</p>
+<p>If the previous message was not from an assistant or tool, an empty
+assistant padding message is inserted automatically to preserve valid
+API sequencing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>content</strong> – Message text.</p></li>
+<li><p><strong>name</strong> – Speaker name.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Self for chaining.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-ara.llm.tools">
+<span id="ara-llm-tools-module"></span><h2>ara.llm.tools module<a class="headerlink" href="#module-ara.llm.tools" title="Link to this heading">¶</a></h2>
+<p>Tool schema builder and lightweight hook registry.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="ara.llm.tools.ToolRegistry">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">ara.llm.tools.</span></span><span class="sig-name descname"><span class="pre">ToolRegistry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">_hooks:</span> <span class="pre">dict[str,</span> <span class="pre">~typing.Callable[[...],</span> <span class="pre">str]]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ara/llm/tools.html#ToolRegistry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.llm.tools.ToolRegistry" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Simple name-to-callable mapping for tool execution.</p>
+<p>The orchestrator and character agents register their tool implementations
+here.  After the LLM returns tool calls, the registry dispatches each
+call to its registered Python function.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ara.llm.tools.ToolRegistry.call">
+<span class="sig-name descname"><span class="pre">call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../_modules/ara/llm/tools.html#ToolRegistry.call"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.llm.tools.ToolRegistry.call" title="Link to this definition">¶</a></dt>
+<dd><p>Invoke the registered handler for <em>name</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – Tool name.</p></li>
+<li><p><strong>args</strong> – JSON-encoded arguments string.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The handler’s return value, or an error message if the tool
+is not registered.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ara.llm.tools.ToolRegistry.register">
+<span class="sig-name descname"><span class="pre">register</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fn</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/ara/llm/tools.html#ToolRegistry.register"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.llm.tools.ToolRegistry.register" title="Link to this definition">¶</a></dt>
+<dd><p>Register <em>fn</em> as the handler for tool <em>name</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – Tool name exactly as declared in the schema.</p></li>
+<li><p><strong>fn</strong> – Callable that receives the JSON-encoded arguments string
+and returns a string result.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ara.llm.tools.tool">
+<span class="sig-prename descclassname"><span class="pre">ara.llm.tools.</span></span><span class="sig-name descname"><span class="pre">tool</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">properties</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">required</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/ara/llm/tools.html#tool"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.llm.tools.tool" title="Link to this definition">¶</a></dt>
+<dd><p>Build an OpenAI-compatible function-tool schema dict.</p>
+<p>When <em>strict</em> is <code class="docutils literal notranslate"><span class="pre">True</span></code> the dict includes <code class="docutils literal notranslate"><span class="pre">strict:</span> <span class="pre">true</span></code> and
+<code class="docutils literal notranslate"><span class="pre">additionalProperties:</span> <span class="pre">false</span></code> so that DeepSeek’s beta endpoint can
+enforce schema compliance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – Function name exposed to the LLM.</p></li>
+<li><p><strong>description</strong> – Human-readable description of what the tool does.</p></li>
+<li><p><strong>properties</strong> – JSON-schema <code class="docutils literal notranslate"><span class="pre">properties</span></code> mapping for the arguments.</p></li>
+<li><p><strong>required</strong> – List of argument names that must be supplied.</p></li>
+<li><p><strong>strict</strong> – Whether to enable strict JSON-schema mode.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dict suitable for the <code class="docutils literal notranslate"><span class="pre">tools</span></code> parameter of the chat-completion
+API.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">ara</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="ara.html">ara package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ara.world.html">ara.world package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ara.agent.html">ara.agent package</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">ara.llm package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-ara.llm.client">ara.llm.client module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#ara.llm.client.LLMClient"><code class="docutils literal notranslate"><span class="pre">LLMClient</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-ara.llm.context">ara.llm.context module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#ara.llm.context.ConversationContext"><code class="docutils literal notranslate"><span class="pre">ConversationContext</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-ara.llm.tools">ara.llm.tools module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#ara.llm.tools.ToolRegistry"><code class="docutils literal notranslate"><span class="pre">ToolRegistry</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ara.llm.tools.tool"><code class="docutils literal notranslate"><span class="pre">tool()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ara.memory.html">ara.memory package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ara.utils.html">ara.utils package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ara.config.html">ara.config module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ara.models.html">ara.models module</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="ara.agent.html" title="previous chapter">ara.agent package</a></li>
+      <li>Next: <a href="ara.memory.html" title="next chapter">ara.memory package</a></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, Ara Developer.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 9.1.0</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../_sources/api/ara.llm.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

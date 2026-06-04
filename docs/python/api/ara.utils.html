@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>ara.utils package &#8212; ara 0.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=27fed22d" />
+    <script src="../_static/documentation_options.js?v=01f34227"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="ara.config module" href="ara.config.html" />
+    <link rel="prev" title="ara.memory package" href="ara.memory.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-ara.utils">
+<span id="ara-utils-package"></span><h1>ara.utils package<a class="headerlink" href="#module-ara.utils" title="Link to this heading">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
+</section>
+<section id="module-ara.utils.ansi">
+<span id="ara-utils-ansi-module"></span><h2>ara.utils.ansi module<a class="headerlink" href="#module-ara.utils.ansi" title="Link to this heading">¶</a></h2>
+<p>ANSI escape sequences for terminal color formatting.</p>
+</section>
+<section id="module-ara.utils.debug">
+<span id="ara-utils-debug-module"></span><h2>ara.utils.debug module<a class="headerlink" href="#module-ara.utils.debug" title="Link to this heading">¶</a></h2>
+<p>Interactive debug console for the Ara engine.</p>
+<p>Inspired by the old project’s <code class="docutils literal notranslate"><span class="pre">get_user_debug</span></code> hook, the console provides
+real-time introspection into the conversation state, LLM context, and engine
+internals.  It can be triggered automatically every turn or on-demand via
+<code class="docutils literal notranslate"><span class="pre">/command</span></code> or <code class="docutils literal notranslate"><span class="pre">:command</span></code> at the player prompt.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="ara.utils.debug.DebugConsole">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">ara.utils.debug.</span></span><span class="sig-name descname"><span class="pre">DebugConsole</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">engine</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="ara.world.html#ara.world.engine.Engine" title="ara.world.engine.Engine"><span class="pre">Engine</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_pause</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ara/utils/debug.html#DebugConsole"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.utils.debug.DebugConsole" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Lightweight REPL for inspecting engine state during a scene.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>engine</strong> – The <code class="xref py py-class docutils literal notranslate"><span class="pre">Engine</span></code> instance driving the scene.</p></li>
+<li><p><strong>auto_pause</strong> – When <code class="docutils literal notranslate"><span class="pre">True</span></code>, the console opens automatically before
+every turn.  When <code class="docutils literal notranslate"><span class="pre">False</span></code>, it is only invoked on-demand.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="ara.utils.debug.DebugConsole.pause">
+<span class="sig-name descname"><span class="pre">pause</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scene</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="ara.world.html#ara.world.scene.Scene" title="ara.world.scene.Scene"><span class="pre">Scene</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="ara.llm.html#ara.llm.context.ConversationContext" title="ara.llm.context.ConversationContext"><span class="pre">ConversationContext</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">here_chars</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">set</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="ara.world.html#ara.world.character.Character" title="ara.world.character.Character"><span class="pre">Character</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">away_chars</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">set</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="ara.world.html#ara.world.character.Character" title="ara.world.character.Character"><span class="pre">Character</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="ara.world.html#ara.world.scene.Location" title="ara.world.scene.Location"><span class="pre">Location</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">decision</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noshell</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/ara/utils/debug.html#DebugConsole.pause"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.utils.debug.DebugConsole.pause" title="Link to this definition">¶</a></dt>
+<dd><p>Enter the debug console.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>scene</strong> – Current scene.</p></li>
+<li><p><strong>ctx</strong> – Conversation context.</p></li>
+<li><p><strong>here_chars</strong> – Characters present in the scene.</p></li>
+<li><p><strong>away_chars</strong> – Characters away from the scene.</p></li>
+<li><p><strong>loc</strong> – Current location.</p></li>
+<li><p><strong>decision</strong> – The most recent orchestrator decision, if any.</p></li>
+<li><p><strong>noshell</strong> – When non-empty, execute a single command and return
+without entering the interactive REPL.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-ara.utils.logger">
+<span id="ara-utils-logger-module"></span><h2>ara.utils.logger module<a class="headerlink" href="#module-ara.utils.logger" title="Link to this heading">¶</a></h2>
+<p>Coloured logger factory used throughout the Ara engine.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="ara.utils.logger.ColorFormatter">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">ara.utils.logger.</span></span><span class="sig-name descname"><span class="pre">ColorFormatter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fmt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datefmt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'%'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">defaults</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ara/utils/logger.html#ColorFormatter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.utils.logger.ColorFormatter" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Formatter</span></code></p>
+<p>Formatter that applies ANSI colours per log level.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ara.utils.logger.ColorFormatter.FORMATS">
+<span class="sig-name descname"><span class="pre">FORMATS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{10:</span> <span class="pre">'\x1b[37m%(asctime)s</span> <span class="pre">-</span> <span class="pre">%(name)s:</span> <span class="pre">%(levelname)s</span> <span class="pre">-</span> <span class="pre">%(message)s</span> <span class="pre">(%(filename)s:%(lineno)d)\x1b[0m',</span> <span class="pre">20:</span> <span class="pre">'\x1b[92m%(levelname)s</span> <span class="pre">-</span> <span class="pre">%(message)s</span> <span class="pre">(%(filename)s:%(lineno)d)\x1b[0m',</span> <span class="pre">30:</span> <span class="pre">'\x1b[93m%(asctime)s</span> <span class="pre">-</span> <span class="pre">%(name)s:</span> <span class="pre">%(levelname)s</span> <span class="pre">-</span> <span class="pre">%(message)s</span> <span class="pre">(%(filename)s:%(lineno)d)\x1b[0m',</span> <span class="pre">40:</span> <span class="pre">'\x1b[91m%(asctime)s</span> <span class="pre">-</span> <span class="pre">%(name)s:</span> <span class="pre">%(levelname)s</span> <span class="pre">-</span> <span class="pre">%(message)s</span> <span class="pre">(%(filename)s:%(lineno)d)\x1b[0m',</span> <span class="pre">50:</span> <span class="pre">'\x1b[1m\x1b[91m%(asctime)s</span> <span class="pre">-</span> <span class="pre">%(name)s:</span> <span class="pre">%(levelname)s</span> <span class="pre">-</span> <span class="pre">%(message)s</span> <span class="pre">(%(filename)s:%(lineno)d)\x1b[0m'}</span></span><a class="headerlink" href="#ara.utils.logger.ColorFormatter.FORMATS" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ara.utils.logger.ColorFormatter.format">
+<span class="sig-name descname"><span class="pre">format</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">LogRecord</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../_modules/ara/utils/logger.html#ColorFormatter.format"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.utils.logger.ColorFormatter.format" title="Link to this definition">¶</a></dt>
+<dd><p>Format the specified record as text.</p>
+<p>The record’s attribute dictionary is used as the operand to a
+string formatting operation which yields the returned string.
+Before formatting the dictionary, a couple of preparatory steps
+are carried out. The message attribute of the record is computed
+using LogRecord.getMessage(). If the formatting string uses the
+time (as determined by a call to usesTime(), formatTime() is
+called to format the event time. If there is exception information,
+it is formatted using formatException() and appended to the message.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ara.utils.logger.get_logger">
+<span class="sig-prename descclassname"><span class="pre">ara.utils.logger.</span></span><span class="sig-name descname"><span class="pre">get_logger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Logger</span></span></span><a class="reference internal" href="../_modules/ara/utils/logger.html#get_logger"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.utils.logger.get_logger" title="Link to this definition">¶</a></dt>
+<dd><p>Create or retrieve a logger with a coloured stream handler.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – Logger name ( conventionally <code class="docutils literal notranslate"><span class="pre">__name__</span></code>).</p></li>
+<li><p><strong>level</strong> – Optional override.  When <code class="docutils literal notranslate"><span class="pre">None</span></code>, the level defaults to
+<code class="xref py py-data docutils literal notranslate"><span class="pre">logging.DEBUG</span></code> when Python is run without <code class="docutils literal notranslate"><span class="pre">-O</span></code>, otherwise
+<code class="xref py py-data docutils literal notranslate"><span class="pre">logging.INFO</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Configured logger instance.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">ara</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="ara.html">ara package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ara.world.html">ara.world package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ara.agent.html">ara.agent package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ara.llm.html">ara.llm package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ara.memory.html">ara.memory package</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">ara.utils package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-ara.utils.ansi">ara.utils.ansi module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-ara.utils.debug">ara.utils.debug module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#ara.utils.debug.DebugConsole"><code class="docutils literal notranslate"><span class="pre">DebugConsole</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-ara.utils.logger">ara.utils.logger module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#ara.utils.logger.ColorFormatter"><code class="docutils literal notranslate"><span class="pre">ColorFormatter</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ara.utils.logger.get_logger"><code class="docutils literal notranslate"><span class="pre">get_logger()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ara.config.html">ara.config module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ara.models.html">ara.models module</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="ara.memory.html" title="previous chapter">ara.memory package</a></li>
+      <li>Next: <a href="ara.config.html" title="next chapter">ara.config module</a></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, Ara Developer.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 9.1.0</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../_sources/api/ara.utils.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
