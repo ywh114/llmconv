@@ -1,0 +1,121 @@
+category = "elemental"
+# Fire-elemental ability entries.
+
+prefix_values = [
+    { value = "pyro", prefixable = false, suffixible = true },
+    { value = "igni", prefixable = false, suffixible = true },
+]
+
+suf_values = [
+    { value = "", prefixable = true, suffixible = false},
+]
+
+domain_values = [
+    { value = "inferno", prefixable = false, suffixible = false },
+    { value = "ash", prefixable = false, suffixible = false },
+    { value = "scalding", prefixable = false, suffixible = false },
+    { value = "cinder", prefixable = false, suffixible = false },
+    { value = "wildfire", prefixable = false, suffixible = false },
+    { value = "magma", prefixable = false, suffixible = false },
+]
+
+fire_melee_values = [
+    { value = "scorch", prefixable = false, suffixible = false },
+    { value = "blaze", prefixable = false, suffixible = false },
+]
+
+fire_area_values = [
+    { value = "explosion", prefixable = false, suffixible = false },
+    { value = "eruption", prefixable = false, suffixible = false },
+    { value = "airburst", prefixable = false, suffixible = false },
+]
+
+fire_ranged_values = [
+    { value = "incineration", prefixable = false, suffixible = false },
+    { value = "blast", prefixable = false, suffixible = false },
+    { value = "eruption", prefixable = false, suffixible = false },
+    { value = "torrent", prefixable = false, suffixible = false },
+]
+
+fire_status_values = [
+    { value = "kindle", prefixable = false, suffixible = false },
+    { value = "immolation", prefixable = false, suffixible = false },
+]
+
+fire_defence_values = [
+    { value = "backdraft", prefixable = false, suffixible = false },
+    { value = "smother", prefixable = false, suffixible = false },
+]
+
+fire_movement_values = [
+    { value = "propellent", prefixable = false, suffixible = false },
+]
+
+verb_values = [
+]
+
+noun_values = [
+    { value = "pyre", prefixable = false, suffixible = false },
+    { value = "ember", prefixable = false, suffixible = false },
+    { value = "inferno", prefixable = false, suffixible = false },
+    { value = "magma", prefixable = false, suffixible = false },
+    { value = "blaze", prefixable = false, suffixible = true },
+    { value = "cinder", prefixable = false, suffixible = true },
+    { value = "flare", prefixable = false, suffixible = true },
+    { value = "rocket", prefixable = false, suffixible = true },
+]
+
+adj_values = [
+    { value = "searing", prefixable = false, suffixible = false },
+    { value = "blazing", prefixable = false, suffixible = false },
+    { value = "scorching", prefixable = false, suffixible = false },
+    { value = "smoldering", prefixable = false, suffixible = false },
+    { value = "blistering", prefixable = false, suffixible = false },
+    { value = "burning", prefixable = false, suffixible = false },
+    { value = "roaring", prefixable = false, suffixible = false },
+    { value = "flaming", prefixable = false, suffixible = false },
+]
+
+
+[["melee"]]
+patterns = ["{fire_melee_values}"]
+
+[["area"]]
+patterns = ["{fire_area_values}"]
+
+[["ranged"]]
+patterns = ["{fire_ranged_values}"]
+
+[["status"]]
+patterns = ["{fire_status_values}"]
+
+[["defence"]]
+patterns = ["{fire_defence_values}"]
+
+[[expose]]
+slot = "suf"
+from = ["suf_values"]
+
+[[expose]]
+slot = "prefix"
+from = ["prefix_values"]
+
+[[expose]]
+slot = "domain"
+from = ["domain_values"]
+
+[[expose]]
+slot = "technique"
+from = ["melee", "area", "ranged", "status", "defence", "movement"]
+
+[[expose]]
+slot = "verb"
+from = ["verb_values"]
+
+[[expose]]
+slot = "noun"
+from = ["noun_values"]
+
+[[expose]]
+slot = "adj"
+from = ["adj_values"]

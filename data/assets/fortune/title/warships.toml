@@ -1,0 +1,67 @@
+ship_adj = [
+    { value = "fleet", prefixable = true, suffixible = true },
+    { value = "stealth", prefixable = true, suffixible = true },
+    { value = "amphibious assault", prefixable = false, suffixible = false },
+    { value = "guided missile", prefixable = false, suffixible = false },
+    { value = "nuclear", prefixable = true, suffixible = true },
+    { value = "fast attack", prefixable = false, suffixible = false },
+    { value = "heavy", prefixable = true, suffixible = true },
+    { value = "light", prefixable = true, suffixible = true },
+]
+ship_noun = [
+    { value = "destroyer", prefixable = true, suffixible = true },
+    { value = "frigate", prefixable = true, suffixible = true },
+    { value = "cruiser", prefixable = true, suffixible = true },
+    { value = "battleship", prefixable = true, suffixible = true },
+    { value = "carrier", prefixable = true, suffixible = true },
+    { value = "fleet carrier", prefixable = false, suffixible = false },
+    { value = "submarine", prefixable = true, suffixible = true },
+    { value = "attack submarine", prefixable = false, suffixible = false },
+    { value = "ballistic missile submarine", prefixable = false, suffixible = false },
+    { value = "corvette", prefixable = true, suffixible = true },
+    { value = "amphibious assault ship", prefixable = false, suffixible = false },
+]
+rank = [
+    { value = "captain", prefixable = true, suffixible = true },
+    { value = "admiral", prefixable = true, suffixible = true },
+    { value = "commander", prefixable = true, suffixible = true },
+    { value = "commodore", prefixable = true, suffixible = true },
+    { value = "lieutenant", prefixable = true, suffixible = true },
+    { value = "ensign", prefixable = true, suffixible = true },
+]
+
+ship_suf = [
+    { value = 'born', prefixable = true, suffixible = true },
+    { value = 'kin', prefixable = true, suffixible = true },
+    { value = 'kind', prefixable = true, suffixible = true },
+    { value = 'craft', prefixable = true, suffixible = true },
+]
+
+[[noun]]
+patterns = [
+    "{ship_adj} {ship_noun}",
+]
+
+[[expose]]
+slot = "adj"
+from = [
+    "ship_adj",
+]
+
+[[expose]]
+slot = "noun"
+from = [
+    "ship_noun",
+    "noun",
+]
+
+[[expose]]
+slot = "rank"
+from = [
+    "rank",
+]
+[[expose]]
+slot = "suf"
+from = [
+    "ship_suf",
+]

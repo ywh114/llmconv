@@ -1,0 +1,4 @@
+title = "Location Test"
+description = "Smoke test for the lc/ location asset system."
+author = "Ara"
+first_scene = "scene"

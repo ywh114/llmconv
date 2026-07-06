@@ -1,0 +1,16 @@
+importance = "REQUIRED"
+title = "Heavy Cruiser"
+sprites = ["default_neutral", "default_xneutral"]
+default_sprite = "default_neutral"
+
+[default_neutral]
+topleft = [243, 124]
+bottomright = [843, 740]
+center = [571, 442]
+focus = [[567, 204, 101]]
+
+[default_xneutral]
+topleft = [243, 124]
+bottomright = [843, 740]
+center = [571, 442]
+focus = [[567, 204, 101], [510, 315, 70], [571, 443, 70], [582, 846, 144]]

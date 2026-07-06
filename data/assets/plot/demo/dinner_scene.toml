@@ -1,0 +1,39 @@
+id = "dinner_scene"
+name = "A Dinner"
+language = "en"
+zeitgeist = "stability"
+tone = "温馨; warm color palette"
+
+[character]
+pool = ["Attilio Regolo", "Andrea Doria", "Noshiro", "Cheshire", "Champagne", "Commander", "Akashi"]
+inits = ["Noshiro", "Attilio Regolo", "Andrea Doria", "Cheshire", "Champagne", "Commander"]
+player = "Commander"
+narrator = "Akashi"
+
+[character.sprites]
+"Attilio Regolo" = "work_neutral"
+"Andrea Doria" = "default_neutral"
+Noshiro = "year_neutral"
+Cheshire = "default_neutral"
+Champagne = "white_neutral"
+Commander = "none"
+Akashi = "default_neutral"
+
+[location]
+pool = ["front_porch", "dining_room", "living_room"]
+init = "front_porch"
+
+[plot]
+considerations = "Debug scene"
+scene = """(1)
+This scene is incomplete, make them converse about something.
+Example topics:  cat species
+
+It's around 6 PM.
+"""
+
+[plot.next]
+considerations = "None"
+
+[plot.next.dinner_scene]
+desc = "The story ends."

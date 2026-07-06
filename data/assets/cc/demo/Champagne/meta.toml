@@ -1,0 +1,22 @@
+importance = "REQUIRED"
+title = "Battleship"
+sprites = ["default_neutral", "white_neutral", "white_xneutral"]
+default_sprite = "default_neutral"
+
+[default_neutral]
+topleft = [760, 641]
+bottomright = [1360, 1413]
+center = [1087, 1024]
+focus = [[961, 736, 128]]
+
+[white_neutral]
+topleft = [400, 751]
+bottomright = [900, 1648]
+center = [685, 1290]
+focus = [[686, 860, 118]]
+
+[white_xneutral]
+topleft = [400, 751]
+bottomright = [900, 1648]
+center = [685, 1290]
+focus = [[686, 860, 118], [692, 1025, 144], [867, 1839, 139]]

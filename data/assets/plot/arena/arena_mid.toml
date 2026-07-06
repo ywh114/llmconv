@@ -1,0 +1,221 @@
+# Arena — Scene 2: The Broken Ladder
+# Three teams from incompatible worlds. Afternoon match.
+
+id = "arena_mid"
+name = "The Infinite Arena"
+time = "afternoon"
+zeitgeist = "bloodsport; spectacle; cruelty; drama; eternal return"
+tone = "marble and sand; roaring crowds; spray of blood; cinematic narration; arena always hungry; clash of worlds; culture war made flesh"
+
+[character]
+pool = ["Cassius", "Lyra", "Spectator", "Narrator", "Crowd"]
+inits = ["Cassius", "Lyra", "Spectator", "Narrator", "Crowd"]
+player = "Spectator"
+narrator = "Narrator"
+
+[character.sprites]
+Cassius = "none"
+Lyra = "none"
+Spectator = "none"
+Narrator = "none"
+
+[location]
+pool = ["arena"]
+init = "arena"
+
+[plot]
+considerations = """
+- Orchestrator uses fortune_title, fortune_ability, fortune_roll,
+  fortune_random, fortune_iching, spawn_anonymous, update_status_page, next_round.
+- Use probability distributions (via fortune_random) where appropriate to model
+  uncertain outcomes that don't need a binary pass/fail roll.
+
+- Use the fighter's full name as their handle everywhere — status bars, text
+  labels, directives, and your own reasoning. Not the title.
+
+- When a fighter dies, exit them immediately and add their handle to a "Dead"
+  text section on the free status page. Keep this section updated — remove
+  none, only append. A fighter in the Dead section never speaks, acts, or
+  appears in narration except as a corpse.
+
+- fortune_title generates visible titles; a fighter's abilities, personality,
+  and combat style derive from their title AND their team's flavor combination.
+  Each team uses a different flavor combo (see scene instructions).
+
+- Power level from title. Assign HP based on what the title suggests — a
+  massive warship title means 300-500 HP, a frail clerk means 10-30 HP, a
+  knight means 80-120 HP. Huge outliers are expected and good.
+  "Nuclear Deterrence Battleship" one-shots anything. "Democrat Lawyer" argues,
+  maybe wins on a technicality, but takes a single hit and dies. A "Black Hole"-related
+  character always one-shots an "Ultimate Troll". If HP hits 0, fighter is dead.
+  always one-shots an "Ultimate Troll". If HP hits 0, fighter is dead. Narrate
+  the kill, exit dead fighters, end the match.
+
+- Internal stats. Before the fight, choose a set of universal combat-relevant
+  stat categories and apply the SAME set to every fighter in this match. The
+  categories can be renamed to fit the tone, but they must measure abilities
+  every fighter actually has so the numbers are comparable across the whole
+  field. Assign values that express relative strengths and weaknesses; higher
+  is better, lower is worse, and a fighter with double the value should feel
+  roughly twice as strong in that area. Record every fighter's ratings in a
+  "Stats" text section on the free status page.
+
+- Stat bonus. When resolving an action, compute a bonus from the relevant
+  stat and add it to the 2d100 roll total. For a positive stat S: bonus ≈
+  ln(S)^3.6 (~+50 at S=20, ~+20 at S=10, ~+6 at S=5). For a negative
+  stat: bonus ≈ -ln(|S|)^3.6 (same magnitudes reversed). The threshold is
+  set independently based on ability strength, situation difficulty, and
+  your discretion — the stat bonus just makes the roll more or less likely
+  to reach it. A fighter with -10 in the relevant stat can still attempt the
+  action, but the penalty makes it nearly impossible to hit the threshold.
+
+  You MUST consider stat bonuses for every action, and you MUST roll for
+  outcomes. Making a descision without rolling and adding stat bonuses is
+  strictly forbidden.
+
+  Before setting the success threshold at 50%, you must answer the question: is
+  this action really suitable for a 50/50? The answer is oftentimes no, be very
+  careful.
+
+- fortune_ability generates each fighter's signature "killer moves." For each
+  fighter, roll 2d2 to get N (2-4 abilities) and call fortune_ability once with
+  count=N, require=["domain","technique"], level="moderate", verbose=true,
+  using the team's flavor and slot restrictions below. Match domain to the
+  fighter's title world and technique delivery to their combat style. Assign
+  the returned abilities to that fighter; do not mix them into a shared pool.
+
+  Team 1 abilities: flavor="void,plague_doctor,corporate,office",
+  slot={"domain":["void"],"technique":["corporate","office"]}.
+
+  Team 2 abilities: flavor="food,fire,water,melee,jrpg",
+  slot={"domain":["food"],"technique":["melee","fire","water"]}.
+
+  Team 3 abilities: flavor="quantum,tfr,ranged,space,defence",
+  slot={"domain":["quantum"],"technique":["ranged","space","tfr"]}.
+
+- Status page format (target: free). Build one page with title "Fighters" and
+  sections merged by type:label:
+  - HP: type="bars", label="HP", items=[{"label": handle, "value": hp, "max": max}, ...].
+  - Stats: type="text", label="Stats", items=["handle: stat1 +N, stat2 +M", ...].
+  - Abilities: one type="skills" section per fighter, label=handle,
+    items=[ability name strings].
+  - Dead: type="text", label="Dead", items=[handle strings], append-only.
+
+- The Narrator has NO knowledge of which characters are fighters unless you
+  explicitly name them in the directive. Always include the full list of
+  fighter names, their titles, AND their team affiliation in the Narrator's
+  directive when asking it to describe entrances or battle events.
+
+- fortune_suite produces many randomness sources that average each other out —
+  avoid calling it. Instead, use a different fortune tool each round: rotate
+  between fortune_random and fortune_roll for variety.
+
+- CRITICAL: Fortune tools are YOUR private DM dice. Their raw output — especially
+  random words and dice results — MUST NEVER be
+  echoed, quoted, summarized, or alluded to in ANY character directive, narration
+  instruction, or suggestion. Characters do not know about dice or
+  random number generators. The fortune output goes to YOU and dies with you.
+
+- fortune_roll(n, m, ...) resolves every decisive action.
+  Before rolling, state the survival threshold explicitly.
+
+- Use update_status_page (target: free) to store health bars, metadata etc. Note
+  that this is just for you to keep track of things, it is not shown publicly.
+
+- Narrator produces narration. Cassius/Lyra commentate on the culture clash
+  between teams — play up the absurd contrast of different worlds colliding.
+  Fighters may take turns acting/speaking.
+
+- Spectator gets turns to react between beats, but do not give the player
+  back-to-back turns.
+"""
+
+scene = """
+Avoid purple prose and LLM 'slop'. Keep it realistic, barring the absurd
+characters that may appear. You are a tabletop DM.
+
+Characters should narrate from their own point of view. You should explicitly
+tell them not to narrate actions you haven't told them to do.
+
+These are death battles, so characters should not be too prosy. The only
+exception is if their title is explicitly very prosy.
+- Characters narrate the attack itself, not the aftermath. "I swing — " not
+  "He staggers back from the wound I just gave him."
+
+TEAM SETUP (once per batch):
+- This is a 2v2v2 team battle. Three teams of two fighters each, six
+  fighters total. Each team draws from a different world — a different set
+  of title flavor combinations, surgically mixed using slot restrictions.
+  Flavors determine a fighter's entire vibe: visual style, vernacular,
+  values, and combat logic.
+
+  Team 1 (Eldritch Administration): fortune_title(
+    flavor="plague_doctor,corporate,administrative_division",
+    require=["place"],
+    slot={"adj":["plague_doctor"],"rank":["corporate"],"place":["administrative_division"]}
+  ).
+
+  Team 2 (Gastronomic Feudalism): fortune_title(
+    flavor="french_food,feudal,jrpg",
+    require=["place","thing"],
+    slot={"class":["french_food"],"rank":["feudal"],"place":["jrpg"]}
+  ).
+
+  Team 3 (Helldiver Physics): fortune_title(
+    flavor="super_earth,standard_model,tfr",
+    require=["place"],
+    slot={"rank":["super_earth"],"place":["super_earth"],"thing":["standard_model"]}
+  ).
+
+- Generate two fighters per team (six total): call fortune_name and the
+  team's fortune_title for each. Spawn them all with spawn_anonymous; each
+  fighter must include a one-line `description` (required by the tool).
+
+- Team affiliation is visible: tell the Narrator which fighters belong to
+  which team when describing their entrances. Use team-coloured banners
+  or marks to distinguish them (e.g. sick-purple for Administration,
+  butter-gold for Gastronomy, democratic-blue for Helldiver Physics).
+
+- Use the names and titles exactly as generated — never shorten, abbreviate,
+  or nick-name them.
+
+- Fighters should be caricatures of their titles and their team's world.
+  A plague-masked auditor should treat combat like a performance
+  review. A sauce-knight should judge opponents by their marbling and
+  reduction technique. A helldiver physicist should yell about gauge
+  invariance and the liberation of managed democracy.
+
+- For flavour: use a single fortune tool per round, rotating — fortune_random
+  one round, fortune_roll the next, etc. Don't call fortune_suite.
+
+- Narrator describes entrance. Then give Spectator a turn to react.
+
+BATTLE (loop until one team remains):
+- fortune_roll resolves every decisive action. Track HP, decide damage,
+  saves, detection, and roll. State the survival threshold before rolling.
+- "Nuclear Deterrence Battleship" one-shots anything. "Democrat Lawyer"
+  argues, maybe wins on a technicality, but takes a single hit and dies.
+  If HP hits 0, fighter is dead. Narrate the kill, exit dead fighters.
+- Fighters get turns to act/speak. Narrator describes based on roll results.
+- Cassius/Lyra commentate on the culture clash between teams — the absurdity
+  of a plague-masked bureaucrat fighting a barnaise-wielding duke fighting
+  a gauge-boson-believing super-patriot.
+- Spectator reacts between beats.
+
+MATCH END:
+- When only one team has living members, the match ends. Exit dead fighters.
+  Narrator describes the victory. Crowd roars.
+- End the scene by calling next_round with end_scene=true and next_scene="arena_fin".
+"""
+
+[plot.next]
+considerations = "The flavor clash is decided. Advance to the final spectacle."
+
+[plot.next.arena_fin]
+prereq_scenes = ["arena_ini", "arena_mid"]
+desc = "Proceed to the final spectacle."
+summarizer_considerations = "Summarize the three-team clash. Note which team won and how the different flavor worlds fared against each other."
+
+[plot.next.fin_scene]
+desc = "End the story. The arena falls silent."
+summarizer_considerations = "Write a closing summary for the continuing characters and the crowd dispersing into the infinite stands."

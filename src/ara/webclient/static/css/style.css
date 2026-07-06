@@ -45,69 +45,120 @@ html, body {
   inset: 0;
   z-index: 2;
   pointer-events: none;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  padding-bottom: 180px;
 }
 
+/* Sprite slot positioning is driven by JS through these custom properties. */
 .vn-sprite {
   position: absolute;
-  bottom: 180px;
-  height: var(--vn-sprite-height);
+  --slot-left: 50;
+  --slot-top: 100;
+  --slot-scale: 1;
+  --sprite-translate-x: -50%;
+  left: calc(var(--slot-left) * 1%);
+  top: calc(var(--slot-top) * 1%);
+  height: calc(var(--vn-sprite-height) * var(--slot-scale));
   width: auto;
   object-fit: contain;
+  transform: translate(var(--sprite-translate-x), calc(-100% + 3vh));
   transition: opacity var(--vn-fade-duration) ease-in-out,
-              transform var(--vn-slide-duration) ease-out;
+              transform var(--vn-slide-duration) ease-out,
+              left var(--vn-slide-duration) ease-out,
+              top var(--vn-slide-duration) ease-out,
+              height var(--vn-slide-duration) ease-out;
   filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));
 }
 
 .vn-sprite.vn-hidden {
   opacity: 0;
-  transform: translateY(20px);
+  transform: translate(var(--sprite-translate-x), calc(-100% + 20px + 3vh));
 }
 
 .vn-sprite.vn-speaking {
   filter: drop-shadow(0 0 16px var(--vn-border-glow))
           drop-shadow(0 4px 12px rgba(0,0,0,0.4));
-  transform: translateY(-8px);
+  transform: translate(var(--sprite-translate-x), calc(-100% - 8px + 3vh));
 }
-
-.vn-sprite[data-position="center"].vn-speaking {
-  transform: translateX(-50%) translateY(-8px);
-}
-
-.vn-sprite[data-position="left"]   { left: 5%; }
-.vn-sprite[data-position="center"] { left: 50%; transform: translateX(-50%); }
-.vn-sprite[data-position="right"]  { right: 5%; }
 
 /* -------------------------------------------------------------------
    Cropped sprite (full image visible, scaled by crop region)
    ------------------------------------------------------------------- */
 .vn-sprite-crop {
   position: absolute;
-  bottom: 180px;
-  height: var(--vn-sprite-height);
-  transition: opacity var(--vn-fade-duration) ease-in-out;
+  --slot-left: 50;
+  --slot-top: 100;
+  --slot-scale: 1;
+  --sprite-translate-x: -50%;
+  left: calc(var(--slot-left) * 1%);
+  top: calc(var(--slot-top) * 1%);
+  height: calc(var(--vn-sprite-height) * var(--slot-scale));
+  transform: translate(var(--sprite-translate-x), calc(-100% + 3vh));
+  transition: opacity var(--vn-fade-duration) ease-in-out,
+              transform var(--vn-slide-duration) ease-out,
+              left var(--vn-slide-duration) ease-out,
+              top var(--vn-slide-duration) ease-out,
+              height var(--vn-slide-duration) ease-out;
 }
 
 .vn-sprite-crop.vn-hidden {
   opacity: 0;
+  transform: translate(var(--sprite-translate-x), calc(-100% + 20px + 3vh));
 }
-
-.vn-sprite-crop[data-position="left"]   { left: 5%; }
-.vn-sprite-crop[data-position="center"] { left: 50%; transform: translateX(-50%); }
-.vn-sprite-crop[data-position="right"]  { right: 5%; }
 
 .vn-sprite-crop img {
   position: absolute;
   bottom: 0;
   left: 0;
   transform-origin: bottom left;
-  transition: filter var(--vn-slide-duration) ease-out;
+  transition: filter var(--vn-slide-duration) ease-out,
+              transform var(--vn-slide-duration) ease-out;
 }
 
 .vn-sprite-crop.vn-speaking img {
+  filter: drop-shadow(0 0 16px var(--vn-border-glow))
+          drop-shadow(0 4px 12px rgba(0,0,0,0.4));
+}
+
+/* -------------------------------------------------------------------
+   Zoom-call layout (9+ characters): circular profile pictures
+   ------------------------------------------------------------------- */
+#vn-sprites.vn-zoom-layout {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1rem;
+  padding: 1rem;
+  align-content: end;
+  align-items: end;
+}
+
+.vn-sprite-crop.vn-zoom {
+  position: relative;
+  left: auto;
+  top: auto;
+  height: auto;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  overflow: hidden;
+  transform: none;
+  transition: opacity var(--vn-fade-duration) ease-in-out;
+}
+
+.vn-sprite-crop.vn-zoom img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform-origin: center center;
+  transition: transform 0.5s ease-out, filter var(--vn-slide-duration) ease-out;
+}
+
+.vn-sprite-crop.vn-zoom.vn-speaking {
+  box-shadow: 0 0 0 4px var(--vn-gold-dark),
+              0 0 20px var(--vn-border-glow);
+}
+
+.vn-sprite-crop.vn-zoom.vn-speaking img {
   filter: drop-shadow(0 0 16px var(--vn-border-glow))
           drop-shadow(0 4px 12px rgba(0,0,0,0.4));
 }
@@ -146,9 +197,18 @@ html, body {
   font-family: var(--vn-font-display);
   font-size: var(--vn-font-size-name);
   color: var(--vn-name);
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.1rem;
   text-shadow: 0 1px 4px rgba(0,0,0,0.6);
   min-height: 1.5em;
+}
+
+#vn-speaker-title {
+  font-family: var(--vn-font-display);
+  font-size: 0.75rem;
+  color: var(--vn-text-muted);
+  margin-bottom: 0.5rem;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+  min-height: 1.2em;
 }
 
 #vn-text {
@@ -172,6 +232,40 @@ html, body {
 
 @keyframes vn-blink {
   50% { opacity: 0; }
+}
+
+#vn-controls {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+  padding-top: 0.4rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  pointer-events: auto;
+}
+
+.vn-control-btn {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--vn-gold-dark);
+  border-radius: 4px;
+  color: var(--vn-text);
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0.3rem 0.5rem;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s ease, background 0.2s ease;
+}
+
+.vn-control-btn:hover {
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.vn-control-btn.active {
+  opacity: 1;
+  background: rgba(212, 175, 55, 0.25);
+  border-color: var(--vn-gold);
 }
 
 /* -------------------------------------------------------------------
@@ -222,6 +316,26 @@ html, body {
   width: 100%;
   max-width: var(--vn-choice-max-width);
   margin-top: 1rem;
+}
+
+.vn-attempt-input {
+  width: 100%;
+  max-width: var(--vn-choice-max-width);
+  min-height: 4rem;
+  margin-top: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: var(--vn-bg-overlay);
+  border: 1px solid var(--vn-gold-dark);
+  border-radius: var(--vn-dialogue-border-radius);
+  color: var(--vn-text);
+  font-family: var(--vn-font-body);
+  font-size: var(--vn-font-size-choice);
+  outline: none;
+  resize: vertical;
+}
+
+.vn-attempt-input:focus {
+  border-color: var(--vn-gold);
 }
 
 .vn-custom-input {
@@ -441,26 +555,195 @@ html, body {
 }
 
 /* -------------------------------------------------------------------
-   Auto mode badge
+   System / player status overlay
    ------------------------------------------------------------------- */
-#vn-auto-badge {
+#vn-system {
   position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
-  z-index: 45;
+  inset: 0;
+  z-index: 56;
   display: none;
-  padding: 0.25rem 0.6rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
   background: var(--vn-bg-overlay);
-  border: 1px solid var(--vn-gold-dark);
-  border-radius: 4px;
-  color: var(--vn-gold);
-  font-size: 0.75rem;
-  letter-spacing: 1px;
-  pointer-events: none;
+  backdrop-filter: blur(8px);
+  padding: 2rem;
+  overflow-y: auto;
 }
 
-#vn-auto-badge.vn-visible {
+#vn-system.vn-visible {
+  display: flex;
+}
+
+#vn-system h2 {
+  font-family: var(--vn-font-display);
+  color: var(--vn-gold);
+  margin-bottom: 1.5rem;
+  letter-spacing: 2px;
+}
+
+#vn-system-content {
+  width: 100%;
+  max-width: 800px;
+  display: grid;
+  gap: 1.5rem;
+}
+
+.vn-system-section {
+  background: var(--vn-bg-panel);
+  border: 1px solid var(--vn-gold-dark);
+  border-radius: 6px;
+  padding: 1rem;
+}
+
+.vn-system-section h3 {
+  color: var(--vn-gold);
+  margin-bottom: 0.75rem;
+  font-weight: normal;
+}
+
+.vn-system-bar {
+  margin-bottom: 0.5rem;
+}
+
+.vn-system-bar label {
   display: block;
+  color: var(--vn-text-muted);
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+}
+
+.vn-system-bar-track {
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 4px;
+  height: 12px;
+  overflow: hidden;
+}
+
+.vn-system-bar-fill {
+  background: var(--vn-gold);
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.vn-system-list {
+  list-style: none;
+  color: var(--vn-text);
+  line-height: 1.6;
+}
+
+.vn-system-list li {
+  padding: 0.25rem 0;
+  border-bottom: 1px solid rgba(201, 169, 110, 0.1);
+}
+
+.vn-system-item-has-desc {
+  cursor: pointer;
+  position: relative;
+  padding-left: 1rem;
+}
+
+.vn-system-item-has-desc::before {
+  content: '▸';
+  position: absolute;
+  left: 0;
+  color: var(--vn-gold);
+  transition: transform 0.2s ease;
+}
+
+.vn-system-item-expanded::before {
+  transform: rotate(90deg);
+}
+
+.vn-system-item-desc {
+  display: none;
+  margin-top: 0.25rem;
+  padding: 0.5rem;
+  background: rgba(0, 0, 0, 0.3);
+  border-left: 2px solid var(--vn-gold-dark);
+  border-radius: 0 4px 4px 0;
+  color: var(--vn-text-muted);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.vn-system-item-expanded .vn-system-item-desc {
+  display: block;
+}
+
+.vn-system-item-important {
+  border: 1px solid rgba(201, 169, 110, 0.4);
+  border-radius: 4px;
+  padding: 0.35rem 0.5rem;
+  margin-bottom: 0.35rem;
+  background: rgba(201, 169, 110, 0.08);
+}
+
+.vn-system-item-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.vn-system-item-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  object-fit: contain;
+  filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.5));
+}
+
+.vn-system-item-name {
+  color: var(--vn-gold);
+  font-weight: 600;
+}
+
+.vn-system-item-qty {
+  margin-left: auto;
+  color: var(--vn-text-muted);
+  font-size: 0.85rem;
+}
+
+.vn-system-item-tags {
+  margin-top: 0.25rem;
+  font-size: 0.8rem;
+  color: var(--vn-text-muted);
+  font-style: italic;
+}
+
+/* -------------------------------------------------------------------
+   Loading overlay
+   ------------------------------------------------------------------- */
+#vn-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 100;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--vn-bg-overlay);
+  backdrop-filter: blur(4px);
+}
+#vn-loading.vn-visible {
+  display: flex;
+}
+.vn-loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--vn-gold-dark);
+  border-top-color: var(--vn-gold);
+  border-radius: 50%;
+  animation: vn-spin 1s linear infinite;
+}
+@keyframes vn-spin {
+  to { transform: rotate(360deg); }
+}
+.vn-loading-text {
+  margin-top: 1rem;
+  color: var(--vn-gold);
+  font-family: var(--vn-font-body);
+  font-size: 1rem;
 }
 
 /* -------------------------------------------------------------------
@@ -487,4 +770,248 @@ html, body {
    ------------------------------------------------------------------- */
 .vn-hidden {
   display: none !important;
+}
+
+/* -------------------------------------------------------------------
+   Save/Load panel
+   ------------------------------------------------------------------- */
+#vn-saveload {
+  position: absolute;
+  inset: 0;
+  z-index: 55;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--vn-bg-overlay);
+  backdrop-filter: blur(8px);
+  padding: 2rem;
+}
+#vn-saveload.vn-visible {
+  display: flex;
+}
+#vn-saveload h2 {
+  font-family: var(--vn-font-title);
+  color: var(--vn-gold);
+  margin-bottom: 1rem;
+}
+#vn-saveload-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  max-width: 800px;
+  width: 100%;
+}
+.vn-saveload-cell {
+  background: var(--vn-bg-panel);
+  border: 1px solid var(--vn-gold-dark);
+  border-radius: 6px;
+  padding: 1rem;
+  cursor: default;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+.vn-saveload-cell:hover {
+  transform: scale(1.03);
+  border-color: var(--vn-gold);
+}
+.vn-saveload-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(20, 20, 40, 0.95);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+}
+.vn-saveload-cell:hover .vn-saveload-overlay {
+  display: flex;
+}
+.vn-saveload-overlay .vn-title-btn {
+  font-size: 0.85rem;
+  padding: 0.4rem 0.8rem;
+  width: 100%;
+  margin: 0.15rem 0;
+}
+.vn-saveload-overlay .vn-title-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.vn-saveload-slot {
+  font-weight: bold;
+  color: var(--vn-gold);
+  font-size: 0.9rem;
+}
+.vn-saveload-slot.empty {
+  color: var(--vn-text-muted);
+}
+.vn-saveload-scene {
+  font-size: 0.8rem;
+  color: var(--vn-text);
+  margin-top: 0.25rem;
+}
+.vn-saveload-time {
+  font-size: 0.7rem;
+  color: var(--vn-text-muted);
+  margin-top: 0.25rem;
+}
+
+/* -------------------------------------------------------------------
+   Debug panel
+   ------------------------------------------------------------------- */
+#vn-debug {
+  position: absolute;
+  inset: 0;
+  z-index: 35;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--vn-bg-overlay);
+  backdrop-filter: blur(8px);
+  padding: 2rem;
+}
+#vn-debug.vn-visible {
+  display: flex;
+}
+#vn-debug h2 {
+  font-family: var(--vn-font-title);
+  color: var(--vn-gold);
+  margin-bottom: 1rem;
+}
+.vn-debug-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 640px;
+  margin-bottom: 0.75rem;
+}
+.vn-debug-row input,
+.vn-debug-row button {
+  height: 40px;
+  box-sizing: border-box;
+}
+.vn-debug-row input {
+  flex: 1;
+  padding: 0.5rem;
+  background: var(--vn-bg-panel);
+  border: 1px solid var(--vn-gold-dark);
+  border-radius: 4px;
+  color: var(--vn-text);
+  font-family: var(--vn-font-body);
+}
+#vn-debug-output {
+  width: 100%;
+  max-width: 640px;
+  flex: 1;
+  background: var(--vn-bg-panel);
+  border: 1px solid var(--vn-gold-dark);
+  border-radius: 4px;
+  padding: 0.75rem;
+  color: var(--vn-text);
+  font-family: monospace;
+  font-size: 0.8rem;
+  overflow: auto;
+  white-space: pre-wrap;
+  margin-bottom: 0.75rem;
+}
+
+/* -------------------------------------------------------------------
+   Story picker
+   ------------------------------------------------------------------- */
+#vn-story-select {
+  margin-bottom: 1rem;
+}
+.vn-story-picker {
+  padding: 0.5rem 1rem;
+  background: var(--vn-bg-panel);
+  border: 1px solid var(--vn-gold-dark);
+  border-radius: 4px;
+  color: var(--vn-text);
+  font-family: var(--vn-font-body);
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+/* -------------------------------------------------------------------
+   Save/Load action buttons
+   ------------------------------------------------------------------- */
+.vn-saveload-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+/* -------------------------------------------------------------------
+   Auto-mode indicator
+   ------------------------------------------------------------------- */
+#vn-auto-indicator {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 100;
+  padding: 0.4rem 1rem;
+  background: var(--vn-bg-overlay);
+  border: 1px solid var(--vn-gold);
+  border-radius: 4px;
+  color: var(--vn-gold);
+  font-family: var(--vn-font-body);
+  font-size: 0.85rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  opacity: 0.9;
+}
+
+/* -------------------------------------------------------------------
+   Scene transition overlay
+   ------------------------------------------------------------------- */
+#vn-transition {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(20, 20, 40, 0.75);
+  backdrop-filter: blur(4px);
+}
+
+#vn-transition .vn-transition-label {
+  font-family: var(--vn-font-display);
+  font-size: 1.5rem;
+  color: var(--vn-text-muted);
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+#vn-transition .vn-transition-scene {
+  font-family: var(--vn-font-display);
+  font-size: 2.5rem;
+  color: var(--vn-gold);
+  text-shadow: 0 0 20px var(--vn-border-glow);
+  margin-bottom: 2rem;
+  letter-spacing: 2px;
+}
+
+#vn-transition .vn-transition-loading {
+  font-family: var(--vn-font-body);
+  font-size: 1rem;
+  color: var(--vn-gold-light);
+  letter-spacing: 2px;
+  animation: vn-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes vn-pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
 }

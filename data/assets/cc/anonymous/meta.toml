@@ -1,0 +1,3 @@
+importance = "IMPORTANT"
+sprites = ['crowd_a', 'crowd_b', 'guard', 'pidgeon', 'unknown', 'waiter']
+default_sprite = "crowd_a"

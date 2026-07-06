@@ -1,0 +1,63 @@
+# Numbers for ability grammar.
+
+digit_values = [
+    { value = "0", prefixable = false, suffixible = false },
+    { value = "1", prefixable = false, suffixible = false },
+    { value = "2", prefixable = false, suffixible = false },
+    { value = "3", prefixable = false, suffixible = false },
+    { value = "4", prefixable = false, suffixible = false },
+    { value = "5", prefixable = false, suffixible = false },
+    { value = "6", prefixable = false, suffixible = false },
+    { value = "7", prefixable = false, suffixible = false },
+    { value = "8", prefixable = false, suffixible = false },
+    { value = "9", prefixable = false, suffixible = false },
+]
+
+ordinal_values = [
+    { value = "1st", prefixable = false, suffixible = false },
+    { value = "2nd", prefixable = false, suffixible = false },
+    { value = "3rd", prefixable = false, suffixible = false },
+    { value = "4th", prefixable = false, suffixible = false },
+    { value = "5th", prefixable = false, suffixible = false },
+    { value = "6th", prefixable = false, suffixible = false },
+    { value = "7th", prefixable = false, suffixible = false },
+    { value = "8th", prefixable = false, suffixible = false },
+    { value = "9th", prefixable = false, suffixible = false },
+    { value = "10th", prefixable = false, suffixible = false },
+]
+
+roman_numeral_values = [
+    { value = "I", prefixable = false, suffixible = false },
+    { value = "II", prefixable = false, suffixible = false },
+    { value = "III", prefixable = false, suffixible = false },
+    { value = "IV", prefixable = false, suffixible = false },
+    { value = "V", prefixable = false, suffixible = false },
+    { value = "VI", prefixable = false, suffixible = false },
+    { value = "VII", prefixable = false, suffixible = false },
+    { value = "X", prefixable = false, suffixible = false },
+]
+
+number_values = [
+    { value = "0", prefixable = false, suffixible = false },
+    { value = "1", prefixable = false, suffixible = false },
+    { value = "2", prefixable = false, suffixible = false },
+    { value = "3", prefixable = false, suffixible = false },
+    { value = "4", prefixable = false, suffixible = false },
+    { value = "5", prefixable = false, suffixible = false },
+    { value = "6", prefixable = false, suffixible = false },
+    { value = "7", prefixable = false, suffixible = false },
+    { value = "8", prefixable = false, suffixible = false },
+    { value = "9", prefixable = false, suffixible = false },
+]
+
+[[expose]]
+slot = "ordinal"
+from = ["ordinal_values"]
+
+[[expose]]
+slot = "number"
+from = ["number_values"]
+
+[[expose]]
+slot = "roman_numeral"
+from = ["roman_numeral_values"]

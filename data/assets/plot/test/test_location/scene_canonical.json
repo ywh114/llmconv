@@ -1,0 +1,7 @@
+{
+  "events": [
+    {"event": "turn", "speaker": "指挥官", "output": "This room has two backgrounds."},
+    {"event": "turn", "speaker": "指挥官", "output": "Switching to night.", "switch_background": "test_room_night"},
+    {"event": "scene_ended", "next_scene": "fin"}
+  ]
+}

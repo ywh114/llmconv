@@ -35,15 +35,19 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Self</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Self</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">tomllib</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">ara.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">AraSettings</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ara.memory.chroma</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChromaStore</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ara.world.character</span><span class="w"> </span><span class="kn">import</span> <span class="n">Character</span><span class="p">,</span> <span class="n">create_anonymous_character</span><span class="p">,</span> <span class="n">load_character</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ara.world.item</span><span class="w"> </span><span class="kn">import</span> <span class="n">Item</span><span class="p">,</span> <span class="n">load_item</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ara.world.i18n</span><span class="w"> </span><span class="kn">import</span> <span class="n">normalize_language</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ara.world.registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">AssetRegistry</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ara.utils.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_logger</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
@@ -55,22 +59,70 @@
 <span class="k">class</span><span class="w"> </span><span class="nc">Location</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A place within a scene.</span>
 
-<span class="sd">    :ivar name: Unique location identifier.</span>
+<span class="sd">    :ivar canonical_name: Stable latin identifier (usually the asset directory name).</span>
+<span class="sd">    :ivar name: Localized display name.</span>
 <span class="sd">    :ivar desc: Human-readable description used in narrator prompts.</span>
 <span class="sd">    :ivar lore: Optional extended background information.</span>
+<span class="sd">    :ivar loading_background: Optional filename stem for a loading-screen image.</span>
+<span class="sd">    :ivar backgrounds: List of available background image stems for this location.</span>
+<span class="sd">    :ivar current_background: The active background stem; rendered by the frontend.</span>
+<span class="sd">    :ivar background_crops: Optional crop/focus data per background stem.</span>
+<span class="sd">    :ivar asset_dir: Path to the location asset directory, if loaded from ``lc/``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
+    <span class="n">canonical_name</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">desc</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">lore</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">loading_background</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">backgrounds</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">current_background</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">background_crops</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+    <span class="n">asset_dir</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">status</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;System-page DSL status for items/state present at this location.&quot;&quot;&quot;</span>
+    <span class="n">names</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Alternative language names for the location (display-name aliases).&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Location.display_name">
+<a class="viewcode-back" href="../../../api/ara.world.html#ara.world.scene.Location.display_name">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">display_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">language</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the name to use for *language*.</span>
+
+<span class="sd">        Falls back to the canonical name when no alias exists.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">language</span> <span class="ow">and</span> <span class="n">language</span> <span class="o">!=</span> <span class="s2">&quot;en&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">names</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">language</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span></div>
+
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Hash based on canonical location name.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">canonical_name</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Equality is canonical-name-based.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Location</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">NotImplemented</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">canonical_name</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">canonical_name</span>
+
+<div class="viewcode-block" id="Location.background_url">
+<a class="viewcode-back" href="../../../api/ara.world.html#ara.world.scene.Location.background_url">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">background_url</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the active background asset path segment.</span>
+
+<span class="sd">        Locations use ``lc/&lt;story&gt;/&lt;canonical_name&gt;/&lt;background&gt;.png`` when</span>
+<span class="sd">        loaded from a per-story asset directory, otherwise fall back to</span>
+<span class="sd">        ``lc/&lt;canonical_name&gt;/&lt;background&gt;.png``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">story</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">asset_dir</span><span class="p">:</span>
+            <span class="n">parts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">asset_dir</span><span class="o">.</span><span class="n">parts</span>
+            <span class="c1"># Per-story layout: .../lc/&lt;story&gt;/&lt;location&gt;/</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">3</span> <span class="ow">and</span> <span class="n">parts</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;lc&quot;</span><span class="p">:</span>
+                <span class="n">story</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span>
+        <span class="n">bg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_background</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">loading_background</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;lc/</span><span class="si">{</span><span class="n">story</span><span class="si">}{</span><span class="bp">self</span><span class="o">.</span><span class="n">canonical_name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">bg</span><span class="si">}</span><span class="s2">.png&quot;</span></div>
 
 <div class="viewcode-block" id="Location.scratch_context">
 <a class="viewcode-back" href="../../../api/ara.world.html#ara.world.scene.Location.scratch_context">[docs]</a>
@@ -96,6 +148,296 @@
 
 
 
+<div class="viewcode-block" id="load_location">
+<a class="viewcode-back" href="../../../api/ara.world.html#ara.world.scene.load_location">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_location</span><span class="p">(</span>
+    <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">inline_desc</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">inline_loading</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">language</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;en&quot;</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Location</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Load a location asset from ``data/assets/lc/&lt;story&gt;/&lt;name&gt;/``.</span>
+
+<span class="sd">    Falls back to inline description/loading data when no asset directory exists.</span>
+
+<span class="sd">    :param path: Directory containing ``card.toml`` and optional ``meta.toml``.</span>
+<span class="sd">    :param name: Location identifier used in the scene. If empty, derived from</span>
+<span class="sd">        the card&#39;s ``[names]`` table.</span>
+<span class="sd">    :param inline_desc: Description from the scene TOML ``[location.descs]`` table.</span>
+<span class="sd">    :param inline_loading: Loading background from ``[location.loading]``.</span>
+<span class="sd">    :param language: Preferred language for the display name.</span>
+<span class="sd">    :return: Initialised :class:`Location`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">card_path</span> <span class="o">=</span> <span class="n">path</span> <span class="o">/</span> <span class="s2">&quot;card.toml&quot;</span>
+    <span class="n">meta_path</span> <span class="o">=</span> <span class="n">path</span> <span class="o">/</span> <span class="s2">&quot;meta.toml&quot;</span>
+
+    <span class="n">card</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="n">card_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="k">with</span> <span class="n">card_path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">card</span> <span class="o">=</span> <span class="n">tomllib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+    <span class="n">desc</span> <span class="o">=</span> <span class="n">inline_desc</span> <span class="ow">or</span> <span class="n">card</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;description&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="n">lore</span> <span class="o">=</span> <span class="n">card</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;lore&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="n">loading_background</span> <span class="o">=</span> <span class="n">inline_loading</span> <span class="ow">or</span> <span class="n">card</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;loading_background&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+    <span class="c1"># The directory name is the canonical ID when an asset exists; otherwise</span>
+    <span class="c1"># the caller-supplied name is the canonical ID.  The card ``name`` field</span>
+    <span class="c1"># and ``[names]`` table provide localized display names.</span>
+    <span class="n">canonical</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">name</span> <span class="k">if</span> <span class="n">card_path</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="k">else</span> <span class="p">(</span><span class="n">name</span> <span class="ow">or</span> <span class="n">path</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">display</span> <span class="o">=</span> <span class="n">card</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">canonical</span>
+
+    <span class="n">names</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">raw_names</span> <span class="o">=</span> <span class="n">card</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;names&quot;</span><span class="p">,</span> <span class="p">{})</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">raw_names</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="n">names</span> <span class="o">=</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">):</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">raw_names</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">str</span><span class="p">)}</span>
+    <span class="k">if</span> <span class="n">canonical</span> <span class="ow">and</span> <span class="s2">&quot;en&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="s2">&quot;en&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">canonical</span>
+    <span class="k">if</span> <span class="n">display</span> <span class="ow">and</span> <span class="n">language</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">language</span><span class="p">]</span> <span class="o">=</span> <span class="n">display</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span><span class="p">:</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">names</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">language</span><span class="p">,</span> <span class="n">names</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;en&quot;</span><span class="p">,</span> <span class="n">canonical</span><span class="p">))</span>
+
+    <span class="n">backgrounds</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">current_background</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">background_crops</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">if</span> <span class="n">meta_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="k">with</span> <span class="n">meta_path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">meta</span> <span class="o">=</span> <span class="n">tomllib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">explicit</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;backgrounds&quot;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="k">if</span> <span class="n">explicit</span><span class="p">:</span>
+            <span class="n">backgrounds</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">explicit</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Auto-discover PNG stems, ignoring the loading background if present.</span>
+            <span class="n">backgrounds</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+                <span class="p">{</span><span class="n">p</span><span class="o">.</span><span class="n">stem</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">path</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*.png&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">is_file</span><span class="p">()}</span>
+            <span class="p">)</span>
+        <span class="n">current_background</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;default_background&quot;</span><span class="p">,</span> <span class="n">backgrounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">backgrounds</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">bg</span> <span class="ow">in</span> <span class="n">backgrounds</span><span class="p">:</span>
+            <span class="n">bg_meta</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">bg</span><span class="p">,</span> <span class="p">{})</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bg_meta</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="n">background_crops</span><span class="p">[</span><span class="n">bg</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="n">k</span><span class="p">:</span> <span class="n">v</span>
+                    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">bg_meta</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;topleft&quot;</span><span class="p">,</span> <span class="s2">&quot;bottomright&quot;</span><span class="p">,</span> <span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="s2">&quot;focus&quot;</span><span class="p">)</span>
+                <span class="p">}</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># No meta.toml: auto-discover image files.</span>
+        <span class="n">backgrounds</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">({</span><span class="n">p</span><span class="o">.</span><span class="n">stem</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">path</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*.png&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">is_file</span><span class="p">()})</span>
+        <span class="k">if</span> <span class="n">backgrounds</span><span class="p">:</span>
+            <span class="n">current_background</span> <span class="o">=</span> <span class="n">backgrounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># If no backgrounds were discovered but an inline loading background exists,</span>
+    <span class="c1"># keep the legacy single-background behaviour.</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">backgrounds</span> <span class="ow">and</span> <span class="n">loading_background</span><span class="p">:</span>
+        <span class="n">backgrounds</span> <span class="o">=</span> <span class="p">[</span><span class="n">loading_background</span><span class="p">]</span>
+        <span class="n">current_background</span> <span class="o">=</span> <span class="n">loading_background</span>
+
+    <span class="k">return</span> <span class="n">Location</span><span class="p">(</span>
+        <span class="n">canonical_name</span><span class="o">=</span><span class="n">canonical</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+        <span class="n">desc</span><span class="o">=</span><span class="n">desc</span><span class="p">,</span>
+        <span class="n">lore</span><span class="o">=</span><span class="n">lore</span><span class="p">,</span>
+        <span class="n">loading_background</span><span class="o">=</span><span class="n">loading_background</span><span class="p">,</span>
+        <span class="n">backgrounds</span><span class="o">=</span><span class="n">backgrounds</span><span class="p">,</span>
+        <span class="n">current_background</span><span class="o">=</span><span class="n">current_background</span><span class="p">,</span>
+        <span class="n">background_crops</span><span class="o">=</span><span class="n">background_crops</span><span class="p">,</span>
+        <span class="n">asset_dir</span><span class="o">=</span><span class="n">path</span> <span class="k">if</span> <span class="n">card_path</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">status</span><span class="o">=</span><span class="p">{},</span>
+        <span class="n">names</span><span class="o">=</span><span class="n">names</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_resolve_by_name</span><span class="p">(</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">by_canonical</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="n">by_display</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve *name* against canonical names, then optional display names.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">by_canonical</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">by_canonical</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">by_display</span> <span class="ow">and</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">by_display</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">by_display</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+    <span class="k">return</span> <span class="kc">None</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_validate_canonical_events</span><span class="p">(</span>
+    <span class="n">json_data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="n">character_pool</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">Character</span><span class="p">],</span>
+    <span class="n">starting_characters</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">Character</span><span class="p">],</span>
+    <span class="n">location_pool</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">Location</span><span class="p">],</span>
+    <span class="n">next_choices</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">SceneChoice</span><span class="p">],</span>
+    <span class="n">player</span><span class="p">:</span> <span class="n">Character</span><span class="p">,</span>
+    <span class="n">narrator</span><span class="p">:</span> <span class="n">Character</span><span class="p">,</span>
+    <span class="n">char_by_canonical</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Character</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">loc_by_canonical</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Location</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">char_by_display</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Character</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">loc_by_display</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Location</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate a canonical script against scene pools.</span>
+
+<span class="sd">    Speakers and location names may use either canonical names or the display</span>
+<span class="sd">    names declared in the scene TOML.</span>
+
+<span class="sd">    :raises RuntimeError: On first validation violation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">events</span> <span class="o">=</span> <span class="n">json_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;events&quot;</span><span class="p">,</span> <span class="p">[])</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">events</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Canonical script has no events&quot;</span><span class="p">)</span>
+
+    <span class="n">char_by_canonical</span> <span class="o">=</span> <span class="n">char_by_canonical</span> <span class="ow">or</span> <span class="p">{</span><span class="n">c</span><span class="o">.</span><span class="n">canonical_name</span><span class="p">:</span> <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">character_pool</span><span class="p">}</span>
+    <span class="n">loc_by_canonical</span> <span class="o">=</span> <span class="n">loc_by_canonical</span> <span class="ow">or</span> <span class="p">{</span><span class="n">l</span><span class="o">.</span><span class="n">canonical_name</span><span class="p">:</span> <span class="n">l</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">location_pool</span><span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_char</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Character</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_resolve_by_name</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">char_by_canonical</span><span class="p">,</span> <span class="n">char_by_display</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_loc</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Location</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_resolve_by_name</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">loc_by_canonical</span><span class="p">,</span> <span class="n">loc_by_display</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_char_names</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="n">names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">char_by_canonical</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">char_by_display</span><span class="p">:</span>
+            <span class="n">names</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">char_by_display</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">names</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_loc_names</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="n">names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">loc_by_canonical</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">loc_by_display</span><span class="p">:</span>
+            <span class="n">names</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">loc_by_display</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">names</span><span class="p">)</span>
+
+    <span class="c1"># Track here/away state across events for consistency checks.</span>
+    <span class="c1"># Any character (including player and narrator) may start away.</span>
+    <span class="n">here_names</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="n">c</span><span class="o">.</span><span class="n">canonical_name</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">starting_characters</span><span class="p">}</span>
+    <span class="n">away_names</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">c</span><span class="o">.</span><span class="n">canonical_name</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">character_pool</span>
+        <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">canonical_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">here_names</span>
+    <span class="p">}</span>
+
+    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">ev</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">events</span><span class="p">):</span>
+        <span class="n">event_type</span> <span class="o">=</span> <span class="n">ev</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;event&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">speaker</span> <span class="o">=</span> <span class="n">ev</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;speaker&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">event_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;turn&quot;</span><span class="p">,</span> <span class="s2">&quot;scene_ended&quot;</span><span class="p">,</span> <span class="s2">&quot;story_complete&quot;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Canonical event </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">: unknown event type &#39;</span><span class="si">{</span><span class="n">event_type</span><span class="si">}</span><span class="s2">&#39;. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Valid: turn, scene_ended, story_complete&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Validate speaker</span>
+        <span class="k">if</span> <span class="n">event_type</span> <span class="o">==</span> <span class="s2">&quot;turn&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">_char</span><span class="p">(</span><span class="n">speaker</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Canonical event </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">: speaker &#39;</span><span class="si">{</span><span class="n">speaker</span><span class="si">}</span><span class="s2">&#39; not in character pool. &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Valid: </span><span class="si">{</span><span class="n">_char_names</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
+        <span class="c1"># Validate enters (must be away to enter)</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">ev</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;enter&quot;</span><span class="p">,</span> <span class="p">[]):</span>
+            <span class="k">if</span> <span class="n">_char</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Canonical event </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">: enter &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; not in character pool. &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Valid: </span><span class="si">{</span><span class="n">_char_names</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+            <span class="n">canonical</span> <span class="o">=</span> <span class="n">_char</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">canonical_name</span>
+            <span class="k">if</span> <span class="n">canonical</span> <span class="ow">in</span> <span class="n">here_names</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Canonical event </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">: character &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; is already here.&quot;</span>
+                <span class="p">)</span>
+            <span class="k">if</span> <span class="n">canonical</span> <span class="ow">in</span> <span class="n">away_names</span><span class="p">:</span>
+                <span class="n">away_names</span><span class="o">.</span><span class="n">discard</span><span class="p">(</span><span class="n">canonical</span><span class="p">)</span>
+            <span class="n">here_names</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">canonical</span><span class="p">)</span>
+
+        <span class="c1"># Validate exits (must be here to exit)</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">ev</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;exit&quot;</span><span class="p">,</span> <span class="p">[]):</span>
+            <span class="k">if</span> <span class="n">_char</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Canonical event </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">: exit &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; not in character pool. &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Valid: </span><span class="si">{</span><span class="n">_char_names</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+            <span class="n">canonical</span> <span class="o">=</span> <span class="n">_char</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">canonical_name</span>
+            <span class="k">if</span> <span class="n">canonical</span> <span class="ow">in</span> <span class="n">away_names</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Canonical event </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">: character &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; is already away.&quot;</span>
+                <span class="p">)</span>
+            <span class="k">if</span> <span class="n">canonical</span> <span class="ow">in</span> <span class="n">here_names</span><span class="p">:</span>
+                <span class="n">here_names</span><span class="o">.</span><span class="n">discard</span><span class="p">(</span><span class="n">canonical</span><span class="p">)</span>
+            <span class="n">away_names</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">canonical</span><span class="p">)</span>
+
+        <span class="c1"># Validate sprite changes</span>
+        <span class="k">for</span> <span class="n">char_name</span><span class="p">,</span> <span class="n">sprite_name</span> <span class="ow">in</span> <span class="n">ev</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sprite_changes&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">char</span> <span class="o">=</span> <span class="n">_char</span><span class="p">(</span><span class="n">char_name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">char</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Canonical event </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">: sprite_change key &#39;</span><span class="si">{</span><span class="n">char_name</span><span class="si">}</span><span class="s2">&#39; not in character pool.&quot;</span>
+                <span class="p">)</span>
+            <span class="k">if</span> <span class="n">sprite_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;hidden&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">sprite_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">char</span><span class="o">.</span><span class="n">sprites</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Canonical event </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">: sprite &#39;</span><span class="si">{</span><span class="n">sprite_name</span><span class="si">}</span><span class="s2">&#39; not available for &#39;</span><span class="si">{</span><span class="n">char_name</span><span class="si">}</span><span class="s2">&#39;. &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Valid: </span><span class="si">{</span><span class="n">char</span><span class="o">.</span><span class="n">sprites</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
+        <span class="c1"># Validate location switch</span>
+        <span class="n">switch_loc</span> <span class="o">=</span> <span class="n">ev</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;switch_location&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">switch_loc</span> <span class="ow">and</span> <span class="n">_loc</span><span class="p">(</span><span class="n">switch_loc</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Canonical event </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">: switch_location &#39;</span><span class="si">{</span><span class="n">switch_loc</span><span class="si">}</span><span class="s2">&#39; not in location pool. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Valid: </span><span class="si">{</span><span class="n">_loc_names</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Validate next_scene / choices</span>
+        <span class="k">if</span> <span class="n">event_type</span> <span class="o">==</span> <span class="s2">&quot;scene_ended&quot;</span><span class="p">:</span>
+            <span class="n">choices</span> <span class="o">=</span> <span class="n">ev</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;choices&quot;</span><span class="p">)</span>
+            <span class="n">next_scene</span> <span class="o">=</span> <span class="n">ev</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;next_scene&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">choices</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">choices</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Canonical event </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">: &#39;choices&#39; must be a list.&quot;</span>
+                    <span class="p">)</span>
+                <span class="k">if</span> <span class="n">next_scene</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Canonical event </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">: cannot have both &#39;choices&#39; and &#39;next_scene&#39;.&quot;</span>
+                    <span class="p">)</span>
+                <span class="k">if</span> <span class="n">idx</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">events</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Canonical event </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">: choices are only allowed on the last event.&quot;</span>
+                    <span class="p">)</span>
+                <span class="k">for</span> <span class="n">c_idx</span><span class="p">,</span> <span class="n">choice</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">choices</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">choice</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;Canonical event </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2"> choice </span><span class="si">{</span><span class="n">c_idx</span><span class="si">}</span><span class="s2">: must be a dict.&quot;</span>
+                        <span class="p">)</span>
+                    <span class="n">c_hint</span> <span class="o">=</span> <span class="n">choice</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;hint&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                    <span class="n">c_text</span> <span class="o">=</span> <span class="n">choice</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                    <span class="n">c_next</span> <span class="o">=</span> <span class="n">choice</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;next_scene&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">c_hint</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">c_hint</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;Canonical event </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2"> choice </span><span class="si">{</span><span class="n">c_idx</span><span class="si">}</span><span class="s2">: &#39;hint&#39; is required and must be a string.&quot;</span>
+                        <span class="p">)</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">c_text</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">c_text</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;Canonical event </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2"> choice </span><span class="si">{</span><span class="n">c_idx</span><span class="si">}</span><span class="s2">: &#39;text&#39; is required and must be a string.&quot;</span>
+                        <span class="p">)</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">c_next</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">c_next</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;Canonical event </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2"> choice </span><span class="si">{</span><span class="n">c_idx</span><span class="si">}</span><span class="s2">: &#39;next_scene&#39; is required and must be a string.&quot;</span>
+                        <span class="p">)</span>
+                    <span class="k">if</span> <span class="n">c_next</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">next_choices</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;Canonical event </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2"> choice </span><span class="si">{</span><span class="n">c_idx</span><span class="si">}</span><span class="s2">: next_scene &#39;</span><span class="si">{</span><span class="n">c_next</span><span class="si">}</span><span class="s2">&#39; not in next_choices. &quot;</span>
+                            <span class="sa">f</span><span class="s2">&quot;Valid: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">next_choices</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="p">)</span>
+            <span class="k">elif</span> <span class="n">next_scene</span> <span class="ow">and</span> <span class="n">next_scene</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">next_choices</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Canonical event </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">: next_scene &#39;</span><span class="si">{</span><span class="n">next_scene</span><span class="si">}</span><span class="s2">&#39; not in next_choices. &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Valid: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">next_choices</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">events</span>
+
+
 <div class="viewcode-block" id="SceneChoice">
 <a class="viewcode-back" href="../../../api/ara.world.html#ara.world.scene.SceneChoice">[docs]</a>
 <span class="nd">@dataclass</span>
@@ -104,14 +446,15 @@
 
 <span class="sd">    :ivar id: Scene identifier used to resolve the follow-up TOML file.</span>
 <span class="sd">    :ivar desc: Human-readable description shown to the orchestrator.</span>
-<span class="sd">    :ivar only_for: Optional list of prerequisite scene IDs.  When non-empty,</span>
+<span class="sd">    :ivar prereq_scenes: Optional list of prerequisite scene IDs.  When non-empty,</span>
 <span class="sd">        the choice is only available if the current scene&#39;s predecessor is in</span>
 <span class="sd">        this list.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">desc</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">only_for</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span></div>
+    <span class="n">prereq_scenes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">summarizer_considerations</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span></div>
 
 
 
@@ -129,6 +472,7 @@
     <span class="n">language</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">zeitgeist</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">tone</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">scene_type</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">character_pool</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">Character</span><span class="p">]</span>
     <span class="n">starting_characters</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">Character</span><span class="p">]</span>
     <span class="n">player</span><span class="p">:</span> <span class="n">Character</span>
@@ -138,6 +482,14 @@
     <span class="n">plot_considerations</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">plot_story</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">next_choices</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">SceneChoice</span><span class="p">]</span>
+    <span class="n">canonical_events</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">time</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">world</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">world_map</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">asset_story_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">settings</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">items</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Item</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Scene.load">
 <a class="viewcode-back" href="../../../api/ara.world.html#ara.world.scene.Scene.load">[docs]</a>
@@ -147,18 +499,26 @@
         <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
         <span class="n">db</span><span class="p">:</span> <span class="n">ChromaStore</span><span class="p">,</span>
         <span class="n">config</span><span class="p">:</span> <span class="n">AraSettings</span><span class="p">,</span>
-        <span class="n">prev_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">scene_history</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">registry</span><span class="p">:</span> <span class="n">AssetRegistry</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">live_characters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Character</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">live_locations</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Location</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Load a scene from a TOML file.</span>
 
-<span class="sd">        Character cards are resolved relative to</span>
-<span class="sd">        ``config.data_dir / &quot;assets&quot; / &quot;cc&quot;``.</span>
+<span class="sd">        Characters and locations are resolved through the ephemeral</span>
+<span class="sd">        :class:`AssetRegistry` rather than by literal directory name.</span>
 
 <span class="sd">        :param path: Path to the scene ``.toml`` file.</span>
 <span class="sd">        :param db: Shared ChromaDB store passed to character loaders.</span>
 <span class="sd">        :param config: Application settings.</span>
-<span class="sd">        :param prev_id: Identifier of the previous scene (for ``only_for``</span>
-<span class="sd">            prerequisite filtering).</span>
+<span class="sd">        :param scene_history: List of already-visited scene IDs (for</span>
+<span class="sd">            ``prereq_scenes`` prerequisite filtering).</span>
+<span class="sd">        :param registry: Session registry used to resolve characters/locations.</span>
+<span class="sd">        :param live_characters: Cache of live character objects keyed by</span>
+<span class="sd">            canonical name.  Used to preserve runtime state across scenes.</span>
+<span class="sd">        :param live_locations: Cache of live location objects keyed by</span>
+<span class="sd">            canonical name.</span>
 <span class="sd">        :return: Initialised :class:`Scene`.</span>
 <span class="sd">        :raises RuntimeError: If the player, narrator, or starting location</span>
 <span class="sd">            cannot be found in their respective pools.</span>
@@ -166,33 +526,77 @@
         <span class="k">with</span> <span class="n">path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">tomllib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
 
+        <span class="n">language</span> <span class="o">=</span> <span class="n">normalize_language</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;language&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">language</span><span class="p">))</span>
+
         <span class="n">char_data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;character&quot;</span><span class="p">,</span> <span class="p">{})</span>
         <span class="n">char_pool_names</span> <span class="o">=</span> <span class="n">char_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;pool&quot;</span><span class="p">,</span> <span class="p">[])</span>
         <span class="n">char_init_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">char_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;inits&quot;</span><span class="p">,</span> <span class="p">[]))</span>
+        <span class="n">char_init_sprites</span> <span class="o">=</span> <span class="n">char_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;init_sprites&quot;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="n">char_sprites_table</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">char_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sprites&quot;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">char_titles_table</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">char_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;titles&quot;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">char_init_titles</span> <span class="o">=</span> <span class="n">char_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;titles&quot;</span><span class="p">,</span> <span class="p">[])</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">char_titles_table</span> <span class="k">else</span> <span class="p">[]</span>
         <span class="n">player_name</span> <span class="o">=</span> <span class="n">char_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;player&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
         <span class="n">narrator_name</span> <span class="o">=</span> <span class="n">char_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;narrator&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-        <span class="n">anonymous_data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;anonymous&quot;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">anonymous_data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;anonymous&quot;</span><span class="p">,</span> <span class="p">{})</span>
 
+        <span class="c1"># Scene TOMLs reference characters and locations by canonical ID (the</span>
+        <span class="c1"># asset directory name).  We keep both canonical and display maps so</span>
+        <span class="c1"># LLM-facing output can use display names while internal state uses IDs.</span>
         <span class="n">character_pool</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">Character</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="n">player</span><span class="p">:</span> <span class="n">Character</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">narrator</span><span class="p">:</span> <span class="n">Character</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">char_by_canonical</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Character</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">char_by_display</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Character</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
-        <span class="n">assets_cc</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">data_dir</span> <span class="o">/</span> <span class="s2">&quot;assets&quot;</span> <span class="o">/</span> <span class="s2">&quot;cc&quot;</span>
-        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">char_pool_names</span><span class="p">:</span>
-            <span class="n">char_path</span> <span class="o">=</span> <span class="n">assets_cc</span> <span class="o">/</span> <span class="n">name</span>
-            <span class="k">if</span> <span class="n">char_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-                <span class="n">char</span> <span class="o">=</span> <span class="n">load_character</span><span class="p">(</span><span class="n">char_path</span><span class="p">,</span> <span class="n">db</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">anonymous_data</span><span class="p">:</span>
-                <span class="n">char</span> <span class="o">=</span> <span class="n">create_anonymous_character</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">anonymous_data</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
-            <span class="k">else</span><span class="p">:</span>
+        <span class="n">live_chars</span> <span class="o">=</span> <span class="n">live_characters</span> <span class="k">if</span> <span class="n">live_characters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">{}</span>
+        <span class="n">story_name</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">name</span>
+        <span class="n">assets_cc</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">characters_path</span><span class="p">(</span><span class="n">story_name</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">canonical_name</span> <span class="ow">in</span> <span class="n">char_pool_names</span><span class="p">:</span>
+            <span class="n">char</span><span class="p">:</span> <span class="n">Character</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="n">registry</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">meta</span> <span class="o">=</span> <span class="n">registry</span><span class="o">.</span><span class="n">get_character</span><span class="p">(</span><span class="n">canonical_name</span><span class="p">,</span> <span class="n">language</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">meta</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">canonical</span> <span class="o">=</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;canonical_name&quot;</span><span class="p">]</span>
+                    <span class="n">asset_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;asset_dir&quot;</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="n">canonical</span> <span class="ow">in</span> <span class="n">live_chars</span><span class="p">:</span>
+                        <span class="n">char</span> <span class="o">=</span> <span class="n">live_chars</span><span class="p">[</span><span class="n">canonical</span><span class="p">]</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">char</span> <span class="o">=</span> <span class="n">load_character</span><span class="p">(</span><span class="n">asset_dir</span><span class="p">,</span> <span class="n">db</span><span class="p">,</span> <span class="n">language</span><span class="p">)</span>
+                        <span class="n">live_chars</span><span class="p">[</span><span class="n">canonical</span><span class="p">]</span> <span class="o">=</span> <span class="n">char</span>
+            <span class="c1"># Fallback to direct directory lookup for unregistered assets or</span>
+            <span class="c1"># callers that do not provide a registry. Reuse the live cache if</span>
+            <span class="c1"># this character was already loaded.</span>
+            <span class="k">if</span> <span class="n">char</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">canonical_name</span> <span class="ow">in</span> <span class="n">live_chars</span><span class="p">:</span>
+                    <span class="n">char</span> <span class="o">=</span> <span class="n">live_chars</span><span class="p">[</span><span class="n">canonical_name</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">char_path</span> <span class="o">=</span> <span class="n">assets_cc</span> <span class="o">/</span> <span class="n">canonical_name</span>
+                    <span class="k">if</span> <span class="n">char_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                        <span class="n">char</span> <span class="o">=</span> <span class="n">load_character</span><span class="p">(</span><span class="n">char_path</span><span class="p">,</span> <span class="n">db</span><span class="p">,</span> <span class="n">language</span><span class="p">)</span>
+                        <span class="n">live_chars</span><span class="p">[</span><span class="n">canonical_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">char</span>
+            <span class="k">if</span> <span class="n">char</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">canonical_name</span> <span class="ow">in</span> <span class="n">anonymous_data</span><span class="p">:</span>
+                <span class="n">anon_entry</span> <span class="o">=</span> <span class="n">anonymous_data</span><span class="p">[</span><span class="n">canonical_name</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">anon_entry</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                    <span class="n">char</span> <span class="o">=</span> <span class="n">create_anonymous_character</span><span class="p">(</span>
+                        <span class="n">canonical_name</span><span class="p">,</span>
+                        <span class="n">description</span><span class="o">=</span><span class="n">anon_entry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;desc&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+                        <span class="n">sprite</span><span class="o">=</span><span class="n">anon_entry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sprite&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">char</span> <span class="o">=</span> <span class="n">create_anonymous_character</span><span class="p">(</span>
+                        <span class="n">canonical_name</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">anon_entry</span><span class="p">)</span>
+                    <span class="p">)</span>
+            <span class="k">if</span> <span class="n">char</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;Character &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; not found in assets (</span><span class="si">{</span><span class="n">char_path</span><span class="si">}</span><span class="s2">) &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Character &#39;</span><span class="si">{</span><span class="n">canonical_name</span><span class="si">}</span><span class="s2">&#39; not found in registry &quot;</span>
                     <span class="sa">f</span><span class="s2">&quot;and not defined in [anonymous].&quot;</span>
                 <span class="p">)</span>
             <span class="n">character_pool</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">char</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">char</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">player_name</span><span class="p">:</span>
+            <span class="n">char_by_canonical</span><span class="p">[</span><span class="n">char</span><span class="o">.</span><span class="n">canonical_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">char</span>
+            <span class="n">char_by_display</span><span class="p">[</span><span class="n">char</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">char</span>
+            <span class="k">if</span> <span class="n">canonical_name</span> <span class="o">==</span> <span class="n">player_name</span><span class="p">:</span>
                 <span class="n">player</span> <span class="o">=</span> <span class="n">char</span>
-            <span class="k">if</span> <span class="n">char</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">narrator_name</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">canonical_name</span> <span class="o">==</span> <span class="n">narrator_name</span><span class="p">:</span>
                 <span class="n">narrator</span> <span class="o">=</span> <span class="n">char</span>
 
         <span class="k">if</span> <span class="n">player</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -200,28 +604,133 @@
         <span class="k">if</span> <span class="n">narrator</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Narrator character &#39;</span><span class="si">{</span><span class="n">narrator_name</span><span class="si">}</span><span class="s2">&#39; not found in pool.&quot;</span><span class="p">)</span>
 
-        <span class="n">starting_characters</span> <span class="o">=</span> <span class="p">{</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">character_pool</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">char_init_names</span><span class="p">}</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_per_char_value</span><span class="p">(</span>
+            <span class="n">table</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
+            <span class="n">positional</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+            <span class="n">canonical</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">canonical</span> <span class="ow">in</span> <span class="n">table</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">table</span><span class="p">[</span><span class="n">canonical</span><span class="p">]</span>
+            <span class="c1"># Allow table keys to be display names for backwards compatibility.</span>
+            <span class="n">char</span> <span class="o">=</span> <span class="n">char_by_canonical</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">canonical</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">char</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">char</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">table</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">table</span><span class="p">[</span><span class="n">char</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">idx</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">positional</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">positional</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="c1"># Apply per-scene initial sprites and titles.</span>
+        <span class="c1"># The special sprite value &quot;none&quot; means the character is present but invisible.</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">canonical_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">char_pool_names</span><span class="p">):</span>
+            <span class="n">char</span> <span class="o">=</span> <span class="n">char_by_canonical</span><span class="p">[</span><span class="n">canonical_name</span><span class="p">]</span>
+            <span class="n">sprite_entry</span> <span class="o">=</span> <span class="n">_per_char_value</span><span class="p">(</span><span class="n">char_sprites_table</span><span class="p">,</span> <span class="n">char_init_sprites</span><span class="p">,</span> <span class="n">canonical_name</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span>
+            <span class="n">sprite_name</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">visible_to</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sprite_entry</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="n">sprite_name</span> <span class="o">=</span> <span class="n">sprite_entry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sprite&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span>
+                <span class="n">visible_to</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">sprite_entry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;visible_to&quot;</span><span class="p">,</span> <span class="p">[]))</span>
+            <span class="k">elif</span> <span class="n">sprite_entry</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">sprite_name</span> <span class="o">=</span> <span class="n">sprite_entry</span>
+
+            <span class="k">if</span> <span class="n">sprite_name</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">sprite_name</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;hidden&quot;</span><span class="p">):</span>
+                    <span class="n">char</span><span class="o">.</span><span class="n">current_sprite</span> <span class="o">=</span> <span class="s2">&quot;none&quot;</span>
+                    <span class="n">char</span><span class="o">.</span><span class="n">hidden</span> <span class="o">=</span> <span class="n">sprite_name</span> <span class="o">==</span> <span class="s2">&quot;hidden&quot;</span>
+                    <span class="c1"># visible_to references canonical IDs in scene TOMLs.</span>
+                    <span class="n">char</span><span class="o">.</span><span class="n">visible_to</span> <span class="o">=</span> <span class="n">visible_to</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">char</span><span class="o">.</span><span class="n">current_sprite</span> <span class="o">=</span> <span class="n">sprite_name</span>
+                    <span class="n">char</span><span class="o">.</span><span class="n">hidden</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="n">char</span><span class="o">.</span><span class="n">visible_to</span> <span class="o">=</span> <span class="n">visible_to</span>
+
+            <span class="n">title</span> <span class="o">=</span> <span class="n">_per_char_value</span><span class="p">(</span><span class="n">char_titles_table</span><span class="p">,</span> <span class="n">char_init_titles</span><span class="p">,</span> <span class="n">canonical_name</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">char</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">title</span>
+
+        <span class="n">starting_characters</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">char_by_canonical</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">char_init_names</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">char_by_canonical</span>
+        <span class="p">}</span>
 
         <span class="n">loc_data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;location&quot;</span><span class="p">,</span> <span class="p">{})</span>
         <span class="n">loc_pool_names</span> <span class="o">=</span> <span class="n">loc_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;pool&quot;</span><span class="p">,</span> <span class="p">[])</span>
         <span class="n">loc_init</span> <span class="o">=</span> <span class="n">loc_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;init&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
         <span class="n">loc_descs</span> <span class="o">=</span> <span class="n">loc_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;descs&quot;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">loc_loadings</span> <span class="o">=</span> <span class="n">loc_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;loading&quot;</span><span class="p">,</span> <span class="p">{})</span>
 
         <span class="n">location_pool</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">Location</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="n">starting_location</span><span class="p">:</span> <span class="n">Location</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">loc_pool_names</span><span class="p">:</span>
-            <span class="n">desc</span> <span class="o">=</span> <span class="n">loc_descs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-            <span class="n">loc</span> <span class="o">=</span> <span class="n">Location</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="n">desc</span><span class="p">)</span>
+        <span class="n">loc_by_canonical</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Location</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">loc_by_display</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Location</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">live_locs</span> <span class="o">=</span> <span class="n">live_locations</span> <span class="k">if</span> <span class="n">live_locations</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">{}</span>
+        <span class="n">assets_lc</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">locations_path</span><span class="p">(</span><span class="n">story_name</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">canonical_name</span> <span class="ow">in</span> <span class="n">loc_pool_names</span><span class="p">:</span>
+            <span class="n">loc</span><span class="p">:</span> <span class="n">Location</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="n">registry</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">meta</span> <span class="o">=</span> <span class="n">registry</span><span class="o">.</span><span class="n">get_location</span><span class="p">(</span><span class="n">canonical_name</span><span class="p">,</span> <span class="n">language</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">meta</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">canonical</span> <span class="o">=</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;canonical_name&quot;</span><span class="p">]</span>
+                    <span class="n">asset_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;asset_dir&quot;</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="n">canonical</span> <span class="ow">in</span> <span class="n">live_locs</span><span class="p">:</span>
+                        <span class="n">loc</span> <span class="o">=</span> <span class="n">live_locs</span><span class="p">[</span><span class="n">canonical</span><span class="p">]</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">loc</span> <span class="o">=</span> <span class="n">load_location</span><span class="p">(</span>
+                            <span class="n">asset_dir</span><span class="p">,</span>
+                            <span class="n">name</span><span class="o">=</span><span class="n">canonical</span><span class="p">,</span>
+                            <span class="n">inline_desc</span><span class="o">=</span><span class="n">loc_descs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">canonical_name</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+                            <span class="n">inline_loading</span><span class="o">=</span><span class="n">loc_loadings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">canonical_name</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+                            <span class="n">language</span><span class="o">=</span><span class="n">language</span><span class="p">,</span>
+                        <span class="p">)</span>
+                        <span class="n">live_locs</span><span class="p">[</span><span class="n">canonical</span><span class="p">]</span> <span class="o">=</span> <span class="n">loc</span>
+            <span class="c1"># Fallback to direct directory lookup for locations not in registry.</span>
+            <span class="c1"># Reuse the live cache if this location was already loaded.</span>
+            <span class="k">if</span> <span class="n">loc</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">canonical_name</span> <span class="ow">in</span> <span class="n">live_locs</span><span class="p">:</span>
+                    <span class="n">loc</span> <span class="o">=</span> <span class="n">live_locs</span><span class="p">[</span><span class="n">canonical_name</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">loc_path</span> <span class="o">=</span> <span class="n">assets_lc</span> <span class="o">/</span> <span class="n">canonical_name</span>
+                    <span class="n">loc</span> <span class="o">=</span> <span class="n">load_location</span><span class="p">(</span>
+                        <span class="n">loc_path</span><span class="p">,</span>
+                        <span class="n">name</span><span class="o">=</span><span class="n">canonical_name</span><span class="p">,</span>
+                        <span class="n">inline_desc</span><span class="o">=</span><span class="n">loc_descs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">canonical_name</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+                        <span class="n">inline_loading</span><span class="o">=</span><span class="n">loc_loadings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">canonical_name</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+                        <span class="n">language</span><span class="o">=</span><span class="n">language</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="n">live_locs</span><span class="p">[</span><span class="n">canonical_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">loc</span>
             <span class="n">location_pool</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">loc</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="n">loc_init</span><span class="p">:</span>
+            <span class="n">loc_by_canonical</span><span class="p">[</span><span class="n">loc</span><span class="o">.</span><span class="n">canonical_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">loc</span>
+            <span class="n">loc_by_display</span><span class="p">[</span><span class="n">loc</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">loc</span>
+            <span class="k">if</span> <span class="n">canonical_name</span> <span class="o">==</span> <span class="n">loc_init</span><span class="p">:</span>
                 <span class="n">starting_location</span> <span class="o">=</span> <span class="n">loc</span>
 
         <span class="k">if</span> <span class="n">starting_location</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Starting location &#39;</span><span class="si">{</span><span class="n">loc_init</span><span class="si">}</span><span class="s2">&#39; not found in pool.&quot;</span><span class="p">)</span>
 
+        <span class="n">world_data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;world&quot;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">world_map</span> <span class="o">=</span> <span class="n">world_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;map&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">world_data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+
         <span class="n">plot_data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;plot&quot;</span><span class="p">,</span> <span class="p">{})</span>
         <span class="n">plot_considerations</span> <span class="o">=</span> <span class="n">plot_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;considerations&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
         <span class="n">plot_story</span> <span class="o">=</span> <span class="n">plot_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;scene&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Load optional plot item templates. Filenames are relative to</span>
+        <span class="c1"># data/assets/items/&lt;story&gt;/ or data/assets/items/.</span>
+        <span class="n">items</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Item</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">item_file</span> <span class="ow">in</span> <span class="n">plot_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;items&quot;</span><span class="p">,</span> <span class="p">[]):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item_file</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">item_file</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.toml&quot;</span><span class="p">):</span>
+                <span class="n">item_file</span> <span class="o">+=</span> <span class="s2">&quot;.toml&quot;</span>
+            <span class="n">item_path</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">items_path</span><span class="p">(</span><span class="n">story_name</span><span class="p">)</span> <span class="o">/</span> <span class="n">item_file</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">item_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="n">item_path</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">items_path</span><span class="p">()</span> <span class="o">/</span> <span class="n">item_file</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">item</span> <span class="o">=</span> <span class="n">load_item</span><span class="p">(</span><span class="n">item_path</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not load plot item </span><span class="si">{</span><span class="n">item_file</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="n">items</span><span class="p">[</span><span class="n">item</span><span class="o">.</span><span class="n">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">item</span>
 
         <span class="n">next_raw</span> <span class="o">=</span> <span class="n">plot_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;next&quot;</span><span class="p">,</span> <span class="p">{})</span>
         <span class="n">next_raw</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;considerations&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
@@ -231,27 +740,66 @@
                 <span class="n">next_choices</span><span class="p">[</span><span class="n">choice_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">SceneChoice</span><span class="p">(</span>
                     <span class="nb">id</span><span class="o">=</span><span class="n">choice_id</span><span class="p">,</span>
                     <span class="n">desc</span><span class="o">=</span><span class="n">details</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;desc&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
-                    <span class="n">only_for</span><span class="o">=</span><span class="n">details</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;only_for&quot;</span><span class="p">,</span> <span class="p">[]),</span>
+                    <span class="n">prereq_scenes</span><span class="o">=</span><span class="n">details</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;prereq_scenes&quot;</span><span class="p">,</span> <span class="p">[]),</span>
+                    <span class="n">summarizer_considerations</span><span class="o">=</span><span class="n">details</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                        <span class="s2">&quot;summarizer_considerations&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span>
+                    <span class="p">),</span>
                 <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">next_choices</span><span class="p">[</span><span class="n">choice_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">SceneChoice</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">choice_id</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">details</span><span class="p">))</span>
 
-        <span class="c1"># Filter choices based on only_for logic</span>
-        <span class="n">has_only_for</span> <span class="o">=</span> <span class="nb">any</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">only_for</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">next_choices</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
-        <span class="k">if</span> <span class="n">has_only_for</span><span class="p">:</span>
+        <span class="c1"># Filter choices based on prereq_scenes logic.</span>
+        <span class="c1"># A choice is only available if every scene in its prereq_scenes list has</span>
+        <span class="c1"># been visited (including the current scene itself).</span>
+        <span class="n">scene_id</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="n">path</span><span class="o">.</span><span class="n">stem</span><span class="p">)</span>
+        <span class="n">scene_name</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="n">scene_id</span><span class="p">)</span>
+        <span class="n">visited</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">scene_history</span> <span class="ow">or</span> <span class="p">[])</span> <span class="o">|</span> <span class="p">{</span><span class="n">scene_id</span><span class="p">}</span>
+        <span class="n">has_prereq_scenes</span> <span class="o">=</span> <span class="nb">any</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">prereq_scenes</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">next_choices</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">has_prereq_scenes</span><span class="p">:</span>
             <span class="n">valid</span> <span class="o">=</span> <span class="p">{</span>
                 <span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">next_choices</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="n">v</span><span class="o">.</span><span class="n">only_for</span> <span class="ow">or</span> <span class="n">prev_id</span> <span class="ow">in</span> <span class="n">v</span><span class="o">.</span><span class="n">only_for</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">v</span><span class="o">.</span><span class="n">prereq_scenes</span> <span class="ow">or</span> <span class="nb">all</span><span class="p">(</span><span class="n">of</span> <span class="ow">in</span> <span class="n">visited</span> <span class="k">for</span> <span class="n">of</span> <span class="ow">in</span> <span class="n">v</span><span class="o">.</span><span class="n">prereq_scenes</span><span class="p">)</span>
             <span class="p">}</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">valid</span> <span class="o">=</span> <span class="n">next_choices</span>
 
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loaded scene </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">path</span><span class="o">.</span><span class="n">stem</span><span class="p">)</span><span class="si">}</span><span class="s2"> with </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">character_pool</span><span class="p">)</span><span class="si">}</span><span class="s2"> chars, </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">location_pool</span><span class="p">)</span><span class="si">}</span><span class="s2"> locs&quot;</span><span class="p">)</span>
+        <span class="c1"># Parse optional canonical script</span>
+        <span class="n">canonical_events</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">canonical_data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;canonical&quot;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">canonical_script</span> <span class="o">=</span> <span class="n">canonical_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;script&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">canonical_script</span><span class="p">:</span>
+            <span class="n">script_path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="n">canonical_script</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">script_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Canonical script not found: </span><span class="si">{</span><span class="n">script_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">with</span> <span class="n">script_path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">canonical_json</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="n">canonical_events</span> <span class="o">=</span> <span class="n">_validate_canonical_events</span><span class="p">(</span>
+                <span class="n">canonical_json</span><span class="p">,</span>
+                <span class="n">character_pool</span><span class="p">,</span>
+                <span class="n">starting_characters</span><span class="p">,</span>
+                <span class="n">location_pool</span><span class="p">,</span>
+                <span class="n">valid</span><span class="p">,</span>
+                <span class="n">player</span><span class="p">,</span>
+                <span class="n">narrator</span><span class="p">,</span>
+                <span class="n">char_by_canonical</span><span class="p">,</span>
+                <span class="n">loc_by_canonical</span><span class="p">,</span>
+                <span class="n">char_by_display</span><span class="p">,</span>
+                <span class="n">loc_by_display</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loaded scene </span><span class="si">{</span><span class="n">scene_name</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">scene_id</span><span class="si">}</span><span class="s2">) with </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">character_pool</span><span class="p">)</span><span class="si">}</span><span class="s2"> chars, </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">location_pool</span><span class="p">)</span><span class="si">}</span><span class="s2"> locs&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-            <span class="nb">id</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="n">path</span><span class="o">.</span><span class="n">stem</span><span class="p">),</span>
-            <span class="n">language</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;language&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">language</span><span class="p">),</span>
+            <span class="nb">id</span><span class="o">=</span><span class="n">scene_id</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">scene_name</span><span class="p">,</span>
+            <span class="n">language</span><span class="o">=</span><span class="n">language</span><span class="p">,</span>
             <span class="n">zeitgeist</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;zeitgeist&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
             <span class="n">tone</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;tone&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+            <span class="n">time</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+            <span class="n">world</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;world&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+            <span class="n">world_map</span><span class="o">=</span><span class="n">world_map</span><span class="p">,</span>
+            <span class="n">settings</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;settings&quot;</span><span class="p">,</span> <span class="p">[]))</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;settings&quot;</span><span class="p">),</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">))</span> <span class="k">else</span> <span class="p">[],</span>
+            <span class="n">asset_story_name</span><span class="o">=</span><span class="n">story_name</span><span class="p">,</span>
+            <span class="n">scene_type</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="s2">&quot;fin&quot;</span> <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;fin_scene.toml&quot;</span> <span class="k">else</span> <span class="s2">&quot;normal&quot;</span><span class="p">),</span>
             <span class="n">character_pool</span><span class="o">=</span><span class="n">character_pool</span><span class="p">,</span>
             <span class="n">starting_characters</span><span class="o">=</span><span class="n">starting_characters</span><span class="p">,</span>
             <span class="n">player</span><span class="o">=</span><span class="n">player</span><span class="p">,</span>
@@ -261,6 +809,8 @@
             <span class="n">plot_considerations</span><span class="o">=</span><span class="n">plot_considerations</span><span class="p">,</span>
             <span class="n">plot_story</span><span class="o">=</span><span class="n">plot_story</span><span class="p">,</span>
             <span class="n">next_choices</span><span class="o">=</span><span class="n">valid</span><span class="p">,</span>
+            <span class="n">canonical_events</span><span class="o">=</span><span class="n">canonical_events</span><span class="p">,</span>
+            <span class="n">items</span><span class="o">=</span><span class="n">items</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 
@@ -282,13 +832,92 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Format the plot data as a single string for injection into the</span>
 <span class="sd">        orchestrator&#39;s system prompt.</span>
 
-<span class="sd">        :return: Combined considerations, story, and next-choice list.</span>
+<span class="sd">        :return: Combined considerations, story, world map, and next-choice list.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Considerations:</span><span class="se">\n</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">plot_considerations</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;Plot:</span><span class="se">\n</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">plot_story</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;Next scene choices:</span><span class="se">\n</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">next_choices_pretty</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="p">)</span></div>
+        <span class="n">parts</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="sa">f</span><span class="s2">&quot;Considerations:</span><span class="se">\n</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">plot_considerations</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;Plot:</span><span class="se">\n</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">plot_story</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">:</span>
+            <span class="n">item_lines</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="n">meta</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; metadata=</span><span class="si">{</span><span class="n">item</span><span class="o">.</span><span class="n">metadata</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">metadata</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+                <span class="n">item_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">item</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">item</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="n">item</span><span class="o">.</span><span class="n">description</span><span class="si">}{</span><span class="n">meta</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Available item templates:</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">item_lines</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">world_map</span><span class="p">:</span>
+            <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;World map:</span><span class="se">\n</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">world_map</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Next scene choices:</span><span class="se">\n</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">next_choices_pretty</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span></div>
+
+
+    <span class="c1"># ------------------------------------------------------------------ #</span>
+    <span class="c1"># Canonical / display name resolution helpers</span>
+    <span class="c1"># ------------------------------------------------------------------ #</span>
+<div class="viewcode-block" id="Scene.character_by_canonical">
+<a class="viewcode-back" href="../../../api/ara.world.html#ara.world.scene.Scene.character_by_canonical">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">character_by_canonical</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Character</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the character whose canonical ID equals *name*.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">character_pool</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">char</span><span class="o">.</span><span class="n">canonical_name</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">char</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="Scene.character_by_display">
+<a class="viewcode-back" href="../../../api/ara.world.html#ara.world.scene.Scene.character_by_display">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">character_by_display</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Character</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the character whose display name equals *name*.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">character_pool</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">char</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">char</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="Scene.character_by_name">
+<a class="viewcode-back" href="../../../api/ara.world.html#ara.world.scene.Scene.character_by_name">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">character_by_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Character</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a character by canonical or display name.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">character_by_canonical</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">character_by_display</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Scene.location_by_canonical">
+<a class="viewcode-back" href="../../../api/ara.world.html#ara.world.scene.Scene.location_by_canonical">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">location_by_canonical</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Location</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the location whose canonical ID equals *name*.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">loc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">location_pool</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">loc</span><span class="o">.</span><span class="n">canonical_name</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">loc</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="Scene.location_by_display">
+<a class="viewcode-back" href="../../../api/ara.world.html#ara.world.scene.Scene.location_by_display">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">location_by_display</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Location</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the location whose display name equals *name*.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">loc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">location_pool</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">loc</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">loc</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="Scene.location_by_name">
+<a class="viewcode-back" href="../../../api/ara.world.html#ara.world.scene.Scene.location_by_name">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">location_by_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Location</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a location by canonical or display name.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">location_by_canonical</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">location_by_display</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Scene.display_name_for">
+<a class="viewcode-back" href="../../../api/ara.world.html#ara.world.scene.Scene.display_name_for">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">display_name_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">canonical</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the display name for *canonical* ID, or the ID itself.&quot;&quot;&quot;</span>
+        <span class="n">char</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">character_by_canonical</span><span class="p">(</span><span class="n">canonical</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">char</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">char</span><span class="o">.</span><span class="n">name</span>
+        <span class="n">loc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">location_by_canonical</span><span class="p">(</span><span class="n">canonical</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">loc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">loc</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">return</span> <span class="n">canonical</span></div>
 </div>
 
 </pre></div>
@@ -321,6 +950,7 @@
 <p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../static_assets.html">Static assets</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Reference:</span></p>
 <ul>
@@ -329,9 +959,11 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../api/ara.agent.html">ara.agent package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api/ara.llm.html">ara.llm package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api/ara.memory.html">ara.memory package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/ara.persistence.html">ara.persistence package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api/ara.utils.html">ara.utils package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api/ara.config.html">ara.config module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../api/ara.models.html">ara.models module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/ara.webclient.html">ara.webclient package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/ara.cli.html">ara.cli package</a></li>
 </ul>
 
 <div class="relations">

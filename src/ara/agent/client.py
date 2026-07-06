@@ -10,8 +10,14 @@ from typing import Any
 class AgentClient:
     """JSON-over-UNIX-socket client for the Ara agent server."""
 
-    def __init__(self, socket_path: str = "sockets/ara_agent.sock") -> None:
-        self.socket_path = socket_path
+    def __init__(self, socket_path: str | None = None) -> None:
+        """Create a client.
+
+        :param socket_path: Path to the agent server's UNIX socket.  Defaults
+            to :attr:`AraSettings.default_socket_path`.
+        """
+        from ara.config import AraSettings
+        self.socket_path = socket_path or str(AraSettings().default_socket_path)
         self._sock: socket.socket | None = None
         self._counter = 0
 
@@ -20,19 +26,23 @@ class AgentClient:
     # ------------------------------------------------------------------ #
 
     def connect(self) -> None:
+        """Open a connection to the agent server."""
         self._sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         self._sock.connect(self.socket_path)
 
     def close(self) -> None:
+        """Close the connection, if open."""
         if self._sock:
             self._sock.close()
             self._sock = None
 
     def __enter__(self) -> AgentClient:
+        """Connect on context entry."""
         self.connect()
         return self
 
     def __exit__(self, *args: Any) -> None:
+        """Close on context exit."""
         self.close()
 
     # ------------------------------------------------------------------ #
@@ -81,9 +91,20 @@ class AgentClient:
         """
         return self._call("step")
 
-    def input(self, text: str) -> dict[str, Any]:
+    def attempt(self, text: str) -> dict[str, Any]:
+        """Store a pending player action attempt without ending the turn."""
+        return self._call("attempt", text=text)
+
+    def input(
+        self,
+        text: str,
+        attempt: str | dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         """Submit player input."""
-        return self._call("input", text=text)
+        params: dict[str, Any] = {"text": text}
+        if attempt is not None:
+            params["attempt"] = attempt
+        return self._call("input", **params)
 
     def state(self) -> dict[str, Any]:
         """Get a full state snapshot (story + engine)."""
@@ -114,3 +135,25 @@ class AgentClient:
         if args is None:
             args = []
         return self._call("debug", command=command, args=args)
+
+    def save(self, slot: int = 1) -> dict[str, Any]:
+        """Save the current story state to a slot."""
+        return self._call("save", slot=slot)
+
+    def load(self, slot: int = 1) -> dict[str, Any]:
+        """Load a story state from a slot."""
+        return self._call("load", slot=slot)
+
+    def list_saves(self, story_id: str | None = None) -> list[dict[str, Any]]:
+        """List all save slots."""
+        params: dict[str, Any] = {}
+        if story_id is not None:
+            params["story_id"] = story_id
+        return self._call("list_saves", **params)
+
+    def delete_save(self, slot: int, story_id: str | None = None) -> dict[str, Any]:
+        """Delete a save slot."""
+        params: dict[str, Any] = {"slot": slot}
+        if story_id is not None:
+            params["story_id"] = story_id
+        return self._call("delete_save", **params)

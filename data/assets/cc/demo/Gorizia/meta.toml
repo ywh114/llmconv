@@ -1,0 +1,3 @@
+importance = "IMPORTANT"
+sprites = ['default_neutral', 'default_xneutral', 'office_neutral', 'office_xneutral', 'work_neutral', 'work_xneutral']
+default_sprite = "default_neutral"

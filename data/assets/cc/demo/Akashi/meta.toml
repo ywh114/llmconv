@@ -1,0 +1,4 @@
+importance = "IMPORTANT"
+title = "Repair Ship"
+sprites = ["default_neutral"]
+default_sprite = "default_neutral"

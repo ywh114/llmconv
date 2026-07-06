@@ -1,0 +1,95 @@
+category = "delivery"
+# Generic movement / mobility ability entries.
+
+movement_movement_values = [
+    { value = "dash", prefixable = false, suffixible = false },
+    { value = "sprint", prefixable = false, suffixible = false },
+    { value = "leap", prefixable = false, suffixible = false },
+    { value = "vault", prefixable = false, suffixible = false },
+    { value = "blink", prefixable = false, suffixible = false },
+    { value = "phase", prefixable = false, suffixible = false },
+    { value = "slide", prefixable = false, suffixible = false },
+    { value = "soar", prefixable = false, suffixible = false },
+    { value = "pounce", prefixable = false, suffixible = false },
+    { value = "charge", prefixable = false, suffixible = false },
+    { value = "bound", prefixable = false, suffixible = false },
+    { value = "sidestep", prefixable = false, suffixible = false },
+    { value = "backflip", prefixable = false, suffixible = false },
+    { value = "teleport", prefixable = false, suffixible = false },
+    { value = "somersault", prefixable = false, suffixible = false },
+]
+
+suf_values = []
+
+verb_values = [
+    { value = "dash", prefixable = false, suffixible = false },
+    { value = "sprint", prefixable = false, suffixible = false },
+    { value = "leap", prefixable = false, suffixible = false },
+    { value = "vault", prefixable = false, suffixible = false },
+    { value = "blink", prefixable = false, suffixible = false },
+    { value = "phase", prefixable = false, suffixible = false },
+    { value = "slide", prefixable = false, suffixible = false },
+    { value = "soar", prefixable = false, suffixible = false },
+    { value = "pounce", prefixable = false, suffixible = false },
+    { value = "charge", prefixable = false, suffixible = false },
+    { value = "bound", prefixable = false, suffixible = false },
+    { value = "evade", prefixable = false, suffixible = false },
+    { value = "weave", prefixable = false, suffixible = false },
+    { value = "rush", prefixable = false, suffixible = false },
+    { value = "dart", prefixable = false, suffixible = false },
+]
+
+noun_values = [
+    { value = "step", prefixable = false, suffixible = false },
+    { value = "stride", prefixable = false, suffixible = false },
+    { value = "leap", prefixable = false, suffixible = false },
+    { value = "dash", prefixable = false, suffixible = false },
+    { value = "charge", prefixable = false, suffixible = false },
+    { value = "rush", prefixable = false, suffixible = false },
+    { value = "vault", prefixable = false, suffixible = false },
+    { value = "blink", prefixable = false, suffixible = false },
+    { value = "slide", prefixable = false, suffixible = false },
+    { value = "soar", prefixable = false, suffixible = false },
+    { value = "pounce", prefixable = false, suffixible = false },
+    { value = "somersault", prefixable = false, suffixible = false },
+    { value = "backflip", prefixable = false, suffixible = false },
+    { value = "teleport", prefixable = false, suffixible = false },
+]
+
+adj_values = [
+    { value = "swift", prefixable = false, suffixible = false },
+    { value = "sudden", prefixable = false, suffixible = false },
+    { value = "agile", prefixable = false, suffixible = false },
+    { value = "bounding", prefixable = false, suffixible = false },
+    { value = "acrobatic", prefixable = false, suffixible = false },
+    { value = "evasive", prefixable = false, suffixible = false },
+    { value = "fluid", prefixable = false, suffixible = false },
+    { value = "rapid", prefixable = false, suffixible = false },
+    { value = "aerial", prefixable = false, suffixible = false },
+    { value = "phasing", prefixable = false, suffixible = false },
+    { value = "nimble", prefixable = false, suffixible = false },
+    { value = "breakneck", prefixable = false, suffixible = false },
+]
+
+[["movement"]]
+patterns = ["{movement_movement_values}"]
+
+[[expose]]
+slot = "suf"
+from = ["suf_values"]
+
+[[expose]]
+slot = "technique"
+from = ["movement"]
+
+[[expose]]
+slot = "verb"
+from = ["verb_values"]
+
+[[expose]]
+slot = "noun"
+from = ["noun_values"]
+
+[[expose]]
+slot = "adj"
+from = ["adj_values"]

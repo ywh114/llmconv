@@ -1,0 +1,70 @@
+category = "delivery"
+# Generic melee delivery ability entries.
+
+melee_melee_values = [
+    { value = "slash", prefixable = false, suffixible = false },
+    { value = "cleave", prefixable = false, suffixible = false },
+    { value = "impale", prefixable = false, suffixible = false },
+    { value = "crush", prefixable = false, suffixible = false },
+    { value = "lunge", prefixable = false, suffixible = false },
+    { value = "bisect", prefixable = false, suffixible = false },
+    { value = "skewer", prefixable = false, suffixible = false },
+    { value = "tackle", prefixable = false, suffixible = false },
+    { value = "headbutt", prefixable = false, suffixible = false },
+    { value = "uppercut", prefixable = false, suffixible = false },
+]
+
+suf_values = []
+
+verb_values = [
+    { value = "slash", prefixable = false, suffixible = false },
+    { value = "cleave", prefixable = false, suffixible = false },
+    { value = "impale", prefixable = false, suffixible = false },
+    { value = "crush", prefixable = false, suffixible = false },
+    { value = "smash", prefixable = false, suffixible = false },
+    { value = "pummel", prefixable = false, suffixible = false },
+    { value = "tackle", prefixable = false, suffixible = false },
+    { value = "uppercut", prefixable = false, suffixible = false },
+]
+
+noun_values = [
+    { value = "blade", prefixable = false, suffixible = false },
+    { value = "fist", prefixable = false, suffixible = false },
+    { value = "hammer", prefixable = false, suffixible = false },
+    { value = "axe", prefixable = false, suffixible = false },
+    { value = "spear", prefixable = false, suffixible = false },
+    { value = "club", prefixable = false, suffixible = false },
+    { value = "maul", prefixable = false, suffixible = false },
+]
+
+adj_values = [
+    { value = "brutal", prefixable = false, suffixible = false },
+    { value = "savage", prefixable = false, suffixible = false },
+    { value = "visceral", prefixable = false, suffixible = false },
+    { value = "close-quarters", prefixable = false, suffixible = false },
+]
+
+melee_movement_values = []
+
+[["melee"]]
+patterns = ["{melee_melee_values}"]
+
+[[expose]]
+slot = "suf"
+from = ["suf_values"]
+
+[[expose]]
+slot = "technique"
+from = ["melee", "movement"]
+
+[[expose]]
+slot = "verb"
+from = ["verb_values"]
+
+[[expose]]
+slot = "noun"
+from = ["noun_values"]
+
+[[expose]]
+slot = "adj"
+from = ["adj_values"]

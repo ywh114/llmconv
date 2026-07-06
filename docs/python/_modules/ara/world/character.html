@@ -41,13 +41,39 @@
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">tomllib</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">IntEnum</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">ara.llm.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConversationContext</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ara.memory.chroma</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChromaStore</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ara.memory.knowledge</span><span class="w"> </span><span class="kn">import</span> <span class="n">CharacterMemory</span><span class="p">,</span> <span class="n">NullMemory</span><span class="p">,</span> <span class="n">Scratchpad</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">ara.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Context</span><span class="p">,</span> <span class="n">Importance</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ara.llm.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Context</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ara.utils.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_logger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ara.world.system_page</span><span class="w"> </span><span class="kn">import</span> <span class="n">pretty_print</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Importance">
+<a class="viewcode-back" href="../../../api/ara.world.html#ara.world.character.Importance">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Importance</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Character importance levels controlling memory fidelity and scratch access.</span>
+
+<span class="sd">    Higher importance characters receive end-of-scene scratch updates and</span>
+<span class="sd">    persistent conversation storage.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">ANONYMOUS</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Background character with minimal persistence.&quot;&quot;&quot;</span>
+
+    <span class="n">IMPORTANT</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Significant character with scratch updates and memory storage.&quot;&quot;&quot;</span>
+
+    <span class="n">REQUIRED</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot-critical character.&quot;&quot;&quot;</span>
+
+    <span class="n">EIGEN</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Protagonist-level character with highest persistence.&quot;&quot;&quot;</span></div>
+
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_stable_uuid</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">uuid</span><span class="o">.</span><span class="n">UUID</span><span class="p">:</span>
@@ -65,23 +91,85 @@
 <span class="k">class</span><span class="w"> </span><span class="nc">Character</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;In-world character backed by a card and persistent memory.</span>
 
-<span class="sd">    :ivar id: Stable UUID derived from the character&#39;s name.</span>
-<span class="sd">    :ivar name: Display name.</span>
+<span class="sd">    :ivar id: Stable UUID derived from the character&#39;s canonical name.</span>
+<span class="sd">    :ivar canonical_name: Stable latin identifier (usually the asset directory name).</span>
+<span class="sd">    :ivar name: Localized display name.</span>
 <span class="sd">    :ivar card_fields: Key-value pairs loaded from the PNG card metadata.</span>
 <span class="sd">    :ivar importance: Persistence level controlling scratch updates and</span>
 <span class="sd">        memory storage.</span>
 <span class="sd">    :ivar memory: Vector-backed conversation memory.</span>
 <span class="sd">    :ivar scratch: Ephemeral scratchpad for in-scene reasoning.</span>
-<span class="sd">    :ivar skins: List of skin filenames found in the character directory.</span>
+<span class="sd">    :ivar sprites: List of available sprite names (filename stems) for this</span>
+<span class="sd">        character, e.g. ``[&quot;default_neutral&quot;, &quot;default_happy&quot;]``.</span>
+<span class="sd">    :ivar current_sprite: The sprite currently being displayed.</span>
+<span class="sd">    :ivar crops: Per-sprite crop regions keyed by sprite name.</span>
+<span class="sd">    :ivar sprite_descriptions: Base description of each sprite/skin.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nb">id</span><span class="p">:</span> <span class="n">uuid</span><span class="o">.</span><span class="n">UUID</span>
+    <span class="n">canonical_name</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">card_fields</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>
     <span class="n">importance</span><span class="p">:</span> <span class="n">Importance</span>
     <span class="n">memory</span><span class="p">:</span> <span class="n">CharacterMemory</span> <span class="o">|</span> <span class="n">NullMemory</span>
     <span class="n">scratch</span><span class="p">:</span> <span class="n">Scratchpad</span>
-    <span class="n">skins</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">sprites</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">current_sprite</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">crops</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+    <span class="n">sprite_descriptions</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+    <span class="n">status</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;System-page DSL dict for the character&#39;s persistent status.&quot;&quot;&quot;</span>
+    <span class="n">names</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Alternative language names for the character, e.g. {\&quot;zh\&quot;: \&quot;柴郡\&quot;}.&quot;&quot;&quot;</span>
+    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Persistent title or epithet (e.g. \&quot;Heavy Cruiser\&quot;, \&quot;Wizard of Despair\&quot;).&quot;&quot;&quot;</span>
+    <span class="n">hidden</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;True when the character is present but hidden from most observers.&quot;&quot;&quot;</span>
+    <span class="n">visible_to</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">set</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Canonical names of characters who can still see/hear this hidden character.&quot;&quot;&quot;</span>
+    <span class="n">inner_log</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Private inner thoughts generated for this character.&quot;&quot;&quot;</span>
+    <span class="n">prev_scene_summary</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Tailored bridging summary injected at the start of a new scene.&quot;&quot;&quot;</span>
+    <span class="n">card_overrides</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Per-scene overrides for card fields, applied by the transition summarizer.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Character.skin_description">
+<a class="viewcode-back" href="../../../api/ara.world.html#ara.world.character.Character.skin_description">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">skin_description</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sprite</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the base description for a sprite, or the current sprite.</span>
+
+<span class="sd">        The description is not absolute: the orchestrator or character may</span>
+<span class="sd">        apply ephemeral modifiers (e.g. muddy dress) via scratch or directives.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sprite</span> <span class="o">=</span> <span class="n">sprite</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_sprite</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sprite_descriptions</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">sprite</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Character.display_name">
+<a class="viewcode-back" href="../../../api/ara.world.html#ara.world.character.Character.display_name">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">display_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">language</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the name to use for *language*.</span>
+
+<span class="sd">        Falls back to the canonical English name when no alias exists.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">language</span> <span class="ow">and</span> <span class="n">language</span> <span class="o">!=</span> <span class="s2">&quot;en&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">names</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">language</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span></div>
+
+
+<div class="viewcode-block" id="Character.display_name_with_title">
+<a class="viewcode-back" href="../../../api/ara.world.html#ara.world.character.Character.display_name_with_title">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">display_name_with_title</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">language</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the display name with title prefix if present.</span>
+
+<span class="sd">        Returns &quot;[title] name&quot; format when title exists, otherwise just name.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display_name</span><span class="p">(</span><span class="n">language</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">title</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">title</span><span class="si">}</span><span class="s2">] </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">return</span> <span class="n">name</span></div>
+
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">whoami</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Context</span><span class="p">:</span>
@@ -93,11 +181,11 @@
         <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
         <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span>
             <span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">),</span>
-            <span class="p">(</span><span class="s2">&quot;summary&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">card_fields</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;summary&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)),</span>
-            <span class="p">(</span><span class="s2">&quot;personality&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">card_fields</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;personality&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)),</span>
-            <span class="p">(</span><span class="s2">&quot;scenario&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">card_fields</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;scenario&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)),</span>
-            <span class="p">(</span><span class="s2">&quot;greeting_message&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">card_fields</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;greeting_message&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)),</span>
-            <span class="p">(</span><span class="s2">&quot;example_messages&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">card_fields</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;example_messages&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)),</span>
+            <span class="p">(</span><span class="s2">&quot;summary&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">card_overrides</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;summary&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">card_fields</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;summary&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))),</span>
+            <span class="p">(</span><span class="s2">&quot;personality&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">card_overrides</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;personality&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">card_fields</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;personality&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))),</span>
+            <span class="p">(</span><span class="s2">&quot;scenario&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">card_overrides</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;scenario&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">card_fields</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;scenario&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))),</span>
+            <span class="p">(</span><span class="s2">&quot;greeting_message&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">card_overrides</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;greeting_message&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">card_fields</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;greeting_message&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))),</span>
+            <span class="p">(</span><span class="s2">&quot;example_messages&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">card_overrides</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;example_messages&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">card_fields</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;example_messages&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))),</span>
         <span class="p">]</span>
         <span class="n">ctx</span><span class="p">:</span> <span class="n">Context</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">field_name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">:</span>
@@ -112,6 +200,54 @@
                 <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span>
             <span class="p">})</span>
         <span class="k">return</span> <span class="n">ctx</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">status_context</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Context</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a context snippet that injects the character&#39;s persistent status.</span>
+
+<span class="sd">        The status is stored as a system-page DSL dict and is pretty-printed</span>
+<span class="sd">        before being shown to the character.  If no status is set, an empty list</span>
+<span class="sd">        is returned so the character is not prompted for a status block.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+        <span class="n">status_text</span> <span class="o">=</span> <span class="n">pretty_print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">status_text</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;Please provide your `status`.&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">ConversationContext</span><span class="o">.</span><span class="n">default_sysname</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;assistant&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">status_text</span><span class="p">,</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">scene_summary_context</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Context</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a context snippet that injects the per-character scene summary.</span>
+
+<span class="sd">        This is generated by the Summarizer during scene transitions and</span>
+<span class="sd">        tells the character what they should remember from the previous scene.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">prev_scene_summary</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;Please summarize what happened before this scene.&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">ConversationContext</span><span class="o">.</span><span class="n">default_sysname</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;assistant&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">prev_scene_summary</span><span class="p">,</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">scratch_context</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Context</span><span class="p">:</span>
@@ -149,14 +285,17 @@
         <span class="p">]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Hash based on the character&#39;s stable ID.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Equality is identity-by-ID.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Character</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">NotImplemented</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">id</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Short representation for debugging.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;Character </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&gt;&quot;</span></div>
 
 
@@ -197,18 +336,29 @@
 
 <div class="viewcode-block" id="create_anonymous_character">
 <a class="viewcode-back" href="../../../api/ara.world.html#ara.world.character.create_anonymous_character">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">create_anonymous_character</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Character</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_anonymous_character</span><span class="p">(</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">sprite</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Character</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a background extra with no assets and no persistent memory.</span>
 
 <span class="sd">    :param name: Display name for the background character.</span>
 <span class="sd">    :param description: Unstructured description of what the character is and</span>
 <span class="sd">        should do. Stored in ``card_fields[&quot;summary&quot;]`` so it appears in the</span>
 <span class="sd">        character&#39;s ``whoami`` context.</span>
+<span class="sd">    :param sprite: Sprite identifier for the web VN frontend (e.g.</span>
+<span class="sd">        ``cat_neutral``). Resolved under ``data/assets/cc/&lt;story&gt;/anonymous/``</span>
+<span class="sd">        if it exists, otherwise ``data/assets/cc/anonymous/``.</span>
+<span class="sd">    :param title: Optional title or epithet (e.g., &quot;The Unbroken&quot;, &quot;Nuclear Fleet Carrier&quot;).</span>
+<span class="sd">        Displays as &quot;[title] name&quot; format.</span>
 <span class="sd">    :return: A :class:`Character` with :attr:`Importance.ANONYMOUS`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">char_id</span> <span class="o">=</span> <span class="n">_stable_uuid</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">Character</span><span class="p">(</span>
         <span class="nb">id</span><span class="o">=</span><span class="n">char_id</span><span class="p">,</span>
+        <span class="n">canonical_name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
         <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
         <span class="n">card_fields</span><span class="o">=</span><span class="p">{</span>
             <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span>
@@ -217,85 +367,120 @@
             <span class="s2">&quot;scenario&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
             <span class="s2">&quot;greeting_message&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
             <span class="s2">&quot;example_messages&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;sprite&quot;</span><span class="p">:</span> <span class="n">sprite</span><span class="p">,</span>
         <span class="p">},</span>
         <span class="n">importance</span><span class="o">=</span><span class="n">Importance</span><span class="o">.</span><span class="n">ANONYMOUS</span><span class="p">,</span>
         <span class="n">memory</span><span class="o">=</span><span class="n">NullMemory</span><span class="p">(),</span>
         <span class="n">scratch</span><span class="o">=</span><span class="n">Scratchpad</span><span class="p">(),</span>
-        <span class="n">skins</span><span class="o">=</span><span class="p">[],</span>
+        <span class="n">sprites</span><span class="o">=</span><span class="p">[],</span>
+        <span class="n">current_sprite</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
     <span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="load_character">
 <a class="viewcode-back" href="../../../api/ara.world.html#ara.world.character.load_character">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">load_character</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">db</span><span class="p">:</span> <span class="n">ChromaStore</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Character</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Load a character from a directory containing a PNG card or card.toml.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_character</span><span class="p">(</span>
+    <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+    <span class="n">db</span><span class="p">:</span> <span class="n">ChromaStore</span><span class="p">,</span>
+    <span class="n">language</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;en&quot;</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Character</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Load a character from a directory containing a ``card.toml`` sidecar.</span>
 
-<span class="sd">    The loader attempts the following sources in order:</span>
-
-<span class="sd">    1. ``card.toml`` sidecar (plain text, easiest for demos).</span>
-<span class="sd">    2. PNG card metadata via ``aichar``.</span>
-<span class="sd">    3. Fallback empty fields.</span>
-
-<span class="sd">    The directory may also contain a ``meta.toml`` file with an</span>
-<span class="sd">    ``importance`` key (one of ``ANONYMOUS``, ``IMPORTANT``, ``REQUIRED``,</span>
+<span class="sd">    The directory may also contain PNG sprites and a ``meta.toml`` file with</span>
+<span class="sd">    an ``importance`` key (one of ``ANONYMOUS``, ``IMPORTANT``, ``REQUIRED``</span>
 <span class="sd">    or ``EIGEN``).</span>
 
 <span class="sd">    :param path: Character asset directory.</span>
 <span class="sd">    :param db: Shared ChromaDB store.</span>
+<span class="sd">    :param language: Preferred language for the display name.</span>
 <span class="sd">    :return: Fully initialised :class:`Character`.</span>
-<span class="sd">    :raises RuntimeError: If neither a PNG card nor ``card.toml`` is found.</span>
+<span class="sd">    :raises RuntimeError: If no ``card.toml`` is found.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">pngs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*.png&quot;</span><span class="p">))</span>
     <span class="n">card_toml</span> <span class="o">=</span> <span class="n">_read_card_toml</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">pngs</span> <span class="ow">and</span> <span class="n">card_toml</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No PNG card or card.toml found in </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">card_toml</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No card.toml found in </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">card_toml</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">name</span> <span class="o">=</span> <span class="n">card_toml</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="ow">or</span> <span class="n">path</span><span class="o">.</span><span class="n">name</span>
-        <span class="n">card_fields</span> <span class="o">=</span> <span class="n">card_toml</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">png</span> <span class="o">=</span> <span class="n">pngs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">name</span> <span class="o">=</span> <span class="n">png</span><span class="o">.</span><span class="n">stem</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="kn">from</span><span class="w"> </span><span class="nn">aichar</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_character_card</span>
+    <span class="n">card_fields</span> <span class="o">=</span> <span class="n">card_toml</span>
 
-            <span class="n">card</span> <span class="o">=</span> <span class="n">load_character_card</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">png</span><span class="p">))</span>
-            <span class="n">card_fields</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">card</span><span class="o">.</span><span class="n">name</span> <span class="ow">or</span> <span class="n">name</span><span class="p">,</span>
-                <span class="s2">&quot;summary&quot;</span><span class="p">:</span> <span class="n">card</span><span class="o">.</span><span class="n">summary</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;personality&quot;</span><span class="p">:</span> <span class="n">card</span><span class="o">.</span><span class="n">personality</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;scenario&quot;</span><span class="p">:</span> <span class="n">card</span><span class="o">.</span><span class="n">scenario</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;greeting_message&quot;</span><span class="p">:</span> <span class="n">card</span><span class="o">.</span><span class="n">greeting</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;example_messages&quot;</span><span class="p">:</span> <span class="n">card</span><span class="o">.</span><span class="n">example_messages</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-            <span class="p">}</span>
-        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-            <span class="n">card_fields</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span>
-                <span class="s2">&quot;summary&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;personality&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;scenario&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;greeting_message&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;example_messages&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-            <span class="p">}</span>
+    <span class="c1"># The directory name is the canonical ID.  The card ``name`` field and</span>
+    <span class="c1"># ``[names]`` table provide localized display names.</span>
+    <span class="n">canonical</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">name</span>
+    <span class="n">display</span> <span class="o">=</span> <span class="n">card_toml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">canonical</span>
+
+    <span class="n">names</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">card_path</span> <span class="o">=</span> <span class="n">path</span> <span class="o">/</span> <span class="s2">&quot;card.toml&quot;</span>
+    <span class="k">if</span> <span class="n">card_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="k">with</span> <span class="n">card_path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">raw_card</span> <span class="o">=</span> <span class="n">tomllib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">raw_names</span> <span class="o">=</span> <span class="n">raw_card</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;names&quot;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">raw_names</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">names</span> <span class="o">=</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">):</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">raw_names</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">str</span><span class="p">)}</span>
+    <span class="k">if</span> <span class="n">canonical</span> <span class="ow">and</span> <span class="s2">&quot;en&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="s2">&quot;en&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">canonical</span>
+    <span class="k">if</span> <span class="n">display</span> <span class="ow">and</span> <span class="n">language</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">language</span><span class="p">]</span> <span class="o">=</span> <span class="n">display</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">names</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">language</span><span class="p">,</span> <span class="n">names</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;en&quot;</span><span class="p">,</span> <span class="n">canonical</span><span class="p">))</span>
 
     <span class="n">meta</span> <span class="o">=</span> <span class="n">_read_meta</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
     <span class="n">importance_name</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;importance&quot;</span><span class="p">,</span> <span class="s2">&quot;ANONYMOUS&quot;</span><span class="p">)</span>
     <span class="n">importance</span> <span class="o">=</span> <span class="n">Importance</span><span class="o">.</span><span class="n">__members__</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">importance_name</span><span class="p">,</span> <span class="n">Importance</span><span class="o">.</span><span class="n">ANONYMOUS</span><span class="p">)</span>
 
-    <span class="n">char_id</span> <span class="o">=</span> <span class="n">_stable_uuid</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-    <span class="n">skins</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">stem</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">path</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*.png&quot;</span><span class="p">)]</span>
+    <span class="c1"># Parse per-sprite crop regions, focus points, and descriptions from meta.toml</span>
+    <span class="c1"># (e.g. [default_neutral] topleft = [0,0])</span>
+    <span class="n">crops</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">sprite_descriptions</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">meta</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;importance&quot;</span><span class="p">,</span> <span class="s2">&quot;sprites&quot;</span><span class="p">,</span> <span class="s2">&quot;default_sprite&quot;</span><span class="p">):</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">continue</span>
+        <span class="n">crop</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="s2">&quot;topleft&quot;</span> <span class="ow">in</span> <span class="n">value</span> <span class="ow">and</span> <span class="s2">&quot;bottomright&quot;</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+            <span class="n">crop</span><span class="p">[</span><span class="s2">&quot;topleft&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="s2">&quot;topleft&quot;</span><span class="p">]</span>
+            <span class="n">crop</span><span class="p">[</span><span class="s2">&quot;bottomright&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="s2">&quot;bottomright&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s2">&quot;center&quot;</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+            <span class="n">crop</span><span class="p">[</span><span class="s2">&quot;center&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="s2">&quot;center&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s2">&quot;focus&quot;</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+            <span class="n">crop</span><span class="p">[</span><span class="s2">&quot;focus&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="s2">&quot;focus&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">crop</span><span class="p">:</span>
+            <span class="n">crops</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">crop</span>
+        <span class="k">if</span> <span class="s2">&quot;description&quot;</span> <span class="ow">in</span> <span class="n">value</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">[</span><span class="s2">&quot;description&quot;</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">sprite_descriptions</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="s2">&quot;description&quot;</span><span class="p">]</span>
 
-    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loaded character </span><span class="si">{</span><span class="n">card_fields</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> (importance=</span><span class="si">{</span><span class="n">importance_name</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+    <span class="n">char_id</span> <span class="o">=</span> <span class="n">_stable_uuid</span><span class="p">(</span><span class="n">canonical</span><span class="p">)</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Ensure a display name exists. If the card has no name field and no</span>
+    <span class="c1"># [names] table, fall back to the canonical id so internal code always</span>
+    <span class="c1"># has a usable display label.</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span><span class="p">:</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">canonical</span>
+
+    <span class="c1"># Sprite list: explicit meta.toml ``sprites`` array, or discover PNGs.</span>
+    <span class="n">sprites</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sprites&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">sprites</span><span class="p">:</span>
+        <span class="n">sprites</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">stem</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">path</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*.png&quot;</span><span class="p">)]</span>
+    <span class="n">current_sprite</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;default_sprite&quot;</span><span class="p">,</span> <span class="n">sprites</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">sprites</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loaded character </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> (importance=</span><span class="si">{</span><span class="n">importance_name</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">Character</span><span class="p">(</span>
         <span class="nb">id</span><span class="o">=</span><span class="n">char_id</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="n">card_fields</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span>
+        <span class="n">canonical_name</span><span class="o">=</span><span class="n">canonical</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
         <span class="n">card_fields</span><span class="o">=</span><span class="n">card_fields</span><span class="p">,</span>
         <span class="n">importance</span><span class="o">=</span><span class="n">importance</span><span class="p">,</span>
         <span class="n">memory</span><span class="o">=</span><span class="n">CharacterMemory</span><span class="p">(</span><span class="n">character_id</span><span class="o">=</span><span class="n">char_id</span><span class="p">,</span> <span class="n">db</span><span class="o">=</span><span class="n">db</span><span class="p">),</span>
         <span class="n">scratch</span><span class="o">=</span><span class="n">Scratchpad</span><span class="p">(),</span>
-        <span class="n">skins</span><span class="o">=</span><span class="n">skins</span><span class="p">,</span>
+        <span class="n">sprites</span><span class="o">=</span><span class="n">sprites</span><span class="p">,</span>
+        <span class="n">current_sprite</span><span class="o">=</span><span class="n">current_sprite</span><span class="p">,</span>
+        <span class="n">crops</span><span class="o">=</span><span class="n">crops</span><span class="p">,</span>
+        <span class="n">sprite_descriptions</span><span class="o">=</span><span class="n">sprite_descriptions</span><span class="p">,</span>
+        <span class="n">names</span><span class="o">=</span><span class="n">names</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
     <span class="p">)</span></div>
 
 </pre></div>
@@ -328,6 +513,7 @@
 <p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../static_assets.html">Static assets</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Reference:</span></p>
 <ul>
@@ -336,9 +522,11 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../api/ara.agent.html">ara.agent package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api/ara.llm.html">ara.llm package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api/ara.memory.html">ara.memory package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/ara.persistence.html">ara.persistence package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api/ara.utils.html">ara.utils package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api/ara.config.html">ara.config module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../api/ara.models.html">ara.models module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/ara.webclient.html">ara.webclient package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/ara.cli.html">ara.cli package</a></li>
 </ul>
 
 <div class="relations">

@@ -1,0 +1,258 @@
+rank = [
+    { value = "comrade", prefixable = true, suffixible = true },
+    { value = "marshal", prefixable = true, suffixible = true },
+    { value = "general", prefixable = true, suffixible = true },
+    { value = "chairman", prefixable = true, suffixible = true },
+    { value = "party member", prefixable = false, suffixible = false },
+    { value = "great leader", prefixable = false, suffixible = false },
+    { value = "dear leader", prefixable = false, suffixible = false },
+    { value = "supreme leader", prefixable = false, suffixible = false },
+]
+class_root = [
+    { value = "worker", prefixable = true, suffixible = true },
+    { value = "peasant", prefixable = true, suffixible = true },
+    { value = "soldier", prefixable = true, suffixible = true },
+    { value = "comrade", prefixable = true, suffixible = true },
+    { value = "citizen", prefixable = true, suffixible = true },
+    { value = "pioneer", prefixable = true, suffixible = true },
+    { value = "revolutionary", prefixable = true, suffixible = true },
+    { value = "red guard", prefixable = false, suffixible = false },
+]
+class_suffix = [
+    { value = "ling", prefixable = true, suffixible = true },
+    { value = "kind", prefixable = true, suffixible = true },
+]
+prefix = []
+adj = [
+    { value = "great", prefixable = true, suffixible = true },
+    { value = "dear", prefixable = true, suffixible = true },
+    { value = "red", prefixable = true, suffixible = true },
+    { value = "socialist", prefixable = true, suffixible = true },
+    { value = "revolutionary", prefixable = true, suffixible = true },
+    { value = "self-reliant", prefixable = true, suffixible = true },
+    { value = "single-hearted", prefixable = true, suffixible = true },
+    { value = "iron-willed", prefixable = true, suffixible = true },
+    { value = "anti-imperialist", prefixable = true, suffixible = true },
+    { value = "patriotic", prefixable = true, suffixible = true },
+    { value = "loyal", prefixable = true, suffixible = true },
+    { value = "militant", prefixable = true, suffixible = true },
+    { value = "glorious", prefixable = true, suffixible = true },
+    { value = "nuclear", prefixable = true, suffixible = true },
+]
+adj_sup = [
+    { value = "greatest", prefixable = true, suffixible = true },
+    { value = "eternal", prefixable = true, suffixible = true },
+    { value = "immortal", prefixable = true, suffixible = true },
+    { value = "supreme", prefixable = true, suffixible = true },
+]
+noun = [
+    { value = "comrade", prefixable = true, suffixible = true },
+    { value = "worker", prefixable = true, suffixible = true },
+    { value = "peasant", prefixable = true, suffixible = true },
+    { value = "soldier", prefixable = true, suffixible = true },
+    { value = "citizen", prefixable = true, suffixible = true },
+    { value = "pioneer", prefixable = true, suffixible = true },
+    { value = "revolutionary", prefixable = true, suffixible = true },
+    { value = "missile", prefixable = true, suffixible = true },
+    { value = "warhead", prefixable = true, suffixible = true },
+    { value = "satellite", prefixable = true, suffixible = true },
+    { value = "tractor", prefixable = true, suffixible = true },
+    { value = "steel", prefixable = true, suffixible = true },
+    { value = "rice", prefixable = true, suffixible = true },
+    { value = "coal", prefixable = true, suffixible = true },
+]
+class_values = [
+    { value = "worker", prefixable = true, suffixible = true },
+    { value = "peasant", prefixable = true, suffixible = true },
+    { value = "soldier", prefixable = true, suffixible = true },
+    { value = "comrade", prefixable = true, suffixible = true },
+    { value = "revolutionary", prefixable = true, suffixible = true },
+    { value = "party member", prefixable = false, suffixible = false },
+]
+thing = [
+    { value = "revolution", prefixable = true, suffixible = true },
+    { value = "self-reliance", prefixable = true, suffixible = true },
+    { value = "socialism", prefixable = true, suffixible = true },
+    { value = "communism", prefixable = true, suffixible = true },
+    { value = "nuclear deterrence", prefixable = false, suffixible = false },
+    { value = "satellite", prefixable = true, suffixible = true },
+    { value = "missile", prefixable = true, suffixible = true },
+    { value = "warhead", prefixable = true, suffixible = true },
+    { value = "tractor", prefixable = true, suffixible = true },
+    { value = "steel", prefixable = true, suffixible = true },
+    { value = "rice", prefixable = true, suffixible = true },
+    { value = "coal", prefixable = true, suffixible = true },
+    { value = "songun", prefixable = true, suffixible = true },
+    { value = "chollima", prefixable = true, suffixible = true },
+    { value = "juche", prefixable = true, suffixible = true },
+]
+
+suf = [
+    { value = 'born', prefixable = true, suffixible = true },
+    { value = 'kin', prefixable = true, suffixible = true },
+    { value = 'kind', prefixable = true, suffixible = true },
+    { value = 'guard', prefixable = true, suffixible = true },
+    { value = 'child', prefixable = true, suffixible = true },
+    { value = 'seed', prefixable = true, suffixible = true },
+]
+
+[[place]]
+value = "Pyongyang"
+takes_of = true
+takes_in = false
+article = ""
+proper_noun = true
+prefixable = true
+suffixible = true
+
+[[place]]
+value = "the DPRK"
+takes_of = true
+takes_in = false
+article = ""
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "Korea"
+takes_of = true
+takes_in = false
+article = ""
+proper_noun = true
+prefixable = true
+suffixible = true
+
+[[place]]
+value = "the Workers' Party"
+takes_of = true
+takes_in = false
+article = ""
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "the People's Army"
+takes_of = true
+takes_in = false
+article = ""
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "the 38th parallel"
+takes_of = true
+takes_in = false
+article = ""
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "the DMZ"
+takes_of = true
+takes_in = false
+article = ""
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "the Juche Tower"
+takes_of = true
+takes_in = false
+article = ""
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "Mount Paektu"
+takes_of = true
+takes_in = false
+article = ""
+proper_noun = true
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "coal mine"
+takes_of = true
+takes_in = false
+article = "the"
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "steel mill"
+takes_of = true
+takes_in = false
+article = "the"
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[class]]
+patterns = [
+    "{prefix}{class_root}",
+    "{class_root}",
+    "{class_root}{class_suffix}",
+]
+
+[[expose]]
+slot = "rank"
+from = [
+    "rank",
+]
+
+[[expose]]
+slot = "class"
+from = [
+    "class",
+    "class_values",
+]
+
+[[expose]]
+slot = "prefix"
+from = [
+    "prefix",
+]
+
+[[expose]]
+slot = "adj"
+from = [
+    "adj",
+]
+
+[[expose]]
+slot = "adj_sup"
+from = [
+    "adj_sup",
+]
+
+[[expose]]
+slot = "noun"
+from = [
+    "noun",
+]
+
+
+[[expose]]
+slot = "thing"
+from = [
+    "thing",
+]
+
+[[expose]]
+slot = "place"
+from = [
+    "place",
+]
+[[expose]]
+slot = "suf"
+from = [
+    "suf",
+]

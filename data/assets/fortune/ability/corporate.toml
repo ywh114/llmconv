@@ -1,0 +1,109 @@
+category = "tonal"
+# Corporate-toned ability entries.
+
+corporate_melee_values = [
+    { value = "downsize", prefixable = false, suffixible = false },
+    { value = "severance", prefixable = false, suffixible = false },
+    { value = "liquidation", prefixable = false, suffixible = false },
+]
+
+corporate_area_values = [
+    { value = "restructure", prefixable = false, suffixible = false },
+    { value = "downsize", prefixable = false, suffixible = false },
+]
+
+corporate_ranged_values = [
+    { value = "outsourcing", prefixable = false, suffixible = false },
+]
+
+corporate_status_values = [
+    { value = "audit", prefixable = false, suffixible = false },
+    { value = "acquire", prefixable = false, suffixible = false },
+    { value = "merger", prefixable = false, suffixible = false },
+    { value = "compliance", prefixable = false, suffixible = false },
+    { value = "outsourcing", prefixable = false, suffixible = false },
+]
+
+corporate_defence_values = [
+    { value = "indemnify", prefixable = false, suffixible = false },
+    { value = "hedge", prefixable = false, suffixible = false },
+]
+
+suf_values = []
+
+domain_values = [
+    { value = "quarterly", prefixable = false, suffixible = false },
+    { value = "boardroom", prefixable = false, suffixible = false },
+    { value = "shareholder", prefixable = false, suffixible = false },
+    { value = "compliance", prefixable = false, suffixible = false },
+    { value = "stakeholder", prefixable = false, suffixible = false },
+    { value = "HR", prefixable = false, suffixible = false },
+]
+
+verb_values = [
+    { value = "audit", prefixable = false, suffixible = false },
+    { value = "downsizing", prefixable = false, suffixible = false },
+    { value = "termination", prefixable = false, suffixible = false },
+    { value = "outsourcing", prefixable = false, suffixible = false },
+    { value = "liquidation", prefixable = false, suffixible = false },
+    { value = "fire", prefixable = false, suffixible = false },
+]
+
+noun_values = [
+    { value = "the board", prefixable = false, suffixible = false },
+    { value = "KPI", prefixable = false, suffixible = false },
+    { value = "redundancy", prefixable = false, suffixible = false },
+    { value = "severance", prefixable = false, suffixible = false },
+    { value = "shares", prefixable = false, suffixible = false },
+    { value = "productivity", prefixable = false, suffixible = false },
+]
+
+adj_sup_values = [
+    { value = "executive", prefixable = false, suffixible = false },
+    { value = "senior", prefixable = false, suffixible = false },
+    { value = "junior", prefixable = false, suffixible = false },
+    { value = "acting", prefixable = false, suffixible = false },
+    { value = "associate", prefixable = false, suffixible = false },
+    { value = "quarterly", prefixable = false, suffixible = false },
+]
+
+corporate_movement_values = []
+
+[["melee"]]
+patterns = ["{corporate_melee_values}"]
+
+[["area"]]
+patterns = ["{corporate_area_values}"]
+
+[["ranged"]]
+patterns = ["{corporate_ranged_values}"]
+
+[["status"]]
+patterns = ["{corporate_status_values}"]
+
+[["defence"]]
+patterns = ["{corporate_defence_values}"]
+
+[[expose]]
+slot = "suf"
+from = ["suf_values"]
+
+[[expose]]
+slot = "technique"
+from = ["melee", "area", "ranged", "status", "defence", "movement"]
+
+[[expose]]
+slot = "domain"
+from = ["domain_values"]
+
+[[expose]]
+slot = "verb"
+from = ["verb_values"]
+
+[[expose]]
+slot = "noun"
+from = ["noun_values"]
+
+[[expose]]
+slot = "adj_sup"
+from = ["adj_sup_values"]

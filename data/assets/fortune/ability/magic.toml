@@ -1,0 +1,190 @@
+category = "concept"
+# Generic non-elemental magic ability entries.
+
+prefix_values = [
+    { value = "arcan", prefixable = false, suffixible = true },
+    { value = "mysti", prefixable = false, suffixible = true },
+    { value = "eldri", prefixable = false, suffixible = true },
+    { value = "mana", prefixable = false, suffixible = true },
+    { value = "aether", prefixable = false, suffixible = true },
+    { value = "rune", prefixable = false, suffixible = true },
+]
+
+suf_values = [
+    { value = "mancy", prefixable = true, suffixible = false},
+    { value = "nomicon", prefixable = true, suffixible = false},
+]
+
+domain_values = [
+    { value = "aether", prefixable = false, suffixible = false },
+    { value = "the weave", prefixable = false, suffixible = false },
+    { value = "the art", prefixable = true, suffixible = false},
+    { value = "the arcane", prefixable = false, suffixible = false },
+    { value = "mana", prefixable = false, suffixible = false },
+    { value = "glyph", prefixable = false, suffixible = false },
+    { value = "hex", prefixable = false, suffixible = false },
+    { value = "curse", prefixable = false, suffixible = false },
+    { value = "charm", prefixable = false, suffixible = false },
+    { value = "portent", prefixable = false, suffixible = false },
+    { value = "sorcery", prefixable = false, suffixible = false },
+    { value = "necromancy", prefixable = false, suffixible = false },
+]
+
+magic_melee_values = [
+    { value = "invoke", prefixable = false, suffixible = false },
+    { value = "evoke", prefixable = false, suffixible = false },
+]
+
+magic_area_values = [
+    { value = "invoke", prefixable = false, suffixible = false },
+    { value = "evoke", prefixable = false, suffixible = false },
+    { value = "conjure", prefixable = false, suffixible = false },
+]
+
+magic_ranged_values = [
+    { value = "conjure", prefixable = false, suffixible = false },
+]
+
+magic_status_values = [
+    { value = "enchant", prefixable = false, suffixible = false },
+    { value = "dispel", prefixable = false, suffixible = false },
+    { value = "ward", prefixable = false, suffixible = false },
+    { value = "hex", prefixable = false, suffixible = false },
+    { value = "curse", prefixable = false, suffixible = false },
+    { value = "polymorph", prefixable = false, suffixible = false },
+    { value = "transmute", prefixable = false, suffixible = false },
+    { value = "scry", prefixable = false, suffixible = false },
+]
+
+magic_defence_values = [
+    { value = "counterspell", prefixable = false, suffixible = false },
+    { value = "ward", prefixable = false, suffixible = false },
+    { value = "dispel", prefixable = false, suffixible = false },
+]
+
+magic_movement_values = [
+    { value = "teleport", prefixable = false, suffixible = false },
+    { value = "step", prefixable = false, suffixible = false },
+    { value = "stride", prefixable = false, suffixible = false },
+]
+
+verb_values = [
+    { value = "conjure", prefixable = false, suffixible = false },
+    { value = "enchant", prefixable = false, suffixible = false },
+    { value = "dispel", prefixable = false, suffixible = false },
+    { value = "banish", prefixable = false, suffixible = false },
+    { value = "scry", prefixable = false, suffixible = false },
+    { value = "transmution", prefixable = false, suffixible = false },
+    { value = "invoke", prefixable = false, suffixible = false, noun_form = "invocation" },
+    { value = "bind", prefixable = false, suffixible = false },
+    { value = "unravel", prefixable = false, suffixible = false },
+]
+
+noun_values = [
+    { value = "spell", prefixable = false, suffixible = false },
+    { value = "spellbook", prefixable = false, suffixible = false },
+    { value = "grimoire", prefixable = false, suffixible = false },
+    { value = "familiar", prefixable = false, suffixible = false },
+    { value = "summon", prefixable = false, suffixible = true },
+    { value = "wand", prefixable = false, suffixible = false },
+    { value = "staff", prefixable = false, suffixible = false },
+    { value = "orb", prefixable = false, suffixible = false },
+    { value = "sigil", prefixable = false, suffixible = false },
+    { value = "rune", prefixable = false, suffixible = false },
+    { value = "glyph", prefixable = false, suffixible = false },
+    { value = "ward", prefixable = false, suffixible = false },
+]
+
+adj_values = [
+    { value = "arcane", prefixable = false, suffixible = false },
+    { value = "mystic", prefixable = false, suffixible = false },
+    { value = "eldritch", prefixable = false, suffixible = false },
+    { value = "enchanted", prefixable = false, suffixible = false },
+    { value = "runic", prefixable = false, suffixible = false },
+    { value = "ethereal", prefixable = false, suffixible = false },
+]
+
+spell_root = [
+    { value = "fire", prefixable = true, suffixible = true },
+    { value = "frost", prefixable = true, suffixible = true },
+    { value = "bolt", prefixable = true, suffixible = true },
+    { value = "ward", prefixable = true, suffixible = true },
+    { value = "curse", prefixable = true, suffixible = true },
+    { value = "hex", prefixable = true, suffixible = true },
+    { value = "heal", prefixable = true, suffixible = true },
+    { value = "shield", prefixable = true, suffixible = true },
+    { value = "bane", prefixable = true, suffixible = true },
+    { value = "charm", prefixable = true, suffixible = true },
+    { value = "rune", prefixable = true, suffixible = true },
+    { value = "or", prefixable = true, suffixible = true },
+]
+
+spell_form = [
+    { value = "ara", prefixable = true, suffixible = true },
+    { value = "aga", prefixable = true, suffixible = true },
+    { value = "aja", prefixable = true, suffixible = true },
+    { value = "gun", prefixable = true, suffixible = true },
+    { value = "za", prefixable = true, suffixible = true },
+    { value = "ra", prefixable = true, suffixible = true },
+    { value = "ga", prefixable = true, suffixible = true },
+    { value = "ja", prefixable = true, suffixible = true },
+]
+
+
+[[technique]]
+patterns = [
+    "{spell_root}{spell_form}",
+    "{spell_root}",
+    "{prefix}{spell_root}",
+]
+
+[["melee"]]
+patterns = ["{magic_melee_values}"]
+
+[["area"]]
+patterns = ["{magic_area_values}"]
+
+[["ranged"]]
+patterns = ["{magic_ranged_values}"]
+
+[["status"]]
+patterns = ["{magic_status_values}"]
+
+[["defence"]]
+patterns = ["{magic_defence_values}"]
+
+[[expose]]
+slot = "suf"
+from = ["suf_values"]
+
+[[expose]]
+slot = "prefix"
+from = ["prefix_values"]
+
+[[expose]]
+slot = "domain"
+from = ["domain_values"]
+
+[[expose]]
+slot = "technique"
+from = [
+    "technique",
+    "melee",
+    "area",
+    "ranged",
+    "status",
+    "defence",
+    "movement",
+]
+
+[[expose]]
+slot = "verb"
+from = ["verb_values"]
+
+[[expose]]
+slot = "noun"
+from = ["noun_values"]
+
+[[expose]]
+slot = "adj"
+from = ["adj_values"]

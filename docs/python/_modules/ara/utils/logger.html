@@ -64,6 +64,7 @@
 <div class="viewcode-block" id="ColorFormatter.format">
 <a class="viewcode-back" href="../../../api/ara.utils.html#ara.utils.logger.ColorFormatter.format">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">LogRecord</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Format *record* using the level-specific colour template.&quot;&quot;&quot;</span>
         <span class="n">log_fmt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">FORMATS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">levelno</span><span class="p">)</span>
         <span class="n">formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="n">log_fmt</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">formatter</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">record</span><span class="p">)</span></div>
@@ -127,6 +128,7 @@
 <p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../static_assets.html">Static assets</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Reference:</span></p>
 <ul>
@@ -135,9 +137,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../api/ara.agent.html">ara.agent package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api/ara.llm.html">ara.llm package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api/ara.memory.html">ara.memory package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/ara.persistence.html">ara.persistence package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api/ara.utils.html">ara.utils package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api/ara.config.html">ara.config module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../api/ara.models.html">ara.models module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/ara.webclient.html">ara.webclient package</a></li>
 </ul>
 
 <div class="relations">

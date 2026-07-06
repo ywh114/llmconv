@@ -1,0 +1,119 @@
+category = "elemental"
+# Lightning-elemental ability entries.
+
+prefix_values = [
+    { value = "electro", prefixable = false, suffixible = true },
+    { value = "volt", prefixable = false, suffixible = true },
+]
+
+suf_values = [
+    { value = "", prefixable = true, suffixible = false},
+]
+
+domain_values = [
+    { value = "tempest", prefixable = false, suffixible = false },
+    { value = "discharge", prefixable = false, suffixible = false },
+    { value = "thunder", prefixable = false, suffixible = false },
+    { value = "lightning", prefixable = false, suffixible = false },
+    { value = "current", prefixable = false, suffixible = false },
+    { value = "plasma", prefixable = false, suffixible = false },
+]
+
+lightning_melee_values = [
+    { value = "jolt", prefixable = false, suffixible = false },
+    { value = "shock", prefixable = false, suffixible = false },
+    { value = "fry", prefixable = false, suffixible = false },
+]
+
+lightning_area_values = [
+    { value = "discharge", prefixable = false, suffixible = false },
+    { value = "overload", prefixable = false, suffixible = false },
+    { value = "tempest", prefixable = false, suffixible = false },
+]
+
+lightning_ranged_values = [
+    { value = "arc", prefixable = false, suffixible = false },
+    { value = "bolt", prefixable = false, suffixible = true },
+    { value = "spark", prefixable = false, suffixible = true },
+    { value = "discharge", prefixable = false, suffixible = false },
+    { value = "overload", prefixable = false, suffixible = false },
+]
+
+lightning_defence_values = [
+    { value = "ground", prefixable = false, suffixible = false },
+    { value = "repel", prefixable = false, suffixible = false },
+]
+
+lightning_status_values = [
+    { value = "charge", prefixable = false, suffixible = false },
+    { value = "overload", prefixable = false, suffixible = false },
+    { value = "electrification", prefixable = false, suffixible = false },
+]
+
+lightning_movement_values = [
+    { value = "surge", prefixable = false, suffixible = false },
+    { value = "levitate", prefixable = false, suffixible = false },
+]
+
+verb_values = [
+]
+
+noun_values = [
+    { value = "storm", prefixable = false, suffixible = false },
+    { value = "bolt", prefixable = false, suffixible = false },
+    { value = "thunder", prefixable = false, suffixible = false },
+    { value = "plasma", prefixable = false, suffixible = false },
+]
+
+adj_values = [
+    { value = "crackling", prefixable = false, suffixible = false },
+    { value = "thundering", prefixable = false, suffixible = false },
+    { value = "arcing", prefixable = false, suffixible = false },
+    { value = "ionized", prefixable = false, suffixible = false },
+]
+
+[["melee"]]
+patterns = ["{lightning_melee_values}"]
+
+[["area"]]
+patterns = ["{lightning_area_values}"]
+
+[["ranged"]]
+patterns = ["{lightning_ranged_values}"]
+
+[["defence"]]
+patterns = ["{lightning_defence_values}"]
+
+[["status"]]
+patterns = ["{lightning_status_values}"]
+
+[["movement"]]
+patterns = ["{lightning_movement_values}"]
+
+[[expose]]
+slot = "suf"
+from = ["suf_values"]
+
+[[expose]]
+slot = "prefix"
+from = ["prefix_values"]
+
+[[expose]]
+slot = "domain"
+from = ["domain_values"]
+
+[[expose]]
+slot = "technique"
+from = ["melee", "area", "ranged", "defence", "status", "movement"]
+
+[[expose]]
+slot = "verb"
+from = ["verb_values"]
+
+[[expose]]
+slot = "noun"
+from = ["noun_values"]
+
+[[expose]]
+slot = "adj"
+from = ["adj_values"]

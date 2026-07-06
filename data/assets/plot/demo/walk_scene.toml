@@ -1,0 +1,49 @@
+id = "walk_scene"
+name = "A Walk"
+language = "en"
+zeitgeist = "stability"
+tone = "温馨; warm color palette"
+
+[character]
+pool = ["Cheshire", "Champagne", "Commander", "Akashi"]
+inits = ["Cheshire", "Champagne", "Commander"]
+player = "Commander"
+narrator = "Akashi"
+
+[character.sprites]
+Cheshire = "default_neutral"
+Champagne = "white_neutral"
+Commander = "none"
+Akashi = "default_neutral"
+
+[location]
+pool = ["aisle", "building_courtyard"]
+init = "aisle"
+
+[plot]
+considerations = """Keep it medium length."""
+scene = """
+(1)
+The characters take a leisurely walk down the `aisle`.
+
+Champagne says they should go to the courtyard.
+
+Cheshire agrees, while chattering about the contents of the book she just found.
+
+The scene transitions to `building_courtyard`.
+
+(2)
+They stop and listen to the seabirds for a while, and Cheshire remarks that it's too
+early so nobody else is around.
+
+Cheshire suggests to go to the garden.
+
+The Commander should agree, and the scene ends.
+"""
+
+[plot.next]
+considerations = "None"
+
+[plot.next.garden_scene]
+prereq_scenes = ["walk_scene"]
+desc = "After the walk, go to the garden."

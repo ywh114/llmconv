@@ -1,0 +1,216 @@
+category = "concept"
+# Quantum-physics ability entries.
+
+prefix_values = [
+    { value = "eigen", prefixable = false, suffixible = true },
+    { value = "wave", prefixable = false, suffixible = true },
+    { value = "hilbert", prefixable = false, suffixible = true },
+    { value = "dirac", prefixable = false, suffixible = true },
+    { value = "bra", prefixable = false, suffixible = true },
+    { value = "ket", prefixable = false, suffixible = true },
+    { value = "hamilto", prefixable = false, suffixible = true },
+    { value = "lagrang", prefixable = false, suffixible = true },
+    { value = "schrodi", prefixable = false, suffixible = true },
+    { value = "heisen", prefixable = false, suffixible = true },
+    { value = "pauli", prefixable = false, suffixible = true },
+    { value = "feyn", prefixable = false, suffixible = true },
+    { value = "bose", prefixable = false, suffixible = true },
+    { value = "fermi", prefixable = false, suffixible = true },
+    { value = "spin", prefixable = false, suffixible = true },
+    { value = "orbit", prefixable = false, suffixible = true },
+]
+
+suf_values = [
+    { value = "value", prefixable = true, suffixible = false },
+    { value = "state", prefixable = true, suffixible = false },
+    { value = "ation", prefixable = true, suffixible = false },
+    { value = "ator", prefixable = true, suffixible = false },
+    { value = "onian", prefixable = true, suffixible = false },
+    { value = "statistics", prefixable = true, suffixible = false },
+    { value = "trino", prefixable = true, suffixible = false },
+]
+
+domain_values = [
+    { value = "wavefunction", prefixable = false, suffixible = false },
+    { value = "eigenvalue", prefixable = false, suffixible = false },
+    { value = "observable", prefixable = false, suffixible = false },
+    { value = "superposition", prefixable = false, suffixible = false },
+    { value = "entanglement", prefixable = false, suffixible = false },
+    { value = "decoherence", prefixable = false, suffixible = false },
+    { value = "potential well", prefixable = false, suffixible = false },
+    { value = "Hilbert space", prefixable = false, suffixible = false },
+    { value = "Fock space", prefixable = false, suffixible = false },
+    { value = "phase space", prefixable = false, suffixible = false },
+    { value = "good basis", prefixable = false, suffixible = false },
+    { value = "total angular momentum", prefixable = false, suffixible = false },
+    { value = "ladder operator", prefixable = false, suffixible = false },
+    { value = "projection operator", prefixable = false, suffixible = false },
+    { value = "density matrix", prefixable = false, suffixible = false },
+    { value = "scattering amplitude", prefixable = false, suffixible = false },
+    { value = "path integral", prefixable = false, suffixible = false },
+    { value = "tunnel barrier", prefixable = false, suffixible = false },
+    { value = "Fermi surface", prefixable = false, suffixible = false },
+    { value = "selection rule", prefixable = false, suffixible = false },
+    { value = "uncertainty principle", prefixable = false, suffixible = false },
+    { value = "exclusion principle", prefixable = false, suffixible = false },
+    { value = "no-cloning theorem", prefixable = false, suffixible = false },
+    { value = "Bell inequality", prefixable = false, suffixible = false },
+]
+
+quantum_area_values = [
+    { value = "collapse", prefixable = false, suffixible = false },
+    { value = "normalize", prefixable = false, suffixible = false },
+    { value = "measurement", prefixable = false, suffixible = false },
+    { value = "renormalize", prefixable = false, suffixible = false },
+]
+
+quantum_ranged_values = [
+    { value = "perturbation", prefixable = false, suffixible = false },
+    { value = "scatter", prefixable = false, suffixible = false },
+    { value = "tunneling", prefixable = false, suffixible = false },
+    { value = "project", prefixable = false, suffixible = false },
+    { value = "annihilate", prefixable = false, suffixible = false },
+    { value = "create", prefixable = false, suffixible = false },
+]
+
+quantum_status_values = [
+    { value = "diagonalize", prefixable = false, suffixible = false },
+    { value = "commute", prefixable = false, suffixible = false },
+    { value = "entanglement", prefixable = false, suffixible = false },
+    { value = "quantize", prefixable = false, suffixible = false },
+    { value = "decohere", prefixable = false, suffixible = false },
+    { value = "excitation", prefixable = false, suffixible = false },
+    { value = "variation", prefixable = false, suffixible = false },
+    { value = "expand", prefixable = false, suffixible = false },
+]
+
+quantum_defence_values = [
+    { value = "exclusion", prefixable = false, suffixible = false },
+    { value = "forbid", prefixable = false, suffixible = false },
+]
+
+adj_sup_values = [
+    { value = "hermitian", prefixable = false, suffixible = false },
+    { value = "unitary", prefixable = false, suffixible = false },
+    { value = "degenerate", prefixable = false, suffixible = false },
+    { value = "entangled", prefixable = false, suffixible = false },
+    { value = "coherent", prefixable = false, suffixible = false },
+    { value = "decoherent", prefixable = false, suffixible = false },
+    { value = "perturbative", prefixable = false, suffixible = false },
+    { value = "non-perturbative", prefixable = false, suffixible = false },
+    { value = "8th-order", prefixable = false, suffixible = false },
+    { value = "second-quantized", prefixable = false, suffixible = false },
+    { value = "virtual", prefixable = false, suffixible = false },
+    { value = "off-shell", prefixable = false, suffixible = false },
+    { value = "stationary", prefixable = false, suffixible = false },
+    { value = "excited", prefixable = false, suffixible = false },
+]
+
+verb_values = [
+    { value = "collapse", prefixable = false, suffixible = false },
+    { value = "measurement", prefixable = false, suffixible = false },
+    { value = "observation", prefixable = false, suffixible = false },
+    { value = "perturbation", prefixable = false, suffixible = false },
+    { value = "quantization", prefixable = false, suffixible = false },
+    { value = "entanglement", prefixable = false, suffixible = false },
+    { value = "renormalization", prefixable = false, suffixible = false },
+    { value = "diagonalization", prefixable = false, suffixible = false },
+    { value = "projection", prefixable = false, suffixible = false },
+    { value = "commutation", prefixable = false, suffixible = false },
+    { value = "tunneling", prefixable = false, suffixible = false },
+    { value = "variation", prefixable = false, suffixible = false },
+    { value = "annihilation", prefixable = false, suffixible = false },
+    { value = "creation", prefixable = false, suffixible = false },
+    { value = "excitation", prefixable = false, suffixible = false },
+]
+
+noun_values = [
+    { value = "wavefunction", prefixable = false, suffixible = false },
+    { value = "eigenvalue", prefixable = false, suffixible = false },
+    { value = "amplitude", prefixable = false, suffixible = false },
+    { value = "observable", prefixable = false, suffixible = false },
+    { value = "potential", prefixable = false, suffixible = false },
+    { value = "Hamiltonian", prefixable = false, suffixible = false },
+    { value = "Lagrangian", prefixable = false, suffixible = false },
+    { value = "symmetry", prefixable = false, suffixible = false },
+    { value = "degeneracy", prefixable = false, suffixible = false },
+    { value = "perturbation", prefixable = false, suffixible = false },
+    { value = "probability", prefixable = false, suffixible = false },
+    { value = "expectation value", prefixable = false, suffixible = false },
+    { value = "ground state", prefixable = false, suffixible = false },
+    { value = "bound state", prefixable = false, suffixible = false },
+    { value = "scattering matrix", prefixable = false, suffixible = false },
+    { value = "propagator", prefixable = false, suffixible = false },
+    { value = "commutator", prefixable = false, suffixible = false },
+    { value = "spinor", prefixable = false, suffixible = false },
+    { value = "photon", prefixable = false, suffixible = false },
+    { value = "phonon", prefixable = false, suffixible = false },
+    { value = "anyon", prefixable = false, suffixible = false },
+    { value = "instanton", prefixable = false, suffixible = false },
+]
+
+adj_values = [
+    { value = "hermitian", prefixable = false, suffixible = false },
+    { value = "unitary", prefixable = false, suffixible = false },
+    { value = "normalizable", prefixable = false, suffixible = false },
+    { value = "degenerate", prefixable = false, suffixible = false },
+    { value = "entangled", prefixable = false, suffixible = false },
+    { value = "coherent", prefixable = false, suffixible = false },
+    { value = "decoherent", prefixable = false, suffixible = false },
+    { value = "perturbative", prefixable = false, suffixible = false },
+    { value = "non-perturbative", prefixable = false, suffixible = false },
+    { value = "stationary", prefixable = false, suffixible = false },
+    { value = "excited", prefixable = false, suffixible = false },
+    { value = "virtual", prefixable = false, suffixible = false },
+    { value = "off-shell", prefixable = false, suffixible = false },
+    { value = "ultraviolet", prefixable = false, suffixible = false },
+    { value = "infrared", prefixable = false, suffixible = false },
+    { value = "second-quantized", prefixable = false, suffixible = false },
+    { value = "8th-order", prefixable = false, suffixible = false },
+]
+
+quantum_movement_values = []
+
+[["area"]]
+patterns = ["{quantum_area_values}"]
+
+[["ranged"]]
+patterns = ["{quantum_ranged_values}"]
+
+[["status"]]
+patterns = ["{quantum_status_values}"]
+
+[["defence"]]
+patterns = ["{quantum_defence_values}"]
+
+[[expose]]
+slot = "prefix"
+from = ["prefix_values"]
+
+[[expose]]
+slot = "suf"
+from = ["suf_values"]
+
+[[expose]]
+slot = "domain"
+from = ["domain_values"]
+
+[[expose]]
+slot = "technique"
+from = ["area", "ranged", "status", "defence", "movement"]
+
+[[expose]]
+slot = "verb"
+from = ["verb_values"]
+
+[[expose]]
+slot = "noun"
+from = ["noun_values"]
+
+[[expose]]
+slot = "adj"
+from = ["adj_values"]
+
+[[expose]]
+slot = "adj_sup"
+from = ["adj_sup_values"]

@@ -1,0 +1,113 @@
+category = "concept"
+# Spatial/teleportation ability entries.
+
+space_melee_values = [
+    { value = "blink", prefixable = false, suffixible = false },
+    { value = "phase", prefixable = false, suffixible = false },
+    { value = "warp", prefixable = false, suffixible = false },
+]
+
+space_area_values = [
+    { value = "warp", prefixable = false, suffixible = false },
+    { value = "fold", prefixable = false, suffixible = false },
+    { value = "rift", prefixable = false, suffixible = false },
+    { value = "portal", prefixable = false, suffixible = false },
+    { value = "stretch", prefixable = false, suffixible = false },
+    { value = "compress", prefixable = false, suffixible = false },
+]
+
+space_ranged_values = [
+    { value = "teleport", prefixable = false, suffixible = false },
+    { value = "displace", prefixable = false, suffixible = false },
+    { value = "portal", prefixable = false, suffixible = false },
+    { value = "blink", prefixable = false, suffixible = false },
+]
+
+space_status_values = [
+    { value = "phase", prefixable = false, suffixible = false },
+    { value = "stretch", prefixable = false, suffixible = false },
+    { value = "compress", prefixable = false, suffixible = false },
+]
+
+space_defence_values = [
+    { value = "isolate", prefixable = false, suffixible = false },
+    { value = "shunt", prefixable = false, suffixible = false },
+]
+
+verb_values = [
+    { value = "teleport", prefixable = false, suffixible = false },
+    { value = "blink", prefixable = false, suffixible = false },
+    { value = "warp", prefixable = false, suffixible = false },
+    { value = "fold", prefixable = false, suffixible = false },
+    { value = "displace", prefixable = false, suffixible = false },
+    { value = "phase", prefixable = false, suffixible = false },
+    { value = "riftwalk", prefixable = false, suffixible = false },
+    { value = "gating", prefixable = false, suffixible = false },
+]
+
+suf_values = []
+
+domain_values = [
+    { value = "portal", prefixable = false, suffixible = false },
+    { value = "rift", prefixable = false, suffixible = false },
+    { value = "voidspace", prefixable = false, suffixible = false },
+    { value = "hyperspace", prefixable = false, suffixible = false },
+    { value = "subspace", prefixable = false, suffixible = false },
+    { value = "the between", prefixable = false, suffixible = false },
+]
+
+noun_values = [
+    { value = "portal", prefixable = false, suffixible = false },
+    { value = "rift", prefixable = false, suffixible = false },
+    { value = "wormhole", prefixable = false, suffixible = false },
+    { value = "gate", prefixable = false, suffixible = false },
+    { value = "distance", prefixable = false, suffixible = false },
+]
+
+adj_values = [
+    { value = "nonlocal", prefixable = false, suffixible = false },
+    { value = "folded", prefixable = false, suffixible = false },
+    { value = "warped", prefixable = false, suffixible = false },
+    { value = "displaced", prefixable = false, suffixible = false },
+]
+
+space_movement_values = []
+
+[["melee"]]
+patterns = ["{space_melee_values}"]
+
+[["area"]]
+patterns = ["{space_area_values}"]
+
+[["ranged"]]
+patterns = ["{space_ranged_values}"]
+
+[["status"]]
+patterns = ["{space_status_values}"]
+
+[["defence"]]
+patterns = ["{space_defence_values}"]
+
+[[expose]]
+slot = "suf"
+from = ["suf_values"]
+
+[[expose]]
+slot = "technique"
+from = ["melee", "area", "ranged", "status", "defence", "movement"]
+
+[[expose]]
+slot = "verb"
+from = ["verb_values"]
+
+[[expose]]
+slot = "domain"
+from = ["domain_values"]
+
+[[expose]]
+slot = "noun"
+from = ["noun_values"]
+
+[[expose]]
+slot = "adj"
+from = ["adj_values"]

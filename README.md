@@ -1,4 +1,4 @@
-# Visual Novel Engine
+# Ara - Visual Novel Engine
 
 Ara is a multi-character AI roleplay / visual novel engine.  It drives
 scene-based narrative via an LLM orchestrator that decides who speaks next,
@@ -13,66 +13,67 @@ uv sync --extra web
 
 # 2. Set your LLM API key
 export DEEPSEEK_API_KEY="sk-..."
-
-# 3. Verify everything works
-uv run pytest tests/ -q
-# Ignore errors, WIP.
 ```
 
-## Quick start — Webclient
+## Quick start - Webclient
 
 The web VN frontend is a thin polling GUI over the agent API.
 
-**1. Start the agent server**:
+**Internal server mode** (single command, no UNIX socket):
 
 ```bash
-uv run python -m ara.agent --scene data/assets/plot/0.toml 2>&1 | tee log
+uv run python -m ara.webclient --internal --scene demo --port 8081 2>&1 | tee servlog
 ```
 
-**2. In a second terminal, after a few seconds, start the web gateway**:
+**Two-process mode**:
 
 ```bash
-uv run python -m ara.webclient --port 8080 2>&1 | tee servlog
+# Terminal 1 - agent server
+uv run python -m ara.agent --scene demo 2>&1 | tee log
+
+# Terminal 2 - web gateway
+uv run python -m ara.webclient --port 8081 2>&1 | tee servlog
 ```
 
-Then open `http://localhost:8080` in your browser. `0.toml` is the first demo
-scene.
+Then open `http://localhost:8081` in your browser.
 
-> TODO: later, wrap the two commands in a single helper script.
+## `aractl`
 
-## Debugging via `aractl`
-
-`examples/aractl.py` is a first-class CLI client for the agent API.  It can
-start/step/reply through the story and also exposes the full debug console.
+`aractl` is a CLI client for the agent API.  It can start/step/reply through the
+story, manage saves, and exposes the full debug console.
 
 ```bash
 # Start or restart the story
-uv run python examples/aractl.py start
+uv run aractl --scene <SCENE> start
 
 # Advance one tick
-uv run python examples/aractl.py step
+uv run aractl step
 
 # Auto-step until player input is required
-uv run python examples/aractl.py next
+uv run aractl next
 
 # Submit player input
-uv run python examples/aractl.py reply "Hello there"
+uv run aractl reply "Hello, world"
 
 # Any input starting with / or : is treated as a debug command
-uv run python examples/aractl.py reply "/info"
+uv run aractl reply "/info"
 
 # Run an explicit debug command
-uv run python examples/aractl.py debug info
-uv run python examples/aractl.py debug here
-uv run python examples/aractl.py debug dump
+uv run aractl debug info
+uv run aractl debug here
+uv run aractl debug dump
 
 # Show full state snapshot
-uv run python examples/aractl.py state
+uv run aractl state
+
+# Save / load
+uv run aractl save 1
+uv run aractl load 1
+uv run aractl saves
+uv run aractl delete-save 1
 
 # Kill the server daemon
-uv run python examples/aractl.py --kill
-
-# TODO: Make the command shorter. Wrap in shell script.
+uv run aractl --kill
 ```
 
 ### Available debug commands
@@ -91,42 +92,18 @@ uv run python examples/aractl.py --kill
 | `dump`, `d` | Pretty-print the full LLM conversation context |
 | `exec`, `x <code>` | Execute arbitrary Python (DANGEROUS) |
 
-## Architecture
+## Asset layout
 
-- Ask an LLM.
+Assets are organised by type, then story:
 
-## Testing with short scenes
-
-Two minimal test scenes live under `data/assets/plot/test/`:
-
-```bash
-# Test the two-scene flow + summarizer bridge
-uv run python -m ara.agent --scene data/assets/plot/test/test_a.toml 2>&1 | tee log
+```
+data/assets/
+  cc/<story>/<character>/card.toml   # character definitions
+  lc/<story>/<location>/card.toml    # location definitions
+  items/<story>/<item>.toml          # item definitions
+  world/<story>.toml                 # world wiki (realms, factions, places)
+  plot/<story>/<scene>.toml          # scene scripts
 ```
 
-Then in another terminal:
-
-```bash
-uv run python examples/aractl.py start
-uv run python examples/aractl.py next
-# … continue through scene A → scene B → fin …
-```
-
-## Roadmap
-
-### Parallel summarizer (future)
-
-Currently the summarizer runs serially during scene finalisation.  The plan is
- to move it to a background worker model:
-
-1. **Locking** — When a scene ends, lock the resources it modifies
-   (character scratchpads, location descriptions).  Other operations that
-   touch locked resources poll until unlocked.
-
-2. **PID tracking** — Each summarizer worker gets a log and a PID.  When
-   polling a locked resource, verify the worker that holds the lock is still
-   alive.  If the worker died, spin up a replacement and retry.
-
-3. **Continue without blocking** — The engine should not wait for the
-   summarizer to finish before allowing the player to interact with the next
-   scene.  The bridging summary is injected lazily when it becomes available.
+Directory/file names are canonical IDs; the `[names]` table is only for
+display/localisation.

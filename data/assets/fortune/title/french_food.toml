@@ -1,0 +1,125 @@
+class_root = [
+    { value = "chef", prefixable = true, suffixible = true },
+    { value = "cuisinier", prefixable = true, suffixible = true },
+    { value = "patissier", prefixable = true, suffixible = true },
+    { value = "sommelier", prefixable = true, suffixible = true },
+]
+prefix = [
+    { value = "sous", prefixable = true, suffixible = true },
+    { value = "grand", prefixable = true, suffixible = true },
+    { value = "chef", prefixable = true, suffixible = true },
+    { value = "maitre", prefixable = true, suffixible = true },
+]
+class_values = [
+    { value = "chef", prefixable = true, suffixible = true },
+    { value = "sous chef", prefixable = false, suffixible = false },
+    { value = "patissier", prefixable = true, suffixible = true },
+    { value = "sommelier", prefixable = true, suffixible = true },
+    { value = "garcon", prefixable = true, suffixible = true },
+]
+adj = [
+    { value = "haute", prefixable = true, suffixible = true },
+    { value = "petit", prefixable = true, suffixible = true },
+    { value = "grande", prefixable = true, suffixible = true },
+    { value = "baguette", prefixable = true, suffixible = true },
+]
+adj_sup = [
+    { value = "grand", prefixable = true, suffixible = true },
+    { value = "le gros", prefixable = true, suffixible = true },
+    { value = "le petit", prefixable = true, suffixible = true },
+]
+noun = [
+    { value = "chef", prefixable = true, suffixible = true },
+    { value = "cuisinier", prefixable = true, suffixible = true },
+    { value = "patissier", prefixable = true, suffixible = true },
+    { value = "baguette", prefixable = true, suffixible = true },
+    { value = "macaron", prefixable = true, suffixible = true },
+    { value = "escargot", prefixable = true, suffixible = true },
+    { value = "wine", prefixable = true, suffixible = true },
+]
+thing = [
+    { value = "cuisine", prefixable = true, suffixible = true },
+    { value = "sauce", prefixable = true, suffixible = true },
+    { value = "baguettes", prefixable = true, suffixible = true },
+    { value = "macaron", prefixable = true, suffixible = true },
+    { value = "escargot", prefixable = true, suffixible = true },
+    { value = "wine", prefixable = true, suffixible = true },
+]
+
+suf = [
+    { value = 'born', prefixable = true, suffixible = true },
+    { value = 'kin', prefixable = true, suffixible = true },
+]
+
+[[class]]
+patterns = [
+    "{prefix}{class_root}",
+    "{class_root}",
+]
+
+[[place]]
+value = "the kitchen"
+takes_of = true
+takes_in = false
+article = ""
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "the bistro"
+takes_of = true
+takes_in = false
+article = ""
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[expose]]
+slot = "class"
+from = [
+    "class",
+    "class_values",
+]
+
+[[expose]]
+slot = "prefix"
+from = [
+    "prefix",
+]
+
+
+[[expose]]
+slot = "adj"
+from = [
+    "adj",
+]
+
+[[expose]]
+slot = "adj_sup"
+from = [
+    "adj_sup",
+]
+
+[[expose]]
+slot = "noun"
+from = [
+    "noun",
+]
+
+[[expose]]
+slot = "place"
+from = [
+    "place",
+]
+
+[[expose]]
+slot = "thing"
+from = [
+    "thing",
+]
+[[expose]]
+slot = "suf"
+from = [
+    "suf",
+]

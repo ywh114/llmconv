@@ -1,0 +1,136 @@
+rank = [
+    { value = "helldiver", prefixable = true, suffixible = true },
+    { value = "marshal", prefixable = true, suffixible = true },
+    { value = "admiral", prefixable = true, suffixible = true },
+    { value = "citizen", prefixable = true, suffixible = true },
+]
+class_root = [
+    { value = "diver", prefixable = true, suffixible = true },
+    { value = "patriot", prefixable = true, suffixible = true },
+    { value = "liberator", prefixable = true, suffixible = true },
+    { value = "democrat", prefixable = true, suffixible = true },
+]
+prefix = [
+    { value = "super", prefixable = true, suffixible = true },
+    { value = "ultra", prefixable = true, suffixible = true },
+    { value = "mega", prefixable = true, suffixible = true },
+    { value = "hyper", prefixable = true, suffixible = true },
+]
+adj = [
+    { value = "managed", prefixable = true, suffixible = true },
+    { value = "democratic", prefixable = true, suffixible = true },
+    { value = "liberated", prefixable = true, suffixible = true },
+    { value = "patriotic", prefixable = true, suffixible = true },
+]
+adj_sup = [
+    { value = "supreme", prefixable = true, suffixible = true },
+    { value = "ultimate", prefixable = true, suffixible = true },
+    { value = "weakest", prefixable = true, suffixible = true },
+    { value = "least", prefixable = true, suffixible = true },
+    { value = "most undemocratic", prefixable = false, suffixible = false },
+]
+noun = [
+    { value = "diver", prefixable = true, suffixible = true },
+    { value = "patriot", prefixable = true, suffixible = true },
+    { value = "liberator", prefixable = true, suffixible = true },
+    { value = "democrat", prefixable = true, suffixible = true },
+]
+thing = [
+    { value = "democracy", prefixable = true, suffixible = true },
+    { value = "liberty", prefixable = true, suffixible = true },
+    { value = "freedom", prefixable = true, suffixible = true },
+]
+
+suf = [
+    { value = 'born', prefixable = true, suffixible = true },
+    { value = 'kin', prefixable = true, suffixible = true },
+    { value = 'kind', prefixable = true, suffixible = true },
+    { value = 'child', prefixable = true, suffixible = true },
+    { value = 'seed', prefixable = true, suffixible = true },
+]
+
+[[class]]
+patterns = [
+    "{prefix}{class_root}",
+    "{class_root}",
+]
+
+[[place]]
+value = "super earth"
+takes_of = true
+takes_in = false
+article = ""
+proper_noun = true
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "the terminid front"
+takes_of = true
+takes_in = false
+article = ""
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "the automaton sector"
+takes_of = true
+takes_in = false
+article = ""
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[expose]]
+slot = "rank"
+from = [
+    "rank",
+]
+
+[[expose]]
+slot = "class"
+from = [
+    "class",
+]
+
+[[expose]]
+slot = "prefix"
+from = [
+    "prefix",
+]
+
+[[expose]]
+slot = "adj"
+from = [
+    "adj",
+]
+
+[[expose]]
+slot = "adj_sup"
+from = [
+    "adj_sup",
+]
+
+[[expose]]
+slot = "noun"
+from = [
+    "noun",
+]
+
+[[expose]]
+slot = "place"
+from = [
+    "place",
+]
+
+[[expose]]
+slot = "thing"
+from = [
+    "thing",
+]
+[[expose]]
+slot = "suf"
+from = [
+    "suf",
+]

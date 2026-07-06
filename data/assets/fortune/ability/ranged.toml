@@ -1,0 +1,66 @@
+category = "delivery"
+# Generic ranged delivery ability entries.
+
+ranged_ranged_values = [
+    { value = "shot", prefixable = false, suffixible = false },
+    { value = "volley", prefixable = false, suffixible = false },
+    { value = "barrage", prefixable = false, suffixible = false },
+    { value = "beam", prefixable = false, suffixible = false },
+    { value = "bolt", prefixable = false, suffixible = false },
+    { value = "salvo", prefixable = false, suffixible = false },
+    { value = "snipe", prefixable = false, suffixible = false },
+    { value = "spray", prefixable = false, suffixible = false },
+    { value = "payload", prefixable = false, suffixible = false },
+]
+
+suf_values = []
+
+verb_values = [
+    { value = "shoot", prefixable = false, suffixible = false },
+    { value = "fire", prefixable = false, suffixible = false },
+    { value = "launch", prefixable = false, suffixible = false },
+    { value = "bombard", prefixable = false, suffixible = false, noun_form = "bombardment" },
+    { value = "snipe", prefixable = false, suffixible = false },
+    { value = "pepper", prefixable = false, suffixible = false },
+]
+
+noun_values = [
+    { value = "arrow", prefixable = false, suffixible = false },
+    { value = "bullet", prefixable = false, suffixible = false },
+    { value = "shell", prefixable = false, suffixible = false },
+    { value = "missile", prefixable = false, suffixible = false },
+    { value = "projectile", prefixable = false, suffixible = false },
+    { value = "lead", prefixable = false, suffixible = false },
+]
+
+adj_values = [
+    { value = "long-range", prefixable = false, suffixible = false },
+    { value = "precision", prefixable = false, suffixible = false },
+    { value = "suppressing", prefixable = false, suffixible = false },
+    { value = "homing", prefixable = false, suffixible = false },
+]
+
+ranged_movement_values = []
+
+[["ranged"]]
+patterns = ["{ranged_ranged_values}"]
+
+[[expose]]
+slot = "suf"
+from = ["suf_values"]
+
+[[expose]]
+slot = "technique"
+from = ["ranged", "movement"]
+
+[[expose]]
+slot = "verb"
+from = ["verb_values"]
+
+[[expose]]
+slot = "noun"
+from = ["noun_values"]
+
+[[expose]]
+slot = "adj"
+from = ["adj_values"]

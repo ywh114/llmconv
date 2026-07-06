@@ -38,18 +38,26 @@
 <p>First-class agent API for the Ara engine.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="ara.agent.AgentClient">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">ara.agent.</span></span><span class="sig-name descname"><span class="pre">AgentClient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">socket_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'/tmp/ara_agent.sock'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ara/agent/client.html#AgentClient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.agent.AgentClient" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">ara.agent.</span></span><span class="sig-name descname"><span class="pre">AgentClient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">socket_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ara/agent/client.html#AgentClient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.agent.AgentClient" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>JSON-over-UNIX-socket client for the Ara agent server.</p>
 <dl class="py method">
+<dt class="sig sig-object py" id="ara.agent.AgentClient.attempt">
+<span class="sig-name descname"><span class="pre">attempt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/ara/agent/client.html#AgentClient.attempt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.agent.AgentClient.attempt" title="Link to this definition">¶</a></dt>
+<dd><p>Store a pending player action attempt without ending the turn.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="ara.agent.AgentClient.close">
 <span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/ara/agent/client.html#AgentClient.close"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.agent.AgentClient.close" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Close the connection, if open.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="ara.agent.AgentClient.connect">
 <span class="sig-name descname"><span class="pre">connect</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/ara/agent/client.html#AgentClient.connect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.agent.AgentClient.connect" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Open a connection to the agent server.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="ara.agent.AgentClient.debug">
@@ -67,9 +75,27 @@ loc, scene, decision, scratch, exec, help).</p></li>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="ara.agent.AgentClient.delete_save">
+<span class="sig-name descname"><span class="pre">delete_save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">story_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/ara/agent/client.html#AgentClient.delete_save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.agent.AgentClient.delete_save" title="Link to this definition">¶</a></dt>
+<dd><p>Delete a save slot.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="ara.agent.AgentClient.input">
-<span class="sig-name descname"><span class="pre">input</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/ara/agent/client.html#AgentClient.input"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.agent.AgentClient.input" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">input</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attempt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/ara/agent/client.html#AgentClient.input"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.agent.AgentClient.input" title="Link to this definition">¶</a></dt>
 <dd><p>Submit player input.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ara.agent.AgentClient.list_saves">
+<span class="sig-name descname"><span class="pre">list_saves</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">story_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/ara/agent/client.html#AgentClient.list_saves"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.agent.AgentClient.list_saves" title="Link to this definition">¶</a></dt>
+<dd><p>List all save slots.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ara.agent.AgentClient.load">
+<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/ara/agent/client.html#AgentClient.load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.agent.AgentClient.load" title="Link to this definition">¶</a></dt>
+<dd><p>Load a story state from a slot.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -83,6 +109,12 @@ loc, scene, decision, scratch, exec, help).</p></li>
 <span class="sig-name descname"><span class="pre">run_until_input</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/ara/agent/client.html#AgentClient.run_until_input"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.agent.AgentClient.run_until_input" title="Link to this definition">¶</a></dt>
 <dd><p>Auto-step until player input is required or the story ends.</p>
 <p>Returns a dict with keys: <code class="docutils literal notranslate"><span class="pre">events</span></code>, <code class="docutils literal notranslate"><span class="pre">output</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ara.agent.AgentClient.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/ara/agent/client.html#AgentClient.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.agent.AgentClient.save" title="Link to this definition">¶</a></dt>
+<dd><p>Save the current story state to a slot.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -126,7 +158,8 @@ loc, scene, decision, scratch, exec, help).</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="ara.agent.AgentRequest.from_json">
 <span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">line</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#ara.agent.types.AgentRequest" title="ara.agent.types.AgentRequest"><span class="pre">AgentRequest</span></a></span></span><a class="reference internal" href="../_modules/ara/agent/types.html#AgentRequest.from_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.agent.AgentRequest.from_json" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Parse a JSON line into a request.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ara.agent.AgentRequest.id">
@@ -168,29 +201,38 @@ loc, scene, decision, scratch, exec, help).</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="ara.agent.AgentResponse.to_json">
 <span class="sig-name descname"><span class="pre">to_json</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../_modules/ara/agent/types.html#AgentResponse.to_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.agent.AgentResponse.to_json" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Serialize the response to a JSON line.</p>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="ara.agent.AgentServer">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">ara.agent.</span></span><span class="sig-name descname"><span class="pre">AgentServer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">story</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="ara.world.html#ara.world.story.Story" title="ara.world.story.Story"><span class="pre">Story</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">socket_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'/tmp/ara_agent.sock'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ara/agent/server.html#AgentServer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.agent.AgentServer" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">ara.agent.</span></span><span class="sig-name descname"><span class="pre">AgentServer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">story</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="ara.world.html#ara.world.story.Story" title="ara.world.story.Story"><span class="pre">Story</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">socket_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">client_step</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ara/agent/server.html#AgentServer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.agent.AgentServer" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>JSON-over-UNIX-socket server exposing the story engine to agents.</p>
+<p>Story events are precomputed by a background worker and buffered in a
+queue.  <code class="docutils literal notranslate"><span class="pre">/step</span></code> pops from the queue, decoupling the client from LLM
+latency.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="ara.agent.AgentServer.handle_request">
 <span class="sig-name descname"><span class="pre">handle_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#ara.agent.types.AgentRequest" title="ara.agent.types.AgentRequest"><span class="pre">AgentRequest</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#ara.agent.types.AgentResponse" title="ara.agent.types.AgentResponse"><span class="pre">AgentResponse</span></a></span></span><a class="reference internal" href="../_modules/ara/agent/server.html#AgentServer.handle_request"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.agent.AgentServer.handle_request" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Dispatch a single request and return a response.</p>
+<p>Exceptions are converted into error responses so the connection stays
+open.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="ara.agent.AgentServer.shutdown">
 <span class="sig-name descname"><span class="pre">shutdown</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/ara/agent/server.html#AgentServer.shutdown"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.agent.AgentServer.shutdown" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Stop the background worker and shut down the socket server.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="ara.agent.AgentServer.start_listening">
 <span class="sig-name descname"><span class="pre">start_listening</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/ara/agent/server.html#AgentServer.start_listening"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.agent.AgentServer.start_listening" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Start the UNIX socket server and serve requests forever.</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -234,18 +276,26 @@ loc, scene, decision, scratch, exec, help).</p></li>
 <p>Synchronous client for the Ara agent API.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="ara.agent.client.AgentClient">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">ara.agent.client.</span></span><span class="sig-name descname"><span class="pre">AgentClient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">socket_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'/tmp/ara_agent.sock'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ara/agent/client.html#AgentClient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.agent.client.AgentClient" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">ara.agent.client.</span></span><span class="sig-name descname"><span class="pre">AgentClient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">socket_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ara/agent/client.html#AgentClient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.agent.client.AgentClient" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>JSON-over-UNIX-socket client for the Ara agent server.</p>
 <dl class="py method">
+<dt class="sig sig-object py" id="ara.agent.client.AgentClient.attempt">
+<span class="sig-name descname"><span class="pre">attempt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/ara/agent/client.html#AgentClient.attempt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.agent.client.AgentClient.attempt" title="Link to this definition">¶</a></dt>
+<dd><p>Store a pending player action attempt without ending the turn.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="ara.agent.client.AgentClient.close">
 <span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/ara/agent/client.html#AgentClient.close"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.agent.client.AgentClient.close" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Close the connection, if open.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="ara.agent.client.AgentClient.connect">
 <span class="sig-name descname"><span class="pre">connect</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/ara/agent/client.html#AgentClient.connect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.agent.client.AgentClient.connect" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Open a connection to the agent server.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="ara.agent.client.AgentClient.debug">
@@ -263,9 +313,27 @@ loc, scene, decision, scratch, exec, help).</p></li>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="ara.agent.client.AgentClient.delete_save">
+<span class="sig-name descname"><span class="pre">delete_save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">story_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/ara/agent/client.html#AgentClient.delete_save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.agent.client.AgentClient.delete_save" title="Link to this definition">¶</a></dt>
+<dd><p>Delete a save slot.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="ara.agent.client.AgentClient.input">
-<span class="sig-name descname"><span class="pre">input</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/ara/agent/client.html#AgentClient.input"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.agent.client.AgentClient.input" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">input</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attempt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/ara/agent/client.html#AgentClient.input"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.agent.client.AgentClient.input" title="Link to this definition">¶</a></dt>
 <dd><p>Submit player input.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ara.agent.client.AgentClient.list_saves">
+<span class="sig-name descname"><span class="pre">list_saves</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">story_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/ara/agent/client.html#AgentClient.list_saves"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.agent.client.AgentClient.list_saves" title="Link to this definition">¶</a></dt>
+<dd><p>List all save slots.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ara.agent.client.AgentClient.load">
+<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/ara/agent/client.html#AgentClient.load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.agent.client.AgentClient.load" title="Link to this definition">¶</a></dt>
+<dd><p>Load a story state from a slot.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -279,6 +347,12 @@ loc, scene, decision, scratch, exec, help).</p></li>
 <span class="sig-name descname"><span class="pre">run_until_input</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/ara/agent/client.html#AgentClient.run_until_input"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.agent.client.AgentClient.run_until_input" title="Link to this definition">¶</a></dt>
 <dd><p>Auto-step until player input is required or the story ends.</p>
 <p>Returns a dict with keys: <code class="docutils literal notranslate"><span class="pre">events</span></code>, <code class="docutils literal notranslate"><span class="pre">output</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ara.agent.client.AgentClient.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/ara/agent/client.html#AgentClient.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.agent.client.AgentClient.save" title="Link to this definition">¶</a></dt>
+<dd><p>Save the current story state to a slot.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -317,7 +391,7 @@ loc, scene, decision, scratch, exec, help).</p></li>
 </section>
 <section id="module-ara.agent.debug_bridge">
 <span id="ara-agent-debug-bridge-module"></span><h2>ara.agent.debug_bridge module<a class="headerlink" href="#module-ara.agent.debug_bridge" title="Link to this heading">¶</a></h2>
-<p>Structured debug bridge — returns dicts instead of printing to stdout.</p>
+<p>Structured debug bridge - returns dicts instead of printing to stdout.</p>
 <p>Mirrors the commands from <a class="reference internal" href="ara.utils.html#ara.utils.debug.DebugConsole" title="ara.utils.debug.DebugConsole"><code class="xref py py-class docutils literal notranslate"><span class="pre">ara.utils.debug.DebugConsole</span></code></a> but emits
 JSON-serializable dictionaries so the agent API can return them over the
 socket.</p>
@@ -341,23 +415,31 @@ socket.</p>
 <p>Uses a UNIX socket with newline-delimited JSON (NDJSON) for request/response.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="ara.agent.server.AgentServer">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">ara.agent.server.</span></span><span class="sig-name descname"><span class="pre">AgentServer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">story</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="ara.world.html#ara.world.story.Story" title="ara.world.story.Story"><span class="pre">Story</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">socket_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'/tmp/ara_agent.sock'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ara/agent/server.html#AgentServer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.agent.server.AgentServer" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">ara.agent.server.</span></span><span class="sig-name descname"><span class="pre">AgentServer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">story</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="ara.world.html#ara.world.story.Story" title="ara.world.story.Story"><span class="pre">Story</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">socket_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">client_step</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ara/agent/server.html#AgentServer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.agent.server.AgentServer" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>JSON-over-UNIX-socket server exposing the story engine to agents.</p>
+<p>Story events are precomputed by a background worker and buffered in a
+queue.  <code class="docutils literal notranslate"><span class="pre">/step</span></code> pops from the queue, decoupling the client from LLM
+latency.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="ara.agent.server.AgentServer.handle_request">
 <span class="sig-name descname"><span class="pre">handle_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#ara.agent.types.AgentRequest" title="ara.agent.types.AgentRequest"><span class="pre">AgentRequest</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#ara.agent.types.AgentResponse" title="ara.agent.types.AgentResponse"><span class="pre">AgentResponse</span></a></span></span><a class="reference internal" href="../_modules/ara/agent/server.html#AgentServer.handle_request"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.agent.server.AgentServer.handle_request" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Dispatch a single request and return a response.</p>
+<p>Exceptions are converted into error responses so the connection stays
+open.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="ara.agent.server.AgentServer.shutdown">
 <span class="sig-name descname"><span class="pre">shutdown</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/ara/agent/server.html#AgentServer.shutdown"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.agent.server.AgentServer.shutdown" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Stop the background worker and shut down the socket server.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="ara.agent.server.AgentServer.start_listening">
 <span class="sig-name descname"><span class="pre">start_listening</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/ara/agent/server.html#AgentServer.start_listening"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.agent.server.AgentServer.start_listening" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Start the UNIX socket server and serve requests forever.</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -381,12 +463,23 @@ socket.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="ara.agent.server.main">
 <span class="sig-prename descclassname"><span class="pre">ara.agent.server.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">argv</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="../_modules/ara/agent/server.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.agent.server.main" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>CLI entry point for <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">ara.agent</span></code>.</p>
+</dd></dl>
 
 </section>
 <section id="module-ara.agent.state">
 <span id="ara-agent-state-module"></span><h2>ara.agent.state module<a class="headerlink" href="#module-ara.agent.state" title="Link to this heading">¶</a></h2>
 <p>Serialize Ara engine state into JSON-friendly dictionaries.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="ara.agent.state.build_visual_state">
+<span class="sig-prename descclassname"><span class="pre">ara.agent.state.</span></span><span class="sig-name descname"><span class="pre">build_visual_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">story</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="ara.world.html#ara.world.story.Story" title="ara.world.story.Story"><span class="pre">Story</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/ara/agent/state.html#build_visual_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.agent.state.build_visual_state" title="Link to this definition">¶</a></dt>
+<dd><p>Build the full visual state the browser needs to render the scene.</p>
+<p>Includes the current scene, engine state, reconstructed dialogue history,
+and which characters are currently present.  Used by <code class="docutils literal notranslate"><span class="pre">/start</span></code>, <code class="docutils literal notranslate"><span class="pre">/load</span></code>
+and <code class="docutils literal notranslate"><span class="pre">/reset</span></code> so the browser can initialise its UI without waiting for a
+<code class="docutils literal notranslate"><span class="pre">scene_loaded</span></code> event.</p>
+</dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="ara.agent.state.character_to_dict">
 <span class="sig-prename descclassname"><span class="pre">ara.agent.state.</span></span><span class="sig-name descname"><span class="pre">character_to_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">char</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="ara.world.html#ara.world.character.Character" title="ara.world.character.Character"><span class="pre">Character</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/ara/agent/state.html#character_to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.agent.state.character_to_dict" title="Link to this definition">¶</a></dt>
@@ -441,7 +534,8 @@ socket.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="ara.agent.types.AgentRequest.from_json">
 <span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">line</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#ara.agent.types.AgentRequest" title="ara.agent.types.AgentRequest"><span class="pre">AgentRequest</span></a></span></span><a class="reference internal" href="../_modules/ara/agent/types.html#AgentRequest.from_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.agent.types.AgentRequest.from_json" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Parse a JSON line into a request.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ara.agent.types.AgentRequest.id">
@@ -483,7 +577,8 @@ socket.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="ara.agent.types.AgentResponse.to_json">
 <span class="sig-name descname"><span class="pre">to_json</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../_modules/ara/agent/types.html#AgentResponse.to_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.agent.types.AgentResponse.to_json" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Serialize the response to a JSON line.</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -520,6 +615,10 @@ socket.</p>
 </dd></dl>
 
 </section>
+<section id="module-ara.agent.__main__">
+<span id="ara-agent-main-module"></span><h2>ara.agent.__main__ module<a class="headerlink" href="#module-ara.agent.__main__" title="Link to this heading">¶</a></h2>
+<p>CLI entry point for <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">ara.agent</span></code>.</p>
+</section>
 </section>
 
 
@@ -551,6 +650,7 @@ socket.</p>
 <p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static_assets.html">Static assets</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Reference:</span></p>
 <ul class="current">
@@ -558,12 +658,17 @@ socket.</p>
 <li class="toctree-l1"><a class="reference internal" href="ara.world.html">ara.world package</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">ara.agent package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#ara.agent.AgentClient"><code class="docutils literal notranslate"><span class="pre">AgentClient</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#ara.agent.AgentClient.attempt"><code class="docutils literal notranslate"><span class="pre">AgentClient.attempt()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#ara.agent.AgentClient.close"><code class="docutils literal notranslate"><span class="pre">AgentClient.close()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#ara.agent.AgentClient.connect"><code class="docutils literal notranslate"><span class="pre">AgentClient.connect()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#ara.agent.AgentClient.debug"><code class="docutils literal notranslate"><span class="pre">AgentClient.debug()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ara.agent.AgentClient.delete_save"><code class="docutils literal notranslate"><span class="pre">AgentClient.delete_save()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#ara.agent.AgentClient.input"><code class="docutils literal notranslate"><span class="pre">AgentClient.input()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ara.agent.AgentClient.list_saves"><code class="docutils literal notranslate"><span class="pre">AgentClient.list_saves()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ara.agent.AgentClient.load"><code class="docutils literal notranslate"><span class="pre">AgentClient.load()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#ara.agent.AgentClient.reset"><code class="docutils literal notranslate"><span class="pre">AgentClient.reset()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#ara.agent.AgentClient.run_until_input"><code class="docutils literal notranslate"><span class="pre">AgentClient.run_until_input()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ara.agent.AgentClient.save"><code class="docutils literal notranslate"><span class="pre">AgentClient.save()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#ara.agent.AgentClient.skip"><code class="docutils literal notranslate"><span class="pre">AgentClient.skip()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#ara.agent.AgentClient.start"><code class="docutils literal notranslate"><span class="pre">AgentClient.start()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#ara.agent.AgentClient.state"><code class="docutils literal notranslate"><span class="pre">AgentClient.state()</span></code></a></li>
@@ -614,6 +719,7 @@ socket.</p>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#module-ara.agent.state">ara.agent.state module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#ara.agent.state.build_visual_state"><code class="docutils literal notranslate"><span class="pre">build_visual_state()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#ara.agent.state.character_to_dict"><code class="docutils literal notranslate"><span class="pre">character_to_dict()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#ara.agent.state.decision_to_dict"><code class="docutils literal notranslate"><span class="pre">decision_to_dict()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#ara.agent.state.engine_to_dict"><code class="docutils literal notranslate"><span class="pre">engine_to_dict()</span></code></a></li>
@@ -629,13 +735,16 @@ socket.</p>
 <li class="toctree-l3"><a class="reference internal" href="#ara.agent.types.StepResult"><code class="docutils literal notranslate"><span class="pre">StepResult</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#module-ara.agent.__main__">ara.agent.__main__ module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="ara.llm.html">ara.llm package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ara.memory.html">ara.memory package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ara.persistence.html">ara.persistence package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ara.utils.html">ara.utils package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ara.config.html">ara.config module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ara.models.html">ara.models module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ara.webclient.html">ara.webclient package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ara.cli.html">ara.cli package</a></li>
 </ul>
 
 <div class="relations">

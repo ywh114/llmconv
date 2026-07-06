@@ -1,0 +1,47 @@
+id = "garden_scene"
+name = "The Garden"
+language = "en"
+zeitgeist = "stability"
+tone = "温馨; warm color palette"
+
+[character]
+pool = ["Cheshire", "Champagne", "Commander", "Akashi"]
+inits = ["Cheshire", "Champagne", "Commander"]
+player = "Commander"
+narrator = "Akashi"
+
+[character.sprites]
+Cheshire = "default_neutral"
+Champagne = "white_neutral"
+Commander = "none"
+Akashi = "default_neutral"
+
+[location]
+pool = ["garden"]
+init = "garden"
+
+[plot]
+considerations = "Keep it short."
+scene = """(1)
+The characters gather in the garden after their tea or walk.
+
+They reflect on the pleasant afternoon together.
+
+Cheshire points at the clouds.
+
+Champagne comments on the beautiful osmanthus flowers.
+
+(2)
+They hear the academy bell toll 6PM, the player says that Noshiro invited
+them for dinner and invites the two to join him.
+
+They happily agree.
+
+The scene ends.
+"""
+
+[plot.next]
+considerations = "None"
+
+[plot.next.dinner_scene]
+desc = "After time in the garden, go for dinner."

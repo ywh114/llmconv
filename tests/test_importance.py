@@ -11,9 +11,11 @@ from unittest.mock import MagicMock
 import pytest
 
 from ara.config import AraSettings
+from ara.llm.client import LLMClient
 from ara.memory.chroma import ChromaStore
 from ara.memory.knowledge import CharacterMemory, NullMemory, Scratchpad
-from ara.models import GameRole, Importance, StreamResult
+from ara.llm.models import GameRole, StreamResult
+from ara.world.character import Importance
 from ara.world.character import Character, create_anonymous_character, load_character
 from ara.world.engine import Engine
 from ara.world.orchestrator import TurnDecision
@@ -26,6 +28,7 @@ def _make_char(name: str, importance: Importance, mock_db: ChromaStore) -> Chara
     cid = uuid.uuid5(uuid.NAMESPACE_DNS, f"test.{name}")
     return Character(
         id=cid,
+        canonical_name=name,
         name=name,
         card_fields={
             "name": name,
@@ -45,7 +48,7 @@ def _make_scene_with_chars(chars: list[Character]) -> Scene:
     """Build a minimal scene containing the given characters."""
     player = next(c for c in chars if c.name == "Player")
     narrator = next(c for c in chars if c.name == "Narrator")
-    loc = Location(name="room", desc="A room.")
+    loc = Location(canonical_name="room", name="room", desc="A room.")
     return Scene(
         id="test",
         language="English",
@@ -83,8 +86,9 @@ class TestAnonymousCharacterCreation:
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp = Path(tmpdir)
             assets = tmp / "assets"
-            cc = assets / "cc"
-            plot = assets / "plot"
+            story = "missing_dir_test"
+            cc = assets / "cc" / story
+            plot = assets / "plot" / story
             cc.mkdir(parents=True)
             plot.mkdir(parents=True)
 
@@ -132,8 +136,9 @@ considerations = "None"
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp = Path(tmpdir)
             assets = tmp / "assets"
-            cc = assets / "cc"
-            plot = assets / "plot"
+            story = "anon_test"
+            cc = assets / "cc" / story
+            plot = assets / "plot" / story
             cc.mkdir(parents=True)
             plot.mkdir(parents=True)
 
@@ -291,7 +296,9 @@ class TestAnonymousEngineBehavior:
         engine.step()
 
         assert calls[-1]["tools"] is not None
-        assert len(calls[-1]["tools"]) == 3
+        assert len(calls[-1]["tools"]) == 4
+        tool_names = {t["function"]["name"] for t in calls[-1]["tools"]}
+        assert "attempt_action" in tool_names
         assert npc.memory.db.upsert.call_count >= 1  # type: ignore[union-attr]
 
 
@@ -319,6 +326,97 @@ class TestAnonymousStoryMerge:
 
         _merge_characters(prev, nxt)
 
-        # Scratchpads are NOT carried over — only memory is
-        assert new_important.scratch.text == "Nothing yet!"
+        # IMPORTANT+ characters carry memory and scratch across scenes.
+        # ANONYMOUS characters get a fresh scratch.
+        assert new_important.scratch.text == "Important memory"
         assert new_anon.scratch.text == "Nothing yet!"
+
+
+
+def _make_char_for_spawn(name: str) -> Character:
+    cid = uuid.uuid5(uuid.NAMESPACE_DNS, f"test.{name}")
+    return Character(
+        id=cid,
+        canonical_name=name,
+        name=name,
+        card_fields={
+            "name": name,
+            "summary": f"{name} summary",
+            "personality": f"{name} personality",
+            "scenario": f"{name} scenario",
+            "greeting_message": f"Hi, I'm {name}",
+            "example_messages": "",
+        },
+        importance=Importance.IMPORTANT,
+        memory=MagicMock(),
+        scratch=MagicMock(),
+    )
+
+
+def _make_scene_for_spawn() -> Scene:
+    player = _make_char_for_spawn("Player")
+    narrator = _make_char_for_spawn("Narrator")
+    npc = _make_char_for_spawn("NPC")
+    loc = Location(canonical_name="room", name="room", desc="A room.")
+    return Scene(
+        id="test",
+        language="English",
+        zeitgeist="test",
+        tone="neutral",
+        scene_type="normal",
+        character_pool={player, narrator, npc},
+        starting_characters={player, narrator, npc},
+        player=player,
+        narrator=narrator,
+        location_pool={loc},
+        starting_location=loc,
+        plot_considerations="",
+        plot_story="Test scene",
+        next_choices={},
+    )
+
+
+def test_create_anonymous_character_factory() -> None:
+    """Factory creates an anonymous character with the requested sprite."""
+    char = create_anonymous_character("Waiter", "A waiter.", sprite="waiter")
+    assert char.name == "Waiter"
+    assert char.importance == Importance.ANONYMOUS
+    assert char.card_fields["sprite"] == "waiter"
+
+
+def test_engine_spawn_anonymous_mid_scene() -> None:
+    """The orchestrator can spawn anonymous characters during a scene."""
+    scene = _make_scene_for_spawn()
+    decisions = [
+        TurnDecision(
+            next_char=scene.narrator,
+            directive="",
+            suggestions=[],
+            entering_chars=set(),
+            exiting_chars=set(),
+            switch_location=None,
+            spawn_anonymous=[
+                {"name": "Waiter", "description": "A waiter.", "sprite": "waiter"},
+            ],
+        ),
+    ]
+
+    class MockClient:
+        def complete(self, **kwargs):
+            from ara.llm.models import StreamResult
+            return StreamResult(content="mock")
+
+    engine = Engine(MockClient())  # type: ignore[arg-type]
+    engine.orchestrator = MagicMock()
+    engine.orchestrator.decide_next_turn.side_effect = lambda **kw: decisions.pop(0)
+    engine.start(scene)
+
+    assert len(scene.character_pool) == 3
+    result = engine.step()
+    assert result.speaker == scene.narrator.name
+    assert len(scene.character_pool) == 4
+    assert "Waiter" in {c.name for c in scene.character_pool}
+    waiter = next(c for c in scene.character_pool if c.name == "Waiter")
+    assert waiter.importance == Importance.ANONYMOUS
+    assert waiter.card_fields["sprite"] == "waiter"
+    assert waiter in engine.here_chars

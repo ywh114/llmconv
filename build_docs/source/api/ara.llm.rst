@@ -25,6 +25,14 @@ ara.llm.context module
    :show-inheritance:
    :undoc-members:
 
+ara.llm.models module
+---------------------
+
+.. automodule:: ara.llm.models
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
 ara.llm.tools module
 --------------------
 

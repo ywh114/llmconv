@@ -17,6 +17,7 @@ class AgentRequest:
 
     @classmethod
     def from_json(cls, line: str) -> AgentRequest:
+        """Parse a JSON line into a request."""
         data = json.loads(line)
         return cls(
             id=data["id"],
@@ -34,6 +35,7 @@ class AgentResponse:
     error: str | None = None
 
     def to_json(self) -> str:
+        """Serialize the response to a JSON line."""
         return json.dumps(asdict(self), default=str) + "\n"
 
 

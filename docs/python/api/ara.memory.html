@@ -14,7 +14,7 @@
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="ara.utils package" href="ara.utils.html" />
+    <link rel="next" title="ara.persistence package" href="ara.persistence.html" />
     <link rel="prev" title="ara.llm package" href="ara.llm.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
@@ -54,9 +54,44 @@ and embedding model name.</p>
 </dd>
 </dl>
 <dl class="py method">
+<dt class="sig sig-object py" id="ara.memory.chroma.ChromaStore.clear_all_collections">
+<span class="sig-name descname"><span class="pre">clear_all_collections</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/ara/memory/chroma.html#ChromaStore.clear_all_collections"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.memory.chroma.ChromaStore.clear_all_collections" title="Link to this definition">¶</a></dt>
+<dd><p>Delete every existing ChromaDB collection.</p>
+<p>This makes the vector store fully transient. Callers are responsible
+for repopulating collections from a snapshot or world settings
+afterwards.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="ara.memory.chroma.ChromaStore.collection">
 <span class="sig-name descname"><span class="pre">collection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ara/memory/chroma.html#ChromaStore.collection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.memory.chroma.ChromaStore.collection" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get or create a collection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> – Collection identifier.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A ChromaDB collection object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ara.memory.chroma.ChromaStore.get_all">
+<span class="sig-name descname"><span class="pre">get_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">collection_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">where</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/ara/memory/chroma.html#ChromaStore.get_all"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.memory.chroma.ChromaStore.get_all" title="Link to this definition">¶</a></dt>
+<dd><p>Retrieve all documents from a collection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>collection_name</strong> – Target collection.</p></li>
+<li><p><strong>where</strong> – Optional ChromaDB metadata filter.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dict with <code class="docutils literal notranslate"><span class="pre">ids</span></code>, <code class="docutils literal notranslate"><span class="pre">documents</span></code>, and <code class="docutils literal notranslate"><span class="pre">metadatas</span></code> keys.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="ara.memory.chroma.ChromaStore.query">
@@ -137,8 +172,23 @@ character’s stable UUID.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="ara.memory.knowledge.CharacterMemory.recall">
-<span class="sig-name descname"><span class="pre">recall</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">queries</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'medium'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/ara/memory/knowledge.html#CharacterMemory.recall"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.memory.knowledge.CharacterMemory.recall" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">recall</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">queries</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'medium'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">client</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="ara.llm.html#ara.llm.client.LLMClient" title="ara.llm.client.LLMClient"><span class="pre">LLMClient</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">querier</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="ara.world.html#ara.world.character.Character" title="ara.world.character.Character"><span class="pre">Character</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/ara/memory/knowledge.html#CharacterMemory.recall"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.memory.knowledge.CharacterMemory.recall" title="Link to this definition">¶</a></dt>
+<dd><p>Retrieve semantically similar conversation snippets.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>queries</strong> – Search query strings.</p></li>
+<li><p><strong>depth</strong> – Recall breadth-one of <code class="docutils literal notranslate"><span class="pre">shallow</span></code>, <code class="docutils literal notranslate"><span class="pre">medium</span></code>, <code class="docutils literal notranslate"><span class="pre">deep</span></code>,
+or <code class="docutils literal notranslate"><span class="pre">very_deep</span></code>.</p></li>
+<li><p><strong>client</strong> – Optional LLM client for querier-aware filtering.</p></li>
+<li><p><strong>querier</strong> – Optional character whose perspective should shape the answer.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Flattened list of retrieved document strings.</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -150,12 +200,14 @@ character’s stable UUID.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="ara.memory.knowledge.NullMemory.add_conversation">
 <span class="sig-name descname"><span class="pre">add_conversation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">texts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/ara/memory/knowledge.html#NullMemory.add_conversation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.memory.knowledge.NullMemory.add_conversation" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Do nothing.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="ara.memory.knowledge.NullMemory.recall">
 <span class="sig-name descname"><span class="pre">recall</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">queries</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'medium'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/ara/memory/knowledge.html#NullMemory.recall"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ara.memory.knowledge.NullMemory.recall" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Return an empty list.</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -219,6 +271,7 @@ can reference it at the start of a new scene.</p>
 <p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static_assets.html">Static assets</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Reference:</span></p>
 <ul class="current">
@@ -240,9 +293,11 @@ can reference it at the start of a new scene.</p>
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="ara.persistence.html">ara.persistence package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ara.utils.html">ara.utils package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ara.config.html">ara.config module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ara.models.html">ara.models module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ara.webclient.html">ara.webclient package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ara.cli.html">ara.cli package</a></li>
 </ul>
 
 <div class="relations">
@@ -250,7 +305,7 @@ can reference it at the start of a new scene.</p>
 <ul>
   <li><a href="../index.html">Documentation overview</a><ul>
       <li>Previous: <a href="ara.llm.html" title="previous chapter">ara.llm package</a></li>
-      <li>Next: <a href="ara.utils.html" title="next chapter">ara.utils package</a></li>
+      <li>Next: <a href="ara.persistence.html" title="next chapter">ara.persistence package</a></li>
   </ul></li>
 </ul>
 </div>

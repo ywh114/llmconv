@@ -32,8 +32,8 @@ def main(argv: list[str] | None = None) -> int:
         "scene",
         nargs="?",
         type=Path,
-        default=Path("data/assets/plot/0.toml"),
-        help="Path to the initial scene TOML file (default: data/assets/plot/0.toml)",
+        default=Path("data/assets/plot/demo/ini_scene.toml"),
+        help="Path to the initial scene TOML file (default: data/assets/plot/demo/ini_scene.toml)",
     )
     parser.add_argument(
         "--api-key",
@@ -115,7 +115,11 @@ def main(argv: list[str] | None = None) -> int:
         if result.event == "scene_loaded" and result.scene is not None:
             print(f"\n=== Scene: {result.scene.id} ===")
             print(f"Location: {result.scene.starting_location.name}")
-            print(f"Characters: {[c.name for c in result.scene.starting_characters]}\n")
+            print(f"Characters: {[c.display_name_with_title() for c in result.scene.starting_characters]}\n")
+
+        elif result.event == "turn" and result.output:
+            print(result.output)
+            print()
 
         elif result.event == "needs_player_input":
             suggestions = result.suggestions or []

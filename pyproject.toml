@@ -14,15 +14,21 @@ dependencies = [
     "pydantic>=2.0",
     "pydantic-settings",
     "sentence-transformers",
+    "starlette>=1.2.1",
     "torch",
 ]
 
 [project.scripts]
 ara = "ara.__main__:main"
+aractl = "ara.cli.aractl:main"
+ara-webclient = "ara.webclient.__main__:main"
 
 [dependency-groups]
 dev = [
+    "playwright>=1.60.0",
     "pytest>=8.0",
+    "sphinx>=8.0",
+    "tomli-w>=1.2.0",
 ]
 
 [project.optional-dependencies]
@@ -41,12 +47,20 @@ packages = ["src/ara"]
 [tool.ara]
 api_key = ""
 api_endpoint = "https://api.deepseek.com"
-api_model = "deepseek-v4-flash"
+api_model = "deepseek-v4-pro"
 embedding_model = "all-MiniLM-L6-v2"
 data_dir = "data"
-language = "English"
+language = "en"
 temperature_character = 0.9
 temperature_narrator = 0.6
 temperature_orchestrator = 0.6
 temperature_summarizer = 0.4
 strict_tools = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+norecursedirs = [".git", ".venv", "tmp", "build_docs"]
+markers = [
+    "live_llm: tests that call a live LLM API (excluded by default)",
+]
+addopts = "-m 'not live_llm'"

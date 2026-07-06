@@ -48,3 +48,11 @@ ara.agent.types module
    :members:
    :show-inheritance:
    :undoc-members:
+
+ara.agent.__main__ module
+-------------------------
+
+.. automodule:: ara.agent.__main__
+   :members:
+   :show-inheritance:
+   :undoc-members:

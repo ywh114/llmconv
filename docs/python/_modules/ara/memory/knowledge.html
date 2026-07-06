@@ -41,8 +41,14 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">chromadb</span><span class="w"> </span><span class="kn">import</span> <span class="n">Metadata</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">chromadb.api.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">OneOrMany</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">ara.memory.chroma</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChromaStore</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ara.utils.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_logger</span>
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ara.llm.client</span><span class="w"> </span><span class="kn">import</span> <span class="n">LLMClient</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ara.world.character</span><span class="w"> </span><span class="kn">import</span> <span class="n">Character</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -89,12 +95,13 @@
 <div class="viewcode-block" id="NullMemory.add_conversation">
 <a class="viewcode-back" href="../../../api/ara.memory.html#ara.memory.knowledge.NullMemory.add_conversation">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">add_conversation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">texts</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">pass</span></div>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Do nothing.&quot;&quot;&quot;</span></div>
 
 
 <div class="viewcode-block" id="NullMemory.recall">
 <a class="viewcode-back" href="../../../api/ara.memory.html#ara.memory.knowledge.NullMemory.recall">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">recall</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">queries</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">depth</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;medium&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return an empty list.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">[]</span></div>
 </div>
 
@@ -120,6 +127,7 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolved collection name (``str(character_id)``).&quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve the collection name from the character ID.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">collection_name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">character_id</span><span class="p">)</span>
 
 <div class="viewcode-block" id="CharacterMemory.add_conversation">
@@ -146,17 +154,25 @@
 
 <div class="viewcode-block" id="CharacterMemory.recall">
 <a class="viewcode-back" href="../../../api/ara.memory.html#ara.memory.knowledge.CharacterMemory.recall">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">recall</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">queries</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">depth</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;medium&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s1">&#39;Recalling from </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">collection_name</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">queries</span><span class="si">!r}</span><span class="s1"> (depth=</span><span class="si">{</span><span class="n">depth</span><span class="si">}</span><span class="s1">)&#39;</span>
-        <span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">recall</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">queries</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">depth</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;medium&#39;</span><span class="p">,</span>
+        <span class="n">client</span><span class="p">:</span> <span class="s1">&#39;LLMClient | None&#39;</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">querier</span><span class="p">:</span> <span class="s1">&#39;Character | None&#39;</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Retrieve semantically similar conversation snippets.</span>
 
 <span class="sd">        :param queries: Search query strings.</span>
-<span class="sd">        :param depth: Recall breadth—one of ``shallow``, ``medium``, ``deep``,</span>
+<span class="sd">        :param depth: Recall breadth-one of ``shallow``, ``medium``, ``deep``,</span>
 <span class="sd">            or ``very_deep``.</span>
+<span class="sd">        :param client: Optional LLM client for querier-aware filtering.</span>
+<span class="sd">        :param querier: Optional character whose perspective should shape the answer.</span>
 <span class="sd">        :return: Flattened list of retrieved document strings.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">&#39;Recalling from </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">collection_name</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">queries</span><span class="si">!r}</span><span class="s1"> (depth=</span><span class="si">{</span><span class="n">depth</span><span class="si">}</span><span class="s1">)&#39;</span>
+        <span class="p">)</span>
         <span class="n">n_results</span> <span class="o">=</span> <span class="n">_DEPTH_MAP</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">depth</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
         <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">collection_name</span><span class="p">,</span>
@@ -168,6 +184,31 @@
         <span class="n">flat</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">docs</span><span class="p">:</span>
             <span class="n">flat</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">group</span> <span class="ow">or</span> <span class="p">[])</span>
+
+        <span class="k">if</span> <span class="n">client</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">querier</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">flat</span><span class="p">:</span>
+            <span class="n">context</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Querier: </span><span class="si">{</span><span class="n">querier</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Personality/expertise: </span><span class="si">{</span><span class="n">querier</span><span class="o">.</span><span class="n">card_fields</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;personality&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Scenario: </span><span class="si">{</span><span class="n">querier</span><span class="o">.</span><span class="n">card_fields</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;scenario&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Query: </span><span class="si">{</span><span class="n">queries</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">queries</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Raw memories:</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;- </span><span class="si">{</span><span class="n">d</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">flat</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">filtered</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">complete_subagent</span><span class="p">(</span>
+                <span class="n">task</span><span class="o">=</span><span class="p">(</span>
+                    <span class="s2">&quot;Reframe the raw memories into an answer for the querier. &quot;</span>
+                    <span class="s2">&quot;If the querier is a child, simplify. &quot;</span>
+                    <span class="s2">&quot;If the querier is an expert, be detailed and precise. &quot;</span>
+                    <span class="s2">&quot;You must base your answer ONLY on the raw memories provided. &quot;</span>
+                    <span class="s2">&quot;If no memory answers the query, return exactly &#39;-- nothing relevant found&#39;. &quot;</span>
+                    <span class="s2">&quot;Do not invent, infer, or hallucinate facts that are not present. &quot;</span>
+                    <span class="s2">&quot;Return a short paragraph.&quot;</span>
+                <span class="p">),</span>
+                <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">,</span>
+                <span class="n">max_tokens</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">filtered</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+                <span class="k">return</span> <span class="p">[</span><span class="n">filtered</span><span class="o">.</span><span class="n">strip</span><span class="p">()]</span>
+
         <span class="k">return</span> <span class="n">flat</span></div>
 </div>
 
@@ -201,6 +242,7 @@
 <p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../static_assets.html">Static assets</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Reference:</span></p>
 <ul>
@@ -209,9 +251,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../api/ara.agent.html">ara.agent package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api/ara.llm.html">ara.llm package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api/ara.memory.html">ara.memory package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/ara.persistence.html">ara.persistence package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api/ara.utils.html">ara.utils package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api/ara.config.html">ara.config module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../api/ara.models.html">ara.models module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/ara.webclient.html">ara.webclient package</a></li>
 </ul>
 
 <div class="relations">

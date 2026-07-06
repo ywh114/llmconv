@@ -1,0 +1,149 @@
+class_values = [
+    { value = "physician", prefixable = true, suffixible = true },
+    { value = "apothecary", prefixable = true, suffixible = true },
+    { value = "barber-surgeon", prefixable = true, suffixible = true },
+]
+class_root = [
+    { value = "doctor", prefixable = true, suffixible = true },
+    { value = "crow", prefixable = true, suffixible = true },
+    { value = "mask", prefixable = true, suffixible = true },
+    { value = "leech", prefixable = true, suffixible = true },
+]
+prefix = [
+    { value = "plague", prefixable = true, suffixible = true },
+    { value = "raven", prefixable = true, suffixible = true },
+    { value = "black", prefixable = true, suffixible = true },
+    { value = "bleak", prefixable = true, suffixible = true },
+]
+adj = [
+    { value = "sickly", prefixable = true, suffixible = true },
+    { value = "pale", prefixable = true, suffixible = true },
+    { value = "bleak", prefixable = true, suffixible = true },
+    { value = "raven", prefixable = true, suffixible = true },
+]
+adj_sup = [
+    { value = "most sickly", prefixable = false, suffixible = false },
+    { value = "grimmest", prefixable = true, suffixible = true },
+]
+noun = [
+    { value = "doctor", prefixable = true, suffixible = true },
+    { value = "crow", prefixable = true, suffixible = true },
+    { value = "mask", prefixable = true, suffixible = true },
+    { value = "plague", prefixable = true, suffixible = true },
+]
+thing = [
+    { value = "miasma", prefixable = true, suffixible = true },
+    { value = "pestilence", prefixable = true, suffixible = true },
+    { value = "buboes", prefixable = true, suffixible = true },
+]
+disease = [
+    { value = "cancer", prefixable = true, suffixible = true },
+    { value = "pox", prefixable = true, suffixible = true },
+    { value = "fever", prefixable = true, suffixible = true },
+    { value = "ague", prefixable = true, suffixible = true },
+    { value = "gout", prefixable = true, suffixible = true },
+    { value = "dropsy", prefixable = true, suffixible = true },
+    { value = "plague", prefixable = true, suffixible = true },
+    { value = "leprosy", prefixable = true, suffixible = true },
+    { value = "cholera", prefixable = true, suffixible = true },
+    { value = "blight", prefixable = true, suffixible = true },
+    { value = "typhus", prefixable = true, suffixible = true },
+    { value = "arthritis", prefixable = true, suffixible = true },
+    { value = "osteoperosis", prefixable = true, suffixible = true },
+]
+
+suf = [
+    { value = 'born', prefixable = true, suffixible = true },
+    { value = 'kin', prefixable = true, suffixible = true },
+    { value = 'kind', prefixable = true, suffixible = true },
+    { value = 'pox', prefixable = true, suffixible = true },
+    { value = 'fever', prefixable = true, suffixible = true },
+    { value = 'ague', prefixable = true, suffixible = true },
+    { value = 'mask', prefixable = true, suffixible = true },
+    { value = 'crow', prefixable = true, suffixible = true },
+    { value = 'leech', prefixable = true, suffixible = true },
+]
+
+[[class]]
+patterns = [
+    "{prefix}{class_root}",
+    "{class_root}",
+    "{disease}",
+    "{prefix}{disease}",
+]
+
+[[class_extra]]
+patterns = [
+    "{class_root}",
+    "{class_values}",
+    "{prefix} {class_root}",
+    "{prefix} {class_values}",
+]
+
+[[place]]
+value = "the quarantine"
+takes_of = true
+takes_in = false
+article = ""
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "the ward"
+takes_of = true
+takes_in = false
+article = ""
+proper_noun = false
+prefixable = false
+suffixible = false
+
+
+[[expose]]
+slot = "class"
+from = [
+    "class",
+    "class_extra",
+]
+
+[[expose]]
+slot = "prefix"
+from = [
+    "prefix",
+]
+
+[[expose]]
+slot = "adj"
+from = [
+    "adj",
+]
+
+[[expose]]
+slot = "adj_sup"
+from = [
+    "adj_sup",
+]
+
+[[expose]]
+slot = "noun"
+from = [
+    "noun",
+    "disease",
+]
+
+[[expose]]
+slot = "place"
+from = [
+    "place",
+]
+
+[[expose]]
+slot = "thing"
+from = [
+    "thing",
+]
+[[expose]]
+slot = "suf"
+from = [
+    "suf",
+]

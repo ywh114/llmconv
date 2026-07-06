@@ -1,5 +1,5 @@
 id = "summary_test_a"
-language = "english"
+language = "en"
 zeitgeist = "test"
 tone = "neutral"
 
@@ -13,9 +13,6 @@ narrator = "Narrator"
 [location]
 pool = ["lab"]
 init = "lab"
-
-[location.descs]
-lab = "A small research lab with computers and filing cabinets."
 
 [plot]
 considerations = "Keep it very short. Alice whispers a secret to Player."

@@ -1,0 +1,5 @@
+title = "Demo"
+description = "A cozy afternoon in the port office break room."
+author = "Ara"
+first_scene = "intro"
+opening_text = """Welcome to the Ara demo. Based on original Azur Lane characters and situations."""

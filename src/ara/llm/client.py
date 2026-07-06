@@ -5,17 +5,34 @@ from __future__ import annotations
 import json
 import os
 import sys
+import threading
 from typing import Any
 
 from openai import OpenAI
 from openai.types.chat import ChatCompletionMessageParam
 
 from ara.config import AraSettings
-from ara.models import GameRole, StreamResult
+from ara.llm.models import GameRole, StreamResult
 from ara.utils.ansi import BLUE, END, GREEN, LIGHTGRAY
 from ara.utils.logger import get_logger
 
 logger = get_logger(__name__)
+
+
+def _normalize_usage(usage: Any) -> dict[str, Any] | None:
+    """Convert an API usage object into a plain dict recursively.
+
+    ``openai`` returns pydantic models for usage; ``model_dump`` flattens
+    nested objects such as ``prompt_tokens_details`` so downstream code can
+    safely use ``dict.get``.
+    """
+    if usage is None:
+        return None
+    if isinstance(usage, dict):
+        return usage
+    if hasattr(usage, "model_dump"):
+        return usage.model_dump()
+    return dict(usage)
 
 
 class LLMClient:
@@ -26,6 +43,10 @@ class LLMClient:
     """
 
     def __init__(self, settings: AraSettings) -> None:
+        """Create the client from application settings.
+
+        :param settings: Application settings instance.
+        """
         self.settings = settings
         base_url = settings.api_endpoint
         if settings.strict_tools:
@@ -33,7 +54,10 @@ class LLMClient:
         self.client = OpenAI(
             api_key=settings.api_key or os.environ.get('DEEPSEEK_API_KEY', ''),
             base_url=base_url,
+            timeout=120.0,
+            max_retries=2,
         )
+        self.cancel_event: threading.Event | None = None
 
     def _profile_kwargs(self, role: GameRole) -> dict[str, Any]:
         """Return the base keyword arguments for a given *role*.
@@ -65,6 +89,7 @@ class LLMClient:
         tool_choice: str | None = None,
         stream: bool = True,
         print_stream: bool = False,
+        name: str | None = None,
     ) -> StreamResult:
         """Send a chat-completion request and return a :class:`StreamResult`.
 
@@ -78,6 +103,7 @@ class LLMClient:
         :param tools: Optional list of tool schemas.
         :param tool_choice: Optional tool-choice directive (e.g. ``"required"``).
         :param stream: Whether to stream the response.
+        :param name: Optional entity name (e.g., character name) for logging.
         :return: Accumulated result containing content, reasoning content, and
             any tool calls.
         """
@@ -107,22 +133,41 @@ class LLMClient:
         # Apply caller-supplied tool_choice only (no automatic override).
         if tool_choice:
             kwargs['tool_choice'] = tool_choice
-
+        sys_msg = kwargs['messages'][0] if kwargs['messages'] else {}
+        sys_text = sys_msg.get('content', '') or ''
         logger.debug(
-            f'LLM request: role={role.value}, tools={len(tools or [])}, '
-            f'tool_choice={kwargs.get("tool_choice")}, '
+            f'LLM request: role={role.value}, name={name or ""}, '
+            f'tools={len(tools or [])}, tool_choice={kwargs.get("tool_choice")}, '
             f'reasoning_effort={kwargs.get("reasoning_effort")}, '
-            f'extra_body={kwargs.get("extra_body")}, stream={stream}'
+            f'extra_body={kwargs.get("extra_body")}, stream={stream}, '
+            f'sys_len={len(sys_text)}, msg_count={len(kwargs["messages"])}'
         )
 
         result = StreamResult()
 
         try:
             if stream:
+                kwargs['stream_options'] = {'include_usage': True}
                 response = self.client.chat.completions.create(
                     **kwargs, stream=True
                 )
                 for chunk in response:
+                    if self.cancel_event is not None and self.cancel_event.is_set():
+                        raise RuntimeError('LLM call cancelled')
+                    # Usage is reported on the final chunk.  Accessing the
+                    # ``usage`` attribute on the parsed pydantic object reliably
+                    # hangs with DeepSeek's streaming endpoint, so we read the
+                    # raw dumped dict instead.
+                    raw_chunk = chunk.model_dump()
+                    usage = raw_chunk.get('usage')
+                    is_final = (
+                        not chunk.choices
+                        or chunk.choices[0].finish_reason is not None
+                    )
+                    if is_final and usage:
+                        result.usage = _normalize_usage(usage)
+                    if not chunk.choices:
+                        continue
                     delta = chunk.choices[0].delta
                     if getattr(delta, 'reasoning_content', None):
                         result.reasoning_content += delta.reasoning_content
@@ -137,12 +182,12 @@ class LLMClient:
                             )
                     if delta.content:
                         result.content += delta.content
-                        # Only stream content to stdout for character/narrator roles.
-                        # Orchestrator output must not pollute stdout because the
-                        # agent server captures stdout to build the narrator/character
-                        # dialogue payload.
+                        # Stream content to stderr alongside reasoning so that
+                        # stdout stays clean for structured callers (agent server,
+                        # tests, etc.).  CLI front-ends can print the returned
+                        # result.content to stdout if they want.
                         if print_stream and role != GameRole.ORCHESTRATOR:
-                            print(GREEN + delta.content + END, end='', flush=True)
+                            print(GREEN + delta.content + END, end='', flush=True, file=sys.stderr)
                     if getattr(delta, 'tool_calls', None):
                         for tc in delta.tool_calls:
                             idx = tc.index
@@ -166,6 +211,8 @@ class LLMClient:
                                 )
             else:
                 response = self.client.chat.completions.create(**kwargs)
+                if getattr(response, 'usage', None):
+                    result.usage = _normalize_usage(response.usage)
                 msg = response.choices[0].message
                 result.content = msg.content or ''
                 result.reasoning_content = (
@@ -187,16 +234,38 @@ class LLMClient:
             logger.error(f'LLM request failed: {exc}')
             raise
 
-        if print_stream and result.content:
-            # Print the full response to stderr as well so it is visible
-            # even when stdout is being captured (e.g. by the agent server).
+        if print_stream and result.content and role != GameRole.ORCHESTRATOR:
+            # Echo the full response to stderr for visibility in CLI/TUI usage.
             print(LIGHTGRAY + result.content + END, file=sys.stderr)
 
+        usage = result.usage
+        prompt_tokens = usage.get('prompt_tokens') if usage else None
+        completion_tokens = usage.get('completion_tokens') if usage else None
+        cached_tokens = None
+        if usage:
+            cached_tokens = (
+                usage.get('prompt_tokens_details', {}).get('cached_tokens')
+                or usage.get('prompt_cache_hit_tokens')
+            )
+        tool_summary = ', '.join(
+            f"{tc['function']['name']}({tc['function']['arguments'][:80]!r}...)"
+            for tc in result.tool_calls
+        )
         logger.debug(
             f'LLM response: content_len={len(result.content)}, '
             f'reasoning_len={len(result.reasoning_content)}, '
-            f'tool_calls={len(result.tool_calls)}'
+            f'tool_calls={len(result.tool_calls)}, '
+            f'prompt_tokens={prompt_tokens}, '
+            f'completion_tokens={completion_tokens}, '
+            f'cached_tokens={cached_tokens}, '
+            f'tool_summary=[{tool_summary}]'
         )
+        log_prefix = f'{role.value}:{name}' if name else role.value
+        # Log reasoning first, then the spoken/written content.
+        if result.reasoning_content:
+            logger.info(f'{log_prefix}:reasoning:{result.reasoning_content!r}')
+        if result.content or not result.reasoning_content:
+            logger.info(f'{log_prefix}:content:{result.content!r}')
         return result
 
     def complete_subagent(
@@ -228,8 +297,12 @@ class LLMClient:
             'extra_body': {'thinking': {'type': 'disabled'}},
         }
         try:
+            logger.debug(f'Sub-agent request: model={kwargs.get("model")}, max_tokens={kwargs.get("max_tokens")}')
             response = self.client.chat.completions.create(**kwargs)
-            return response.choices[0].message.content or ""
+            content = response.choices[0].message.content or ""
+            logger.debug(f'Sub-agent response: content_len={len(content)}')
+            logger.info(f'subagent:content:{content!r}')
+            return content
         except Exception as exc:
             logger.warning(f"Sub-agent call failed: {exc}")
             return ""

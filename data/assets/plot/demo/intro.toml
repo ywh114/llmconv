@@ -1,0 +1,66 @@
+id = "intro"
+name = "On Break"
+language = "en"
+zeitgeist = "stability"
+tone = "温馨; warm color palette"
+
+[character]
+pool = ["Cheshire", "Champagne", "Commander", "Akashi"]
+inits = ["Cheshire", "Champagne", "Commander"]
+player = "Commander"
+narrator = "Akashi"
+
+[character.sprites]
+Cheshire = "default_neutral"
+Champagne = "white_neutral"
+Commander = "none"
+Akashi = "default_neutral"
+
+[location]
+pool = ["building_break_room", "building_storage_room", "building_aisle"]
+init = "building_break_room"
+
+[plot]
+considerations = """Keep it short."""
+scene = """
+(1)
+Cheshire，Champagne，and Commander begin in `building_break_room`.
+
+They converse a bit about random things for a few rounds.
+
+Think of a smooth transition, after which Cheshire begins talking about her lost book. Champagne says to look for it in `building_storage_room`.
+
+(2)
+They enter the `building_aisle`; there is a narration:
+A short narration about the characters entering the aisle and about the warm afternoon sunlight slanting through the window.
+
+Champagne remarks on the evening clouds.
+
+They enter the `building_storage_room`.
+
+(3)
+A short narration describes the dusty room, and they look around.
+
+Eventually, the book is found on top of a closet by Champagne, and the Commander
+retrieves it.
+
+Cheshire hugs Champagne and the Commander in delight.
+
+They re-enter the `building_aisle`.
+
+(4)
+Champagne asks the others to take a walk, while Cheshire invites the others for tea.
+
+The scene ends.
+"""
+
+[plot.next]
+considerations = "None"
+
+[plot.next.tea_scene]
+prereq_scenes = ["intro"]
+desc = "If going for tea."
+
+[plot.next.walk_scene]
+prereq_scenes = ["intro"]
+desc = "If going for a walk."

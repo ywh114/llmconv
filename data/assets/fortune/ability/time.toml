@@ -1,0 +1,116 @@
+category = "concept"
+# Time-manipulation ability entries.
+
+prefix_values = [
+    { value = "chrono", prefixable = false, suffixible = true },
+    { value = "tempo", prefixable = false, suffixible = true },
+    { value = "aeon", prefixable = false, suffixible = true },
+]
+
+time_status_values = [
+    { value = "haste", prefixable = false, suffixible = false },
+    { value = "slow", prefixable = false, suffixible = false },
+    { value = "stop", prefixable = false, suffixible = false },
+    { value = "freeze", prefixable = false, suffixible = false },
+    { value = "lag", prefixable = false, suffixible = false },
+    { value = "accelerate", prefixable = false, suffixible = false },
+    { value = "decelerate", prefixable = false, suffixible = false },
+    { value = "delay", prefixable = false, suffixible = false },
+    { value = "loop", prefixable = false, suffixible = false },
+]
+
+time_area_values = [
+    { value = "loop", prefixable = false, suffixible = false },
+    { value = "skip", prefixable = false, suffixible = false },
+    { value = "rewind", prefixable = false, suffixible = false },
+    { value = "paradox", prefixable = false, suffixible = false },
+]
+
+time_ranged_values = [
+    { value = "paradox", prefixable = false, suffixible = false },
+]
+
+time_defence_values = [
+    { value = "halt", prefixable = false, suffixible = false },
+    { value = "suspend", prefixable = false, suffixible = false },
+]
+
+verb_values = [
+    { value = "haste", prefixable = false, suffixible = false, noun_form = "hastening" },
+    { value = "slow", prefixable = false, suffixible = false },
+    { value = "stop", prefixable = false, suffixible = false },
+    { value = "rewind", prefixable = false, suffixible = false },
+    { value = "freeze", prefixable = false, suffixible = false },
+    { value = "skip", prefixable = false, suffixible = false },
+    { value = "fast-forward", prefixable = false, suffixible = false },
+    { value = "delay", prefixable = false, suffixible = false },
+]
+
+suf_values = []
+
+domain_values = [
+    { value = "timeline", prefixable = false, suffixible = false },
+    { value = "paradox", prefixable = false, suffixible = false },
+    { value = "entropy", prefixable = false, suffixible = false },
+    { value = "causality", prefixable = false, suffixible = false },
+    { value = "dilation", prefixable = false, suffixible = false },
+    { value = "eternity", prefixable = false, suffixible = false },
+]
+
+noun_values = [
+    { value = "time", prefixable = false, suffixible = false },
+    { value = "the clock", prefixable = false, suffixible = false },
+    { value = "age", prefixable = false, suffixible = false },
+    { value = "moment", prefixable = false, suffixible = false },
+    { value = "paradox", prefixable = false, suffixible = false },
+]
+
+adj_values = [
+    { value = "temporal", prefixable = false, suffixible = false },
+    { value = "atemporal", prefixable = false, suffixible = false },
+    { value = "dilated", prefixable = false, suffixible = false },
+    { value = "looping", prefixable = false, suffixible = false },
+    { value = "frozen", prefixable = false, suffixible = false },
+]
+
+time_movement_values = []
+
+[["status"]]
+patterns = ["{time_status_values}"]
+
+[["area"]]
+patterns = ["{time_area_values}"]
+
+[["ranged"]]
+patterns = ["{time_ranged_values}"]
+
+[["defence"]]
+patterns = ["{time_defence_values}"]
+
+[[expose]]
+slot = "suf"
+from = ["suf_values"]
+
+[[expose]]
+slot = "prefix"
+from = ["prefix_values"]
+
+[[expose]]
+slot = "technique"
+from = ["status", "area", "ranged", "defence", "movement"]
+
+[[expose]]
+slot = "verb"
+from = ["verb_values"]
+
+[[expose]]
+slot = "domain"
+from = ["domain_values"]
+
+[[expose]]
+slot = "noun"
+from = ["noun_values"]
+
+[[expose]]
+slot = "adj"
+from = ["adj_values"]

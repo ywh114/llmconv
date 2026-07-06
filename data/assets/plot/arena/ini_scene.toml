@@ -1,0 +1,5 @@
+title = "The Infinite Arena"
+description = "A gladiatorial spectacle where the player watches from the crowd."
+author = "Ara"
+first_scene = "arena_ini"
+world = "arena"

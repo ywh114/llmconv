@@ -1,0 +1,21 @@
+importance = "EIGEN"
+sprites = ["default_neutral", "year_neutral", "year_xneutral"]
+default_sprite = "default_neutral"
+
+[default_neutral]
+topleft = [422, 154]
+bottomright = [628, 855]
+center = [519, 571]
+focus =[[581, 270, 155]]
+
+[year_neutral]
+topleft = [341, 6]
+bottomright = [681, 1108]
+center = [689, 616]
+focus = [[493, 229, 180]]
+
+[year_xneutral]
+topleft = [341, 6]
+bottomright = [681, 1108]
+center = [689, 616]
+focus = [[493, 229, 180], [518, 447, 111], [687, 615, 95], [1236, 796, 171]]

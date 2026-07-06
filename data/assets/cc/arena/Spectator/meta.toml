@@ -1,0 +1,4 @@
+importance = "REQUIRED"
+title = "Anonymous Observer"
+sprites = []
+default_sprite = ""

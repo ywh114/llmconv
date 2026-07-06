@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 from chromadb import Metadata, PersistentClient, QueryResult
 from chromadb.api.types import OneOrMany
 from chromadb.config import Settings as ChromaSettings
@@ -24,17 +26,22 @@ class ChromaStore:
     """
 
     def __init__(self, settings: AraSettings) -> None:
+        """Create the store.
+
+        :param settings: Application settings used to resolve the persistent
+            path and embedding model name.
+        """
         self.settings = settings
         self.client = PersistentClient(
             path=str(settings.chroma_path),
             settings=ChromaSettings(anonymized_telemetry=False),
         )
         self._ef = SentenceTransformerEmbeddingFunction(
-            model_name=settings.embedding_model
+            model_name=settings.embedding_model,
+            token=False,
         )
 
     def collection(self, name: str):
-        logger.debug(f'Accessing collection: {name}')
         """Get or create a collection.
 
         :param name: Collection identifier.
@@ -84,3 +91,37 @@ class ChromaStore:
             n_results=n_results,
             where=where,
         )
+
+    def get_all(
+        self,
+        collection_name: str,
+        where: dict | None = None,
+    ) -> dict[str, Any]:
+        """Retrieve all documents from a collection.
+
+        :param collection_name: Target collection.
+        :param where: Optional ChromaDB metadata filter.
+        :return: Dict with ``ids``, ``documents``, and ``metadatas`` keys.
+        """
+        coll = self.collection(collection_name)
+        return coll.get(where=where)  # type: ignore[return-value]
+
+    def clear_all_collections(self) -> None:
+        """Delete every existing ChromaDB collection.
+
+        This makes the vector store fully transient. Callers are responsible
+        for repopulating collections from a snapshot or world settings
+        afterwards.
+        """
+        try:
+            collections = list(self.client.list_collections())
+        except Exception as exc:
+            logger.warning(f"Could not list Chroma collections: {exc}")
+            return
+
+        for coll in collections:
+            try:
+                self.client.delete_collection(coll.name)
+                logger.debug(f"Deleted Chroma collection {coll.name}")
+            except Exception as exc:
+                logger.warning(f"Could not delete Chroma collection {coll.name}: {exc}")

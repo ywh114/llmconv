@@ -1,0 +1,15 @@
+importance = "EIGEN"
+sprites = ["default_neutral", "default_xneutral"]
+default_sprite = "default_neutral"
+
+[default_neutral]
+topleft = [1056, 534]
+bottomright = [1456, 1480]
+center = [1271, 1038]
+focus = [[1280, 635, 111]]
+
+[default_xneutral]
+topleft = [1056, 534]
+bottomright = [1456, 1480]
+center = [1271, 1038]
+focus = [[1280, 635, 111], [1273, 1035, 87], [1256, 791, 70], [1375, 805, 53], [1240, 1681, 208]]

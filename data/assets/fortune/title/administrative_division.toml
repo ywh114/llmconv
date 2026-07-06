@@ -1,0 +1,120 @@
+rank = [
+    { value = "mayor", prefixable = true, suffixible = true },
+    { value = "governor", prefixable = true, suffixible = true },
+    { value = "senator", prefixable = true, suffixible = true },
+    { value = "commissioner", prefixable = true, suffixible = true },
+    { value = "sheriff", prefixable = true, suffixible = true },
+]
+noun = [
+    { value = "mayor", prefixable = true, suffixible = true },
+    { value = "governor", prefixable = true, suffixible = true },
+    { value = "commissioner", prefixable = true, suffixible = true },
+]
+class_values = [
+    { value = "postmaster", prefixable = true, suffixible = true },
+    { value = "tax collector", prefixable = false, suffixible = false },
+    { value = "clerk", prefixable = true, suffixible = true },
+    { value = "registrar", prefixable = true, suffixible = true },
+]
+adj = [
+    { value = "local", prefixable = true, suffixible = true },
+    { value = "regional", prefixable = true, suffixible = true },
+    { value = "federal", prefixable = true, suffixible = true },
+]
+adj_sup = [
+    { value = "chief", prefixable = true, suffixible = true },
+    { value = "head", prefixable = true, suffixible = true },
+    { value = "assistant", prefixable = true, suffixible = true },
+    { value = "acting", prefixable = true, suffixible = true },
+    { value = "junior", prefixable = true, suffixible = true },
+]
+
+[[place]]
+value = "county"
+takes_of = true
+takes_in = false
+article = "the"
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "parish"
+takes_of = true
+takes_in = false
+article = "the"
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "borough"
+takes_of = true
+takes_in = false
+article = "the"
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "district"
+takes_of = true
+takes_in = false
+article = "the"
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "precinct"
+takes_of = true
+takes_in = false
+article = "the"
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "zipcode {number}"
+takes_of = true
+takes_in = false
+article = ""
+proper_noun = true
+prefixable = false
+suffixible = false
+
+[[expose]]
+slot = "rank"
+from = [
+    "rank",
+]
+
+[[expose]]
+slot = "noun"
+from = [
+    "noun",
+]
+
+[[expose]]
+slot = "class"
+from = [
+    "class_values",
+]
+
+[[expose]]
+slot = "adj"
+from = [
+    "adj",
+]
+
+[[expose]]
+slot = "adj_sup"
+from = [
+    "adj_sup",
+]
+
+[[expose]]
+slot = "place"
+from = [
+    "place",
+]

@@ -93,7 +93,7 @@ class TestWebGateway:
             resp = client.post("/input", json={"text": "hello"})
             assert resp.status_code == 200
             assert resp.json()["submitted"] == "hello"
-            mock_input.assert_called_once_with(text="hello")
+            mock_input.assert_called_once_with(text="hello", attempt=None)
 
     def test_skip_endpoint(self, client: TestClient) -> None:
         with patch.object(

@@ -1,0 +1,95 @@
+category = "delivery"
+
+# Generic defence delivery ability entries.
+
+defence_defence_values = [
+    { value = "block", prefixable = false, suffixible = false },
+    { value = "parry", prefixable = false, suffixible = false },
+    { value = "guard", prefixable = false, suffixible = false },
+    { value = "deflect", prefixable = false, suffixible = false },
+    { value = "counter", prefixable = false, suffixible = false },
+    { value = "riposte", prefixable = false, suffixible = false },
+    { value = "endure", prefixable = false, suffixible = false },
+    { value = "shield", prefixable = false, suffixible = false },
+    { value = "barrier", prefixable = false, suffixible = false },
+    { value = "brace", prefixable = false, suffixible = false },
+    { value = "ward", prefixable = false, suffixible = false },
+    { value = "repel", prefixable = false, suffixible = false },
+    { value = "reflect", prefixable = false, suffixible = false },
+    { value = "absorb", prefixable = false, suffixible = false },
+    { value = "bulwark", prefixable = false, suffixible = false },
+]
+
+verb_values = [
+    { value = "defend", prefixable = false, suffixible = false },
+    { value = "block", prefixable = false, suffixible = false },
+    { value = "guard", prefixable = false, suffixible = false },
+    { value = "parry", prefixable = false, suffixible = false },
+    { value = "repel", prefixable = false, suffixible = false },
+    { value = "withstand", prefixable = false, suffixible = false },
+    { value = "absorb", prefixable = false, suffixible = false },
+]
+
+noun_values = [
+    { value = "shield", prefixable = false, suffixible = false },
+    { value = "barrier", prefixable = false, suffixible = false },
+    { value = "wall", prefixable = false, suffixible = false },
+    { value = "aegis", prefixable = false, suffixible = false },
+    { value = "bulwark", prefixable = false, suffixible = false },
+    { value = "rampart", prefixable = false, suffixible = false },
+    { value = "bastion", prefixable = false, suffixible = false },
+    { value = "ward", prefixable = false, suffixible = false },
+    { value = "fortress", prefixable = false, suffixible = false },
+]
+
+adj_values = [
+    { value = "defensive", prefixable = false, suffixible = false },
+    { value = "fortified", prefixable = false, suffixible = false },
+    { value = "stalwart", prefixable = false, suffixible = false },
+    { value = "impervious", prefixable = false, suffixible = false },
+    { value = "impenetrable", prefixable = false, suffixible = false },
+    { value = "unyielding", prefixable = false, suffixible = false },
+    { value = "adamant", prefixable = false, suffixible = false },
+    { value = "ironclad", prefixable = false, suffixible = false },
+]
+
+suf_values = []
+
+domain_values = [
+    { value = "the bulwark", prefixable = false, suffixible = false },
+    { value = "the aegis", prefixable = false, suffixible = false },
+    { value = "the rampart", prefixable = false, suffixible = false },
+    { value = "the bastion", prefixable = false, suffixible = false },
+    { value = "iron", prefixable = false, suffixible = false },
+    { value = "adamant", prefixable = false, suffixible = false },
+    { value = "the shield", prefixable = false, suffixible = false },
+]
+
+defence_movement_values = []
+
+[["defence"]]
+patterns = ["{defence_defence_values}"]
+
+[[expose]]
+slot = "suf"
+from = ["suf_values"]
+
+[[expose]]
+slot = "technique"
+from = ["defence", "movement"]
+
+[[expose]]
+slot = "verb"
+from = ["verb_values"]
+
+[[expose]]
+slot = "noun"
+from = ["noun_values"]
+
+[[expose]]
+slot = "adj"
+from = ["adj_values"]
+
+[[expose]]
+slot = "domain"
+from = ["domain_values"]

@@ -1,0 +1,32 @@
+id = "scene_prereq"
+language = "en"
+zeitgeist = "test"
+tone = "neutral"
+
+[character]
+pool = ["Player", "Narrator", "NPC"]
+inits = ["Player", "Narrator", "NPC"]
+player = "Player"
+narrator = "Narrator"
+
+[location]
+pool = ["room"]
+init = "room"
+
+[plot]
+considerations = ""
+scene = "Test"
+
+[plot.next]
+considerations = "None"
+
+[plot.next.scene_b]
+desc = "Go to B"
+prereq_scenes = ["scene_prereq"]
+
+[plot.next.scene_c]
+desc = "Go to C"
+prereq_scenes = ["other"]
+
+[plot.next.scene_d]
+desc = "Go to D"

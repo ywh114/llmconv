@@ -1,6 +1,0 @@
-name = "Player"
-summary = "The player character. A curious and friendly individual."
-personality = "Curious, friendly, adaptable."
-scenario = "Exploring the building with friends."
-greeting_message = "Hey everyone, what's going on?"
-example_messages = "Player: Hey, that sounds interesting!\nPlayer: Let's check it out."

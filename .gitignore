@@ -9,8 +9,9 @@ build_docs/build/
 log
 servlog
 
-# Cache
+# Testing/cache
 data/chroma/*
+saves/
+sockets/
 
-# Etc
-sockets/*
+tmp/

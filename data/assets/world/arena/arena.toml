@@ -1,0 +1,38 @@
+title = "Arena Worldbuilding"
+
+[arena]
+name = "The Infinite Arena"
+description = "A colossus that exists outside time and geography. It has always been here. It will always be here. The stands are packed with beings who hunger for spectacle—mortals, demons, bureaucrats, sentient algorithms, things that should not be."
+
+[arena.variations]
+sand = "Sun-baked sand and white marble. The crowd roars for blood. Stained by centuries of combat."
+void = "Void-blackness with gravity anomalies. Starfleets maneuver in silent combat. The arena expands to accommodate."
+chrome = "Neon-lit chrome. Cyborgs duel with laser blades. The crowd watches through energy shields."
+
+[spectators]
+crowd = "Anonymous beings who cannot leave. They roar for blood, gasp at miracles, boo cowardice. Coins change hands on impossible odds."
+
+[combatants]
+gladiators = "Fighters with titles earned through battle. '[The Unbroken] Marcus' has survived matches that killed others."
+non_human = "Warships, starfleets, cosmic entities—anything can fight. The arena resizes to fit."
+titles = "Titles mean something. They're earned based on performance, fighting style, or reputation. '[Nuclear Fleet Carrier] Supreme' commands a fleet."
+
+[sensory]
+details = [
+    "The crunch of sand beneath armored boots",
+    "The roar of thousands in the stands",
+    "The spray of blood on white marble",
+    "The scorching breath of dragons",
+    "Chains rattling as beasts are led in",
+    "The trumpet heralding match's start",
+    "The silence before the kill",
+]
+
+[loop]
+description = "Each day brings new matches. The crowd demands blood. The arena never closes. Time has no meaning here."
+
+[schedule]
+description = "The arena runs three spectacles a day, each with its own character. Tickets include all food and drink — vendors circulate through the stands throughout."
+morning = "The morning spectacle. Crowd is fresh, eating breakfast pastries and honeyed bread. Vendors hawk roasted meats and watered wine. The light is sharp, the crowd still waking up."
+afternoon = "The afternoon spectacle, after lunch. The crowd is rowdy and well-fed, drunk on midday wine and roasted boar. Vendors weave through the stands with fresh bread and skewered meats. The heat brings sweat and short tempers."
+evening = "The evening spectacle, during dinner. A full feast is served: roasted beasts, spiced mead, flowing dark wine. The crowd is sated, blood-warm, and hungry for the finale. Torches and braziers light the arena as the day's last blood spills."

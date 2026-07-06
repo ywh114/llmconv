@@ -1,0 +1,112 @@
+category = "tonal"
+# tfr = "The Fire Rises" mod for Hearts of Iron IV
+
+tfr_melee_values = [
+    { value = "spearhead", prefixable = false, suffixible = false },
+    { value = "assault", prefixable = false, suffixible = false },
+]
+
+tfr_area_values = [
+    { value = "strategic bombing", prefixable = false, suffixible = false },
+    { value = "naval blockade", prefixable = false, suffixible = false },
+    { value = "airstrike", prefixable = false, suffixible = false },
+    { value = "self-criticize", prefixable = false, suffixible = false },
+    { value = "redistribution", prefixable = false, suffixible = false },
+    { value = "agitate", prefixable = false, suffixible = false },
+]
+
+tfr_status_values = [
+    { value = "nationalize", prefixable = false, suffixible = false },
+    { value = "collectivize", prefixable = false, suffixible = false },
+    { value = "redistribute", prefixable = false, suffixible = false },
+    { value = "industrialize", prefixable = false, suffixible = false },
+    { value = "agitate", prefixable = false, suffixible = false },
+    { value = "mobilize", prefixable = false, suffixible = false },
+    { value = "rectify", prefixable = false, suffixible = false },
+    { value = "rally", prefixable = false, suffixible = false },
+    { value = "self-criticize", prefixable = false, suffixible = false },
+    { value = "redistribute", prefixable = false, suffixible = false },
+]
+
+tfr_defence_values = [
+    { value = "fortify", prefixable = false, suffixible = false },
+    { value = "entrench", prefixable = false, suffixible = false },
+    { value = "line", prefixable = false, suffixible = false },
+]
+
+verb_values = [
+    { value = "liberation", prefixable = false, suffixible = false },
+    { value = "smash", prefixable = false, suffixible = false, noun_form = "smashing" },
+    { value = "seizure", prefixable = false, suffixible = false },
+    { value = "expropriation", prefixable = false, suffixible = false },
+    { value = "overthrow", prefixable = false, suffixible = false },
+    { value = "declaration", prefixable = false, suffixible = false },
+    { value = "purge", prefixable = false, suffixible = false },
+    { value = "nationalization", prefixable = false, suffixible = false },
+    { value = "collectivization", prefixable = false, suffixible = false },
+    { value = "mobilization", prefixable = false, suffixible = false },
+    { value = "balkinization", prefixable = false, suffixible = false },
+]
+
+suf_values = []
+
+domain_values = [
+    { value = "civilian factory", prefixable = false, suffixible = false },
+    { value = "military factory", prefixable = false, suffixible = false },
+    { value = "the treaty", prefixable = false, suffixible = false },
+    { value = "the government", prefixable = false, suffixible = false },
+]
+
+noun_values = [
+    { value = "destiny", prefixable = false, suffixible = false },
+    { value = "struggle", prefixable = false, suffixible = false },
+]
+
+adj_values = [
+    { value = "popular", prefixable = false, suffixible = false },
+    { value = "people's", prefixable = false, suffixible = false },
+    { value = "vanguard", prefixable = false, suffixible = false },
+    { value = "national", prefixable = false, suffixible = false },
+    { value = "permanent", prefixable = false, suffixible = false },
+    { value = "left-wing", prefixable = false, suffixible = false },
+    { value = "right-wing", prefixable = false, suffixible = false },
+    { value = "centrist", prefixable = false, suffixible = false },
+]
+
+tfr_movement_values = []
+
+[["melee"]]
+patterns = ["{tfr_melee_values}"]
+
+[["area"]]
+patterns = ["{tfr_area_values}"]
+
+[["status"]]
+patterns = ["{tfr_status_values}"]
+
+[["defence"]]
+patterns = ["{tfr_defence_values}"]
+
+[[expose]]
+slot = "suf"
+from = ["suf_values"]
+
+[[expose]]
+slot = "technique"
+from = ["melee", "area", "status", "defence", "movement"]
+
+[[expose]]
+slot = "verb"
+from = ["verb_values"]
+
+[[expose]]
+slot = "domain"
+from = ["domain_values"]
+
+[[expose]]
+slot = "noun"
+from = ["noun_values"]
+
+[[expose]]
+slot = "adj"
+from = ["adj_values"]

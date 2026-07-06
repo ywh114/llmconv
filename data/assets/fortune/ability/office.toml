@@ -1,0 +1,94 @@
+category = "silly"
+# Office-theme silly ability entries.
+
+office_melee_values = [
+    { value = "papercut", prefixable = false, suffixible = false },
+    { value = "staple", prefixable = false, suffixible = false },
+    { value = "three-hole-punch", prefixable = false, suffixible = false },
+]
+
+office_area_values = [
+    { value = "shred", prefixable = false, suffixible = false },
+    { value = "print", prefixable = false, suffixible = false },
+]
+
+office_ranged_values = [
+    { value = "fax", prefixable = false, suffixible = false },
+    { value = "carbon-copy", prefixable = false, suffixible = false },
+]
+
+office_status_values = [
+    { value = "memo", prefixable = false, suffixible = false },
+    { value = "carbon-copy", prefixable = false, suffixible = false },
+]
+
+office_defence_values = [
+    { value = "encrypt", prefixable = false, suffixible = false },
+    { value = "shred", prefixable = false, suffixible = false },
+]
+
+suf_values = []
+
+domain_values = [
+    { value = "toner", prefixable = false, suffixible = false },
+    { value = "fax", prefixable = false, suffixible = false },
+    { value = "memo", prefixable = false, suffixible = false },
+    { value = "copier", prefixable = false, suffixible = false },
+    { value = "water cooler", prefixable = false, suffixible = false },
+    { value = "reply all", prefixable = false, suffixible = false },
+]
+
+verb_values = [
+    { value = "papercut", prefixable = false, suffixible = false },
+    { value = "fax", prefixable = false, suffixible = false, noun_form = "faxing" },
+    { value = "staple", prefixable = false, suffixible = false },
+    { value = "shred", prefixable = false, suffixible = false },
+    { value = "file", prefixable = false, suffixible = false },
+    { value = "cc", prefixable = false, suffixible = false },
+]
+
+noun_values = [
+    { value = "paper", prefixable = false, suffixible = false },
+    { value = "toner", prefixable = false, suffixible = false },
+    { value = "memo", prefixable = false, suffixible = false },
+    { value = "TPS report", prefixable = false, suffixible = false },
+    { value = "watermark", prefixable = false, suffixible = false },
+    { value = "stapler", prefixable = false, suffixible = false },
+]
+
+office_movement_values = []
+
+[["melee"]]
+patterns = ["{office_melee_values}"]
+
+[["area"]]
+patterns = ["{office_area_values}"]
+
+[["ranged"]]
+patterns = ["{office_ranged_values}"]
+
+[["status"]]
+patterns = ["{office_status_values}"]
+
+[["defence"]]
+patterns = ["{office_defence_values}"]
+
+[[expose]]
+slot = "suf"
+from = ["suf_values"]
+
+[[expose]]
+slot = "technique"
+from = ["melee", "area", "ranged", "status", "defence", "movement"]
+
+[[expose]]
+slot = "domain"
+from = ["domain_values"]
+
+[[expose]]
+slot = "verb"
+from = ["verb_values"]
+
+[[expose]]
+slot = "noun"
+from = ["noun_values"]

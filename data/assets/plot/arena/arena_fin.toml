@@ -1,0 +1,190 @@
+# Arena — Scene 3: The Grand Finale
+# The orchestrator uses fortune tools to decide the format.
+# Evening match during dinner. Loops back to arena_ini.
+
+id = "arena_fin"
+name = "The Infinite Arena"
+time = "evening"
+zeitgeist = "bloodsport; spectacle; cruelty; drama; eternal return"
+tone = "marble and sand; roaring crowds; spray of blood; cinematic narration; arena always hungry"
+
+[character]
+pool = ["Cassius", "Lyra", "Spectator", "Narrator", "Crowd"]
+inits = ["Cassius", "Lyra", "Spectator", "Narrator", "Crowd"]
+player = "Spectator"
+narrator = "Narrator"
+
+[character.sprites]
+Cassius = "none"
+Lyra = "none"
+Spectator = "none"
+Narrator = "none"
+
+[location]
+pool = ["arena"]
+init = "arena"
+
+[plot]
+considerations = """
+- Orchestrator uses fortune_title, fortune_ability, fortune_roll,
+  fortune_random, fortune_iching, spawn_anonymous, update_status_page, next_round.
+- Use probability distributions (via fortune_random) where appropriate to model
+  uncertain outcomes that don't need a binary pass/fail roll.
+
+- Use the fighter's full name as their handle everywhere — status bars, text
+  labels, directives, and your own reasoning. Not the title.
+
+- When a fighter dies, exit them immediately and add their handle to a "Dead"
+  text section on the free status page. Keep this section updated — remove
+  none, only append. A fighter in the Dead section never speaks, acts, or
+  appears in narration except as a corpse.
+
+- fortune_title generates visible titles; a fighter's abilities, personality,
+  and combat style derive from their title / their team's flavor combination.
+
+- Power level from title. Assign HP based on what the title suggests — a
+  massive warship title means 10000 HP, a frail clerk means 10-30 HP, a
+  knight means 80-120 HP. Huge outliers are expected.
+  "Nuclear Deterrence Battleship" one-shots anything. "Democrat Lawyer" argues,
+  maybe wins on a technicality, but takes a single hit and dies. A "Black Hole"-related
+  character always one-shots an "Ultimate Troll". If HP hits 0, fighter is dead.
+  always one-shots an "Ultimate Troll". If HP hits 0, fighter is dead. Narrate
+  the kill, exit dead fighters, end the match.
+
+- Internal stats. Before the fight, choose a set of universal combat-relevant
+  stat categories and apply the SAME set to every fighter in this match. The
+  categories can be renamed to fit the tone, but they must measure abilities
+  every fighter actually has so the numbers are comparable across the whole
+  field. Assign values that express relative strengths and weaknesses; higher
+  is better, lower is worse, and a fighter with double the value should feel
+  roughly twice as strong in that area. Record every fighter's ratings in a
+  "Stats" text section on the free status page.
+
+- Stat bonus. When resolving an action, compute a bonus from the relevant
+  stat and add it to the 2d100 roll total. For a positive stat S: bonus ≈
+  ln(S)^3.6 (~+50 at S=20, ~+20 at S=10, ~+6 at S=5). For a negative
+  stat: bonus ≈ -ln(|S|)^3.6 (same magnitudes reversed). The threshold is
+  set independently based on ability strength, situation difficulty, and
+  your discretion — the stat bonus just makes the roll more or less likely
+  to reach it. A fighter with -10 in the relevant stat can still attempt the
+  action, but the penalty makes it nearly impossible to hit the threshold.
+
+  You MUST consider stat bonuses for every action, and you MUST roll for
+  outcomes. Making a descision without rolling and adding stat bonuses is
+  strictly forbidden.
+
+  Before setting the success threshold at 50%, you must answer the question: is
+  this action really suitable for a 50/50? The answer is oftentimes no, be very
+  careful.
+
+- fortune_ability generates each fighter's signature "killer moves." For each
+  fighter, roll 2d2 to get N (2-4 abilities) and call fortune_ability once with
+  count=N, require=["domain","technique"], level="moderate", verbose=true. Match
+  domain to the fighter's title world and technique delivery to their combat
+  style. Assign the returned abilities to that fighter; do not mix them into a
+  shared pool.
+
+- Status page format (target: free). Build one page with title "Fighters" and
+  sections merged by type:label:
+  - HP: type="bars", label="HP", items=[{"label": handle, "value": hp, "max": max}, ...].
+  - Stats: type="text", label="Stats", items=["handle: stat1 +N, stat2 +M", ...].
+  - Abilities: one type="skills" section per fighter, label=handle,
+    items=[ability name strings].
+  - Dead: type="text", label="Dead", items=[handle strings], append-only.
+
+- The Narrator has NO knowledge of which characters are fighters unless you
+  explicitly name them in the directive. Always include the full list of
+  fighter names, their titles, AND their team affiliation (if applicable) in the
+  Narrator's directive when asking it to describe entrances or battle events.
+
+- fortune_suite produces many randomness sources that average each other out —
+  avoid calling it. Instead, use a different fortune tool each round: rotate
+  between fortune_random and fortune_roll for variety.
+
+- CRITICAL: Fortune tools are YOUR private DM dice. Their raw output — especially
+  random words and dice results — MUST NEVER be
+  echoed, quoted, summarized, or alluded to in ANY character directive, narration
+  instruction, or suggestion. Characters do not know about hexagrams, dice, or
+  random number generators.
+
+- fortune_roll(n, m, ...) resolves every decisive action.
+  Before rolling, state the survival threshold explicitly.
+
+- Use update_status_page (target: free) to store health bars, metadata etc. Note
+  that this is just for you to keep track of things, it is not shown publicly.
+
+- Narrator produces narration. Cassius/Lyra commentate on the culture clash
+  between fighers/teams — play up the absurd contrast of different worlds
+  colliding. Fighters may take turns acting/speaking.
+
+- Spectator gets turns to react between beats, but do not give the player
+  back-to-back turns.
+"""
+
+scene = """
+Avoid purple prose and LLM 'slop'. Keep it realistic, barring the absurd
+characters that may appear. You are a tabletop DM.
+
+Characters should narrate from their own point of view. You should explicitly
+tell them not to narrate actions you haven't told them to do.
+
+These are death battles, so characters should not be too prosy. The only
+exception is if their title is explicitly very prosy.
+- Characters narrate the attack itself, not the aftermath. "I swing — " not
+  "He staggers back from the wound I just gave him."
+
+FIGHTER SETUP (once per batch):
+- Use fortune_roll(1, 6) to decide the format and scale at once:
+    1-2: 1v1 duel (2 fighters)
+    3:   execution (1 fighter vs the arena)
+    4:   free-for-all (3 fighters)
+    5:   team battle (two teams of 2)
+    6:   one-vs-many (1 champion vs 3 minions)
+- Call fortune_name for each fighter name, call fortune_title({}) for each.
+- Use the names and titles exactly as generated — never shorten, abbreviate, or
+  nick-name them. "Intercontinental Supercarrier of the Nile Delta" stays that
+  way, never just "the carrier guy."
+- Fighters should be caricatures of their titles.
+- Fighters may not be human-shape or even human-size. I.e. "Democratic Socialist
+  of the Office" vs. "Highest Battleship of the Oort Cloud" should be a one-hit
+  kill.
+- For flavour: use a single fortune tool per round, rotating — fortune_random one
+  round, fortune_roll the next, etc. Don't call fortune_suite (it averages out).
+- Spawn fighters: fortune_name result goes to `name`, fortune_title result goes to `title`, and include a one-line `description` (required by spawn_anonymous). Display will be "[TITLE] name".
+- Narrator describes entrance. Then give Spectator a turn to react.
+
+BATTLE (loop until match ends):
+- fortune_roll resolves every decisive action. Track HP, decide damage, saves,
+  detection, and roll.
+- You are the DM running a tabletop fight, take inspiration from DnD or
+  pathfinder.
+- Fighters get turns to act/speak. Narrator describes based on roll results.
+- Cassius/Lyra commentate. Spectator reacts between beats.
+
+MATCH END:
+- Exit dead fighter. Narrator describes the victory.
+- Crowd roars, comments on the fight and their wagers.
+- End the scene by calling next_round with end_scene=true and next_scene="arena_ini" to loop, or next_scene="fin_scene" to end.
+"""
+
+[plot.next]
+considerations = """The finale is complete. The arena cycle begins again — or, if the
+crowd has had enough, the story can end. Call next_round with end_scene=true
+and next_scene="arena_ini" to loop, or next_scene="fin_scene" to end."""
+
+[plot.next.arena_ini]
+prereq_scenes = ["arena_ini", "arena_mid", "arena_fin"]
+desc = "Loop back to start a new cycle."
+summarizer_considerations = """Summarize the finale. Note the winner and the format that was chosen.
+IMPORTANT: State explicitly how many full cycles (sets of 3 matches) of the 
+arena have completed so far. The next scene (arena_ini) begins cycle N+1.
+Write character summaries as a recap of "what happened yesterday" — the crowd
+returning for another day of spectacles, remembering the previous matches."""
+
+[plot.next.fin_scene]
+desc = "End the story. The arena falls silent."
+summarizer_considerations = """The arena cycle has ended. The crowd goes home.
+Note the total number of matches fought across all cycles and the victors of each.
+Write a closing summary for each continuing character — Cassius and Lyra hanging
+up their commentary, the Crowd dispersing into the infinite stands, the Spectator
+leaving with memories of blood and spectacle."""

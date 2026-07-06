@@ -1,0 +1,25 @@
+id = "scene1"
+language = "en"
+zeitgeist = "test"
+tone = "neutral"
+
+[character]
+pool = ["Player", "Narrator", "NPC"]
+inits = ["Player", "Narrator", "NPC"]
+player = "Player"
+narrator = "Narrator"
+
+[location]
+pool = ["room"]
+init = "room"
+
+[plot]
+considerations = ""
+scene = "Scene 1"
+
+[plot.next]
+considerations = "None"
+
+[plot.next.scene2]
+desc = "Next"
+prereq_scenes = ["scene1"]

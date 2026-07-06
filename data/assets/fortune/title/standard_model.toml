@@ -1,0 +1,108 @@
+fermion = [
+    { value = "fermion", prefixable = true, suffixible = true },
+]
+boson = [
+    { value = "boson", prefixable = true, suffixible = true },
+]
+quark = [
+    { value = "quark", prefixable = true, suffixible = true },
+]
+lepton = [
+    { value = "lepton", prefixable = true, suffixible = true },
+]
+prefix = [
+    { value = "higgs", prefixable = true, suffixible = true },
+    { value = "gluon", prefixable = true, suffixible = true },
+    { value = "photon", prefixable = true, suffixible = true },
+    { value = "muon", prefixable = true, suffixible = true },
+    { value = "tau", prefixable = true, suffixible = true },
+]
+adj = [
+    { value = "charged", prefixable = true, suffixible = true },
+    { value = "neutral", prefixable = true, suffixible = true },
+    { value = "virtual", prefixable = true, suffixible = true },
+]
+adj_sup = [
+    { value = "fundamental", prefixable = true, suffixible = true },
+    { value = "elementary", prefixable = true, suffixible = true },
+    { value = "composite", prefixable = true, suffixible = true },
+    { value = "derivative", prefixable = true, suffixible = true },
+    { value = "least fundamental", prefixable = false, suffixible = false },
+]
+thing = [
+    { value = "mass", prefixable = true, suffixible = true },
+    { value = "charge", prefixable = true, suffixible = true },
+    { value = "spin", prefixable = true, suffixible = true },
+]
+
+suf = [
+    { value = 'kind', prefixable = true, suffixible = true },
+    { value = 'born', prefixable = true, suffixible = true },
+]
+
+[[particle]]
+patterns = [
+    "{fermion}",
+    "{boson}",
+    "{quark}",
+    "{lepton}",
+]
+
+[[place]]
+value = "the vacuum"
+takes_of = false
+takes_in = true
+article = ""
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "the collider"
+takes_of = false
+takes_in = true
+article = ""
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[expose]]
+slot = "noun"
+from = [
+    "particle",
+]
+
+[[expose]]
+slot = "prefix"
+from = [
+    "prefix",
+]
+
+[[expose]]
+slot = "adj"
+from = [
+    "adj",
+]
+
+[[expose]]
+slot = "adj_sup"
+from = [
+    "adj_sup",
+]
+
+[[expose]]
+slot = "thing"
+from = [
+    "thing",
+]
+
+[[expose]]
+slot = "place"
+from = [
+    "place",
+]
+[[expose]]
+slot = "suf"
+from = [
+    "suf",
+]

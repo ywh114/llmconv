@@ -1,0 +1,225 @@
+rank = [
+    { value = "king", prefixable = true, suffixible = true },
+    { value = "queen", prefixable = true, suffixible = true },
+    { value = "prince", prefixable = true, suffixible = true },
+    { value = "princess", prefixable = true, suffixible = true },
+    { value = "duke", prefixable = true, suffixible = true },
+    { value = "duchess", prefixable = true, suffixible = true },
+    { value = "earl", prefixable = true, suffixible = true },
+    { value = "count", prefixable = true, suffixible = true },
+    { value = "countess", prefixable = true, suffixible = true },
+    { value = "baron", prefixable = true, suffixible = true },
+    { value = "baroness", prefixable = true, suffixible = true },
+    { value = "lord", prefixable = true, suffixible = true },
+    { value = "lady", prefixable = true, suffixible = true },
+    { value = "liege", prefixable = true, suffixible = true },
+]
+class_root = [
+    { value = "knight", prefixable = true, suffixible = true },
+    { value = "lord", prefixable = true, suffixible = true },
+    { value = "vassal", prefixable = true, suffixible = true },
+    { value = "squire", prefixable = true, suffixible = true },
+    { value = "thane", prefixable = true, suffixible = true },
+    { value = "serf", prefixable = true, suffixible = true },
+    { value = "banneret", prefixable = true, suffixible = true },
+]
+prefix = [
+    { value = "knight", prefixable = true, suffixible = true },
+    { value = "liege", prefixable = true, suffixible = true },
+    { value = "mesne", prefixable = true, suffixible = true },
+    { value = "over", prefixable = true, suffixible = true },
+    { value = "tenant", prefixable = true, suffixible = true },
+    { value = "grand", prefixable = true, suffixible = true },
+    { value = "high", prefixable = true, suffixible = true },
+    { value = "elder", prefixable = true, suffixible = true },
+    { value = "holy", prefixable = true, suffixible = true },
+]
+adj = [
+    { value = "feudal", prefixable = true, suffixible = true },
+    { value = "landed", prefixable = true, suffixible = true },
+    { value = "liege", prefixable = true, suffixible = true },
+    { value = "noble", prefixable = true, suffixible = true },
+    { value = "brave", prefixable = true, suffixible = true },
+    { value = "pious", prefixable = true, suffixible = true },
+]
+adj_sup = [
+    { value = "supreme", prefixable = true, suffixible = true },
+    { value = "sovereign", prefixable = true, suffixible = true },
+    { value = "greatest", prefixable = true, suffixible = true },
+    { value = "noblest", prefixable = true, suffixible = true },
+    { value = "lowliest", prefixable = true, suffixible = true },
+    { value = "least noble", prefixable = true, suffixible = true },
+    { value = "weakest", prefixable = true, suffixible = true },
+    { value = "most disgraced", prefixable = false, suffixible = false },
+]
+noun = [
+    { value = "knight", prefixable = true, suffixible = true },
+    { value = "lord", prefixable = true, suffixible = true },
+    { value = "vassal", prefixable = true, suffixible = true },
+    { value = "baron", prefixable = true, suffixible = true },
+    { value = "castellan", prefixable = true, suffixible = true },
+    { value = "crusader", prefixable = true, suffixible = true },
+]
+class_values = [
+    { value = "seneschal", prefixable = true, suffixible = true },
+    { value = "chamberlain", prefixable = true, suffixible = true },
+    { value = "steward", prefixable = true, suffixible = true },
+    { value = "herald", prefixable = true, suffixible = true },
+    { value = "blacksmith", prefixable = true, suffixible = true },
+    { value = "fletcher", prefixable = true, suffixible = true },
+    { value = "cook", prefixable = true, suffixible = true },
+    { value = "scribe", prefixable = true, suffixible = true },
+    { value = "falconer", prefixable = true, suffixible = true },
+]
+
+suf = [
+    { value = 'king', prefixable = true, suffixible = true },
+    { value = 'lord', prefixable = true, suffixible = true },
+    { value = 'knight', prefixable = true, suffixible = true },
+    { value = 'thane', prefixable = true, suffixible = true },
+    { value = 'born', prefixable = true, suffixible = true },
+    { value = 'kin', prefixable = true, suffixible = true },
+    { value = 'folk', prefixable = true, suffixible = true },
+    { value = 'child', prefixable = true, suffixible = true },
+    { value = 'seed', prefixable = true, suffixible = true },
+    { value = 'guard', prefixable = true, suffixible = true },
+    { value = 'sword', prefixable = true, suffixible = true },
+    { value = 'shield', prefixable = true, suffixible = true },
+    { value = 'crown', prefixable = true, suffixible = true },
+]
+
+[[class]]
+patterns = [
+    "{prefix}{class_root}",
+    "{class_root}",
+]
+
+[[place]]
+value = "england"
+takes_of = true
+takes_in = false
+article = ""
+proper_noun = true
+prefixable = true
+suffixible = true
+
+[[place]]
+value = "france"
+takes_of = true
+takes_in = false
+article = ""
+proper_noun = true
+prefixable = true
+suffixible = true
+
+[[place]]
+value = "the holy land"
+takes_of = true
+takes_in = false
+article = ""
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "the manor"
+takes_of = true
+takes_in = false
+article = ""
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "the fief"
+takes_of = true
+takes_in = false
+article = ""
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "the castle"
+takes_of = true
+takes_in = false
+article = ""
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "the realm"
+takes_of = true
+takes_in = false
+article = ""
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "the kingdom"
+takes_of = true
+takes_in = false
+article = ""
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "the land"
+takes_of = true
+takes_in = false
+article = ""
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[expose]]
+slot = "rank"
+from = [
+    "rank",
+]
+
+[[expose]]
+slot = "class"
+from = [
+    "class",
+    "class_values",
+]
+
+[[expose]]
+slot = "prefix"
+from = [
+    "prefix",
+]
+
+[[expose]]
+slot = "adj"
+from = [
+    "adj",
+]
+
+[[expose]]
+slot = "adj_sup"
+from = [
+    "adj_sup",
+]
+
+[[expose]]
+slot = "noun"
+from = [
+    "noun",
+]
+
+
+[[expose]]
+slot = "place"
+from = [
+    "place",
+]
+[[expose]]
+slot = "suf"
+from = [
+    "suf",
+]

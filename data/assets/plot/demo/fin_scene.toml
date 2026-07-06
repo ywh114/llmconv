@@ -1,0 +1,15 @@
+id = "fin_scene"
+type = "fin"
+
+[character]
+pool = ["Commander"]
+inits = ["Commander"]
+player = "Commander"
+narrator = "Commander"
+
+[character.sprites]
+Commander = "default_neutral"
+
+[location]
+pool = ["fin"]
+init = "fin"

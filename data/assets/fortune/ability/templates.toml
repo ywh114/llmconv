@@ -1,0 +1,51 @@
+# Ability grammar templates.
+#
+# Complexity levels:
+#   simple    — compound suffix (Pyrothermia), prefix-noun, adj-suffix
+#   moderate  — domain-technique combos (Miasma Surge), modifiers, numbered
+#   complex   — technique-of-noun (Audit of Entropy), stacked modifiers, ordinals
+#   insane    — absurd combos (Sauce's Flush), cascading mods
+
+simple = [
+    "{prefix}{suf}",
+    "{prefix}{noun}",
+    "{adj}{suf}",
+    "{adj_sup} {technique}",
+    "{adj_sup} {domain}",
+]
+
+moderate = [
+    "{domain} {technique}",
+    "{adj} {technique}",
+    "{domain} {noun}",
+    "{adj_sup} {technique}",
+    "{adj_sup} {domain} {technique}",
+    "{technique} {roman_numeral}",
+    "{ordinal} {technique}",
+    "{technique}{suf}",
+]
+
+complex = [
+    "{technique} of {noun}",
+    "The {adj} {noun}",
+    "{noun}'s {technique}",
+    "{ordinal} {domain} {technique}",
+    "{adj} {noun} {roman_numeral}",
+    "{adj_sup} {technique} of {noun}",
+    "{adj_sup} {domain} {technique}",
+    "{prefix}{technique}",
+    "{domain} {technique}",
+]
+
+insane = [
+    "{noun}'s {noun}",
+    "{domain} {domain} {technique}",
+    "The {domain} of {domain} and {domain}",
+    "{technique} of {technique}s",
+    "{prefix}{suf} Mk.{number}",
+    "The {ordinal} {noun}",
+    "Level {number} {technique}",
+    "{adj_sup} {prefix}{suf}",
+    "{adj_sup} {adj_sup} {technique}",
+    "{technique}{suf} {roman_numeral}",
+]

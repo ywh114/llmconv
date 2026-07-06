@@ -1,0 +1,127 @@
+prefix = [
+    { value = "milli", prefixable = true, suffixible = true },
+    { value = "centi", prefixable = true, suffixible = true },
+    { value = "kilo", prefixable = true, suffixible = true },
+    { value = "mega", prefixable = true, suffixible = true },
+    { value = "giga", prefixable = true, suffixible = true },
+    { value = "tera", prefixable = true, suffixible = true },
+    { value = "nano", prefixable = true, suffixible = true },
+    { value = "pico", prefixable = true, suffixible = true },
+]
+base_unit = [
+    { value = "m", prefixable = true, suffixible = true },
+    { value = "g", prefixable = true, suffixible = true },
+    { value = "s", prefixable = true, suffixible = true },
+    { value = "A", prefixable = true, suffixible = true },
+    { value = "K", prefixable = true, suffixible = true },
+]
+derived_unit = [
+    { value = "N", prefixable = true, suffixible = true },
+    { value = "J", prefixable = true, suffixible = true },
+    { value = "W", prefixable = true, suffixible = true },
+    { value = "Pa", prefixable = true, suffixible = true },
+    { value = "Hz", prefixable = true, suffixible = true },
+]
+adj = [
+    { value = "metric", prefixable = true, suffixible = true },
+    { value = "standard", prefixable = true, suffixible = true },
+    { value = "calibrated", prefixable = true, suffixible = true },
+    { value = "normalized", prefixable = true, suffixible = true },
+]
+adj_sup = [
+    { value = "absolute", prefixable = true, suffixible = true },
+    { value = "fundamental", prefixable = true, suffixible = true },
+    { value = "exact", prefixable = true, suffixible = true },
+]
+quantity = [
+    { value = "magnitude", prefixable = true, suffixible = true },
+    { value = "vector", prefixable = true, suffixible = true },
+    { value = "scalar", prefixable = true, suffixible = true },
+    { value = "tensor", prefixable = true, suffixible = true },
+]
+thing = [
+    { value = "force", prefixable = true, suffixible = true },
+    { value = "energy", prefixable = true, suffixible = true },
+    { value = "power", prefixable = true, suffixible = true },
+    { value = "pressure", prefixable = true, suffixible = true },
+]
+
+suf = [
+    { value = 'kind', prefixable = true, suffixible = true },
+    { value = 'scale', prefixable = true, suffixible = true },
+]
+
+[[place]]
+value = "the lab"
+takes_of = true
+takes_in = false
+article = ""
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "the field"
+takes_of = true
+takes_in = false
+article = ""
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "the vacuum"
+takes_of = true
+takes_in = false
+article = ""
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[unit]]
+patterns = [
+    "{base_unit}",
+    "{derived_unit}",
+]
+
+[[expose]]
+slot = "noun"
+from = [
+    "unit",
+    "quantity",
+]
+
+[[expose]]
+slot = "prefix"
+from = [
+    "prefix",
+]
+
+[[expose]]
+slot = "adj"
+from = [
+    "adj",
+]
+
+[[expose]]
+slot = "adj_sup"
+from = [
+    "adj_sup",
+]
+
+[[expose]]
+slot = "place"
+from = [
+    "place",
+]
+
+[[expose]]
+slot = "thing"
+from = [
+    "thing",
+]
+[[expose]]
+slot = "suf"
+from = [
+    "suf",
+]

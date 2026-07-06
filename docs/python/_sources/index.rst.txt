@@ -10,6 +10,7 @@ Welcome to Ara documentation.
    :caption: User Guide:
 
    usage
+   static_assets
 
 .. toctree::
    :maxdepth: 3
@@ -20,9 +21,11 @@ Welcome to Ara documentation.
    api/ara.agent
    api/ara.llm
    api/ara.memory
+   api/ara.persistence
    api/ara.utils
    api/ara.config
-   api/ara.models
+   api/ara.webclient
+   api/ara.cli
 
 Indices and tables
 ==================

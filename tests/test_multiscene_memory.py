@@ -12,13 +12,18 @@ import pytest
 from ara.config import AraSettings
 from ara.llm.client import LLMClient
 from ara.memory.chroma import ChromaStore
-from ara.models import GameRole, Importance, StreamResult
+from ara.llm.models import GameRole, StreamResult
+from ara.world.character import Importance
 from ara.world.character import Character
 from ara.world.engine import Engine
 from ara.world.orchestrator import TurnDecision
-from ara.world.scene import Location, Scene, SceneChoice
+from ara.world.scene import Location, Scene, SceneChoice, load_location
 from ara.world.story import Story
 from ara.memory.knowledge import CharacterMemory, Scratchpad
+from ara.world.orchestrator import Orchestrator
+from ara.world.summarizer import Summarizer, SceneStateModifiers
+from ara.world.character import load_character
+from ara.persistence.save import SaveManager
 
 
 class MockLLMClient:
@@ -38,6 +43,7 @@ class MockLLMClient:
         tool_choice: str | None = None,
         stream: bool = True,
         print_stream: bool = False,
+        name: str | None = None,
     ) -> StreamResult:
         self.calls.append({
             "role": role,
@@ -68,6 +74,7 @@ def _make_scene(
         cid = uuid.uuid5(uuid.NAMESPACE_DNS, f"test.{name}")
         return Character(
             id=cid,
+            canonical_name=name,
             name=name,
             card_fields={
                 "name": name,
@@ -86,7 +93,7 @@ def _make_scene(
     narrator = make_char("Narrator")
     npc = make_char("NPC")
 
-    loc = Location(name="room", desc="A room.")
+    loc = Location(canonical_name="room", name="room", desc="A room.")
 
     return Scene(
         id=scene_id,
@@ -109,7 +116,7 @@ def _make_scene(
 class TestMultiSceneFlow:
     """Test scene transitions with only_for prerequisites."""
 
-    def test_only_for_filters_next_choices(self) -> None:
+    def test_prereq_scenes_filters_next_choices(self) -> None:
         """Scene.load() should filter next_choices based on prev_id."""
         import tempfile
         from ara.config import AraSettings
@@ -120,8 +127,9 @@ class TestMultiSceneFlow:
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp = Path(tmpdir)
             assets = tmp / "assets"
-            cc = assets / "cc"
-            plot = assets / "plot"
+            story = "prereq_test"
+            cc = assets / "cc" / story
+            plot = assets / "plot" / story
             cc.mkdir(parents=True)
             plot.mkdir(parents=True)
 
@@ -159,11 +167,11 @@ considerations = "None"
 
 [plot.next.scene_b]
 desc = "Go to B"
-only_for = ["scene_a"]
+prereq_scenes = ["scene_a"]
 
 [plot.next.scene_c]
 desc = "Go to C"
-only_for = ["other"]
+prereq_scenes = ["other"]
 
 [plot.next.scene_d]
 desc = "Go to D"
@@ -172,14 +180,15 @@ desc = "Go to D"
             config.data_dir = tmp
 
             # When coming from scene_a, only scene_b and scene_d should be available
-            scene = Scene.load(toml, mock_db, config, prev_id="scene_a")
+            scene = Scene.load(toml, mock_db, config, scene_history=["scene_a"])
             assert "scene_b" in scene.next_choices
             assert "scene_c" not in scene.next_choices
             assert "scene_d" in scene.next_choices
 
-            # When coming from 'other', only scene_c and scene_d should be available
-            scene2 = Scene.load(toml, mock_db, config, prev_id="other")
-            assert "scene_b" not in scene2.next_choices
+            # With "other" in history, all choices are available because
+            # prereq_scenes checks visited history (which includes the current scene).
+            scene2 = Scene.load(toml, mock_db, config, scene_history=["other"])
+            assert "scene_b" in scene2.next_choices
             assert "scene_c" in scene2.next_choices
             assert "scene_d" in scene2.next_choices
 
@@ -189,7 +198,7 @@ desc = "Go to D"
 
         scene1 = _make_scene(
             "scene1",
-            {"scene2": SceneChoice(id="scene2", desc="Next", only_for=["scene1"])},
+            {"scene2": SceneChoice(id="scene2", desc="Next", prereq_scenes=["scene1"])},
             mock_db,
         )
         scene2 = _make_scene(
@@ -266,8 +275,9 @@ desc = "Go to D"
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp = Path(tmpdir)
             assets = tmp / "assets"
-            cc = assets / "cc"
-            plot = assets / "plot"
+            story = "two_scene_test"
+            cc = assets / "cc" / story
+            plot = assets / "plot" / story
             cc.mkdir(parents=True)
             plot.mkdir(parents=True)
 
@@ -304,7 +314,7 @@ considerations = "None"
 
 [plot.next.scene2]
 desc = "Next"
-only_for = ["scene1"]
+prereq_scenes = ["scene1"]
 ''')
             (plot / "scene2.toml").write_text('''
 id = "scene2"
@@ -341,7 +351,7 @@ considerations = "None"
 
             scenes = {"scene1": scene1, "scene2": scene2}
 
-            def fake_load(path: Path, db: ChromaStore, config: AraSettings, prev_id: str = "") -> Scene:
+            def fake_load(path: Path, db: ChromaStore, config: AraSettings, scene_history: list[str] | None = None, **kwargs) -> Scene:
                 return scenes[path.stem]
 
             with patch("ara.world.story.Scene.load", side_effect=fake_load):
@@ -363,16 +373,17 @@ considerations = "None"
 
                 # Scene ends
                 result = story.step()
-                assert result.event == "scene_ended"
+                assert result.event == "transition"
+                assert result.phase == "ended"
                 assert result.next_scene == "scene2"
 
-                # scene2 loaded - verify memory carried over but scratch reset
+                # scene2 finalised and loaded - verify memory carried over but scratch reset
                 result = story.step()
                 assert result.event == "scene_loaded"
                 assert result.scene.id == "scene2"
 
                 npc2 = next(c for c in scene2.character_pool if c.name == "NPC")
-                # Scratchpads do NOT carry over — only memory does
+                # Scratchpads do NOT carry over - only memory does
                 assert npc2.scratch.text == "Nothing yet!"
 
 
@@ -554,7 +565,7 @@ class TestPerCharacterSummarization:
         # Scene A: Player, Alice, Narrator
         scene_a = _make_scene_with_chars(
             "scene_a",
-            {"scene_b": SceneChoice(id="scene_b", desc="Next", only_for=["scene_a"])},
+            {"scene_b": SceneChoice(id="scene_b", desc="Next", prereq_scenes=["scene_a"])},
             mock_db,
             char_names=["Player", "Alice", "Narrator"],
         )
@@ -628,8 +639,9 @@ class TestPerCharacterSummarization:
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp = Path(tmpdir)
             assets = tmp / "assets"
-            cc = assets / "cc"
-            plot = assets / "plot"
+            story = "summary_test"
+            cc = assets / "cc" / story
+            plot = assets / "plot" / story
             cc.mkdir(parents=True)
             plot.mkdir(parents=True)
 
@@ -666,7 +678,7 @@ considerations = "None"
 
 [plot.next.scene_b]
 desc = "Next"
-only_for = ["scene_a"]
+prereq_scenes = ["scene_a"]
 ''')
             (plot / "scene_b.toml").write_text('''
 id = "scene_b"
@@ -703,7 +715,7 @@ considerations = "None"
 
             scenes = {"scene_a": scene_a, "scene_b": scene_b}
 
-            def fake_load(path: Path, db: ChromaStore, config: AraSettings, prev_id: str = "") -> Scene:
+            def fake_load(path: Path, db: ChromaStore, config: AraSettings, scene_history: list[str] | None = None, **kwargs) -> Scene:
                 return scenes[path.stem]
 
             with patch("ara.world.story.Scene.load", side_effect=fake_load):
@@ -725,10 +737,11 @@ considerations = "None"
 
                 # Scene ends
                 result = story.step()
-                assert result.event == "scene_ended"
+                assert result.event == "transition"
+                assert result.phase == "ended"
                 assert result.next_scene == "scene_b"
 
-                # scene_b loaded
+                # scene_b finalised and loaded
                 result = story.step()
                 assert result.event == "scene_loaded"
                 assert result.scene.id == "scene_b"
@@ -806,6 +819,7 @@ def _make_scene_with_chars(
         cid = uuid.uuid5(uuid.NAMESPACE_DNS, f"test.{name}")
         return Character(
             id=cid,
+            canonical_name=name,
             name=name,
             card_fields={
                 "name": name,
@@ -824,7 +838,7 @@ def _make_scene_with_chars(
     player = next(c for c in chars if c.name == "Player")
     narrator = next(c for c in chars if c.name == "Narrator")
 
-    loc = Location(name="lab", desc="A lab.")
+    loc = Location(canonical_name="lab", name="lab", desc="A lab.")
 
     return Scene(
         id=scene_id,
@@ -842,3 +856,363 @@ def _make_scene_with_chars(
         plot_story=f"Test scene {scene_id}",
         next_choices=next_choices,
     )
+class _FakeCollection:
+    """Minimal in-memory ChromaDB collection for save/load tests."""
+
+    def __init__(self) -> None:
+        self.docs: dict[str, dict[str, Any]] = {}
+
+    def upsert(self, *, ids: list[str], documents: list[str], metadatas: list[Any] | None = None) -> None:
+        metadatas = metadatas or [{} for _ in ids]
+        for i, doc_id in enumerate(ids):
+            self.docs[doc_id] = {
+                "document": documents[i] if i < len(documents) else "",
+                "metadata": metadatas[i] if i < len(metadatas) else {},
+            }
+
+    def get(self, where: Any | None = None) -> dict[str, Any]:
+        return {
+            "ids": list(self.docs.keys()),
+            "documents": [d["document"] for d in self.docs.values()],
+            "metadatas": [d["metadata"] for d in self.docs.values()],
+        }
+
+    def delete(self, *, ids: list[str]) -> None:
+        for doc_id in ids:
+            self.docs.pop(doc_id, None)
+
+    def query(
+        self,
+        query_texts: list[str],
+        n_results: int = 5,
+        where: Any | None = None,
+    ) -> dict[str, Any]:
+        docs = [d["document"] for d in self.docs.values()]
+        per_query = docs[:n_results]
+        return {
+            "documents": [per_query for _ in query_texts],
+            "ids": [list(self.docs.keys())[:n_results] for _ in query_texts],
+            "metadatas": [[d["metadata"] for d in list(self.docs.values())[:n_results]] for _ in query_texts],
+            "distances": [[0.1 for _ in per_query] for _ in query_texts],
+        }
+
+
+class _FakeChromaStore:
+    """Minimal ChromaDB stand-in that avoids heavy dependencies in tests."""
+
+    def __init__(self) -> None:
+        self._collections: dict[str, _FakeCollection] = {}
+
+    def collection(self, name: str) -> _FakeCollection:
+        if name not in self._collections:
+            self._collections[name] = _FakeCollection()
+        return self._collections[name]
+
+    def get_or_create_collection(self, **kwargs: Any) -> _FakeCollection:
+        name = kwargs.get("name", "default")
+        return self.collection(name)
+
+    def upsert(
+        self,
+        collection_name: str,
+        ids: list[str],
+        documents: list[str],
+        metadatas: Any | None = None,
+    ) -> None:
+        self.collection(collection_name).upsert(
+            ids=ids, documents=documents, metadatas=metadatas
+        )
+
+    def query(self, collection_name: str, query_texts: list[str], n_results: int = 5, where: Any | None = None) -> dict[str, Any]:
+        return self.collection(collection_name).query(
+            query_texts=query_texts, n_results=n_results, where=where
+        )
+
+    def get_all(self, collection_name: str, where: Any | None = None) -> dict[str, Any]:
+        return self.collection(collection_name).get(where=where)
+
+    def clear_all_collections(self) -> None:
+        self._collections.clear()
+
+
+class TestCrossSceneLiveCacheAndMemory:
+    """Tests for live-cache authority, orchestrator digest, and save/load."""
+
+    def test_live_cache_identity_across_scenes(self) -> None:
+        """Scene.load() should reuse live-cache objects for shared characters/locations."""
+        mock_db = MagicMock(spec=ChromaStore)
+        config = AraSettings()
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp = Path(tmpdir)
+            assets = tmp / "assets"
+            story_name = "live_cache_test"
+            cc = assets / "cc" / story_name
+            lc = assets / "lc" / story_name
+            plot = assets / "plot" / story_name
+            cc.mkdir(parents=True)
+            lc.mkdir(parents=True)
+            plot.mkdir(parents=True)
+
+            for name in ["Player", "Narrator", "NPC"]:
+                d = cc / name
+                d.mkdir()
+                (d / "card.toml").write_text(f'name = "{name}"\n')
+
+            (lc / "room").mkdir()
+            (lc / "room" / "card.toml").write_text(
+                'name = "room"\ndescription = "A room."\n'
+            )
+
+            (plot / "scene1.toml").write_text('''
+id = "scene1"
+language = "English"
+zeitgeist = "test"
+tone = "neutral"
+
+[character]
+pool = ["Player", "Narrator", "NPC"]
+inits = ["Player", "Narrator", "NPC"]
+player = "Player"
+narrator = "Narrator"
+
+[location]
+pool = ["room"]
+init = "room"
+
+[plot]
+considerations = ""
+scene = "Scene 1"
+''')
+            (plot / "scene2.toml").write_text('''
+id = "scene2"
+language = "English"
+zeitgeist = "test"
+tone = "neutral"
+
+[character]
+pool = ["Player", "Narrator", "NPC"]
+inits = ["Player", "Narrator", "NPC"]
+player = "Player"
+narrator = "Narrator"
+
+[location]
+pool = ["room"]
+init = "room"
+
+[plot]
+considerations = ""
+scene = "Scene 2"
+''')
+            config.data_dir = tmp
+
+            live_chars: dict[str, Character] = {}
+            live_locs: dict[str, Location] = {}
+
+            scene1 = Scene.load(
+                plot / "scene1.toml",
+                mock_db,
+                config,
+                live_characters=live_chars,
+                live_locations=live_locs,
+            )
+            npc = scene1.character_by_name("NPC")
+            assert npc is not None
+            npc.status = {"mood": "worried"}
+            room = scene1.location_by_name("room")
+            assert room is not None
+            room.desc = "A dusty room."
+
+            scene2 = Scene.load(
+                plot / "scene2.toml",
+                mock_db,
+                config,
+                live_characters=live_chars,
+                live_locations=live_locs,
+            )
+            npc2 = scene2.character_by_name("NPC")
+            room2 = scene2.location_by_name("room")
+
+            assert npc2 is npc
+            assert npc2.status == {"mood": "worried"}
+            assert room2 is room
+            assert room2.desc == "A dusty room."
+
+    def test_orchestrator_character_scratch_digest(self) -> None:
+        """_character_scratch_digest should expose non-default scratches only."""
+        mock_db = MagicMock(spec=ChromaStore)
+        scene = _make_scene("digest", {}, mock_db)
+
+        npc = next(c for c in scene.character_pool if c.name == "NPC")
+        npc.scratch.text = "secret plan to flee"
+        player = scene.player
+        player.scratch.text = "Nothing yet!"
+        narrator = scene.narrator
+        narrator.scratch.text = ""
+
+        digest = Orchestrator._character_scratch_digest(scene)
+
+        assert len(digest) == 2
+        assert digest[0]["role"] == "user"
+        assert digest[1]["role"] == "assistant"
+        assert "secret plan to flee" in digest[1]["content"]
+        assert "Nothing yet!" not in digest[1]["content"]
+        assert digest[1].get("_canonical_name") == "__orchestrator__"
+
+    def test_summarizer_receives_history_context(self) -> None:
+        """The summarizer prompt should include recalled story history."""
+        mock_db = MagicMock(spec=ChromaStore)
+        scene = _make_scene("history", {}, mock_db)
+
+        response = """SUMMARY NPC:
+The NPC arrives at the inn.
+
+LOCATION:
+A room.
+
+TIME: afternoon"""
+        client = MockLLMClient([StreamResult(content=response)])
+        summarizer = Summarizer(client)
+
+        summarizer.summarize_transition(
+            current_scene=scene,
+            current_scene_considerations="",
+            next_scene_plot="The hero arrives at the inn.",
+            next_scene_considerations="",
+            conversation_context=[],
+            location_desc="A room.",
+            language="English",
+            scratchpads={},
+            next_scene_chars=["NPC"],
+            history_context="Earlier scene: a promise was made at the crossroads.",
+        )
+
+        assert len(client.calls) == 1
+        prompt = client.calls[0]["messages"][0]["content"]
+        assert "Earlier scene: a promise was made at the crossroads." in prompt
+        assert "Relevant summaries from earlier scenes:" in prompt
+
+    def test_save_load_preserves_live_cache(self) -> None:
+        """Save/load should keep off-screen live-cache characters and locations."""
+        fake_db = _FakeChromaStore()
+        mock_client = MockLLMClient([])
+        config = AraSettings()
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp = Path(tmpdir)
+            assets = tmp / "assets"
+            story_name = "save_cache_test"
+            cc = assets / "cc" / story_name
+            lc = assets / "lc" / story_name
+            plot = assets / "plot" / story_name
+            cc.mkdir(parents=True)
+            lc.mkdir(parents=True)
+            plot.mkdir(parents=True)
+
+            for name in ["Player", "Narrator", "NPC"]:
+                d = cc / name
+                d.mkdir()
+                (d / "card.toml").write_text(f'name = "{name}"\n')
+
+            off_char_dir = cc / "OffChar"
+            off_char_dir.mkdir()
+            (off_char_dir / "card.toml").write_text('name = "OffChar"\n')
+
+            (lc / "room").mkdir()
+            (lc / "room" / "card.toml").write_text('name = "room"\n')
+            off_loc_dir = lc / "OffLoc"
+            off_loc_dir.mkdir()
+            (off_loc_dir / "card.toml").write_text('name = "OffLoc"\n')
+
+            (plot / "scene1.toml").write_text('''
+id = "scene1"
+language = "English"
+zeitgeist = "test"
+tone = "neutral"
+
+[character]
+pool = ["Player", "Narrator", "NPC"]
+inits = ["Player", "Narrator", "NPC"]
+player = "Player"
+narrator = "Narrator"
+
+[location]
+pool = ["room"]
+init = "room"
+
+[plot]
+considerations = ""
+scene = "Scene 1"
+''')
+            (plot / "scene2.toml").write_text('''
+id = "scene2"
+language = "English"
+zeitgeist = "test"
+tone = "neutral"
+
+[character]
+pool = ["Player", "Narrator", "NPC", "OffChar"]
+inits = ["Player", "Narrator", "NPC", "OffChar"]
+player = "Player"
+narrator = "Narrator"
+
+[location]
+pool = ["room", "OffLoc"]
+init = "room"
+
+[plot]
+considerations = ""
+scene = "Scene 2"
+''')
+            config.data_dir = tmp
+
+            story = Story(config, fake_db, mock_client, plot / "scene1.toml")
+            scene = Scene.load(
+                plot / "scene1.toml",
+                fake_db,
+                config,
+                registry=story.registry,
+                live_characters=story._live_characters,
+                live_locations=story._live_locations,
+            )
+            story._current_scene = scene
+
+            off_char = load_character(off_char_dir, fake_db, "en")
+            off_char.scratch.text = "offscreen scratch"
+            off_char.status = {"hp": 5}
+            story._live_characters["OffChar"] = off_char
+
+            off_loc = load_location(off_loc_dir, language="en")
+            off_loc.desc = "offscreen description"
+            story._live_locations["OffLoc"] = off_loc
+
+            manager = SaveManager(config)
+            snapshot = manager._build_snapshot(story)
+
+            fresh_story = Story(config, fake_db, mock_client, plot / "scene1.toml")
+
+            with patch("ara.world.story.Engine.start"), patch(
+                "ara.world.story.Summarizer.apply_initial_state_modifiers",
+                return_value=SceneStateModifiers(),
+            ):
+                manager._apply_snapshot(fresh_story, snapshot)
+
+            assert "OffChar" in fresh_story._live_characters
+            restored_char = fresh_story._live_characters["OffChar"]
+            assert restored_char.scratch.text == "offscreen scratch"
+            assert restored_char.status == {"hp": 5}
+
+            assert "OffLoc" in fresh_story._live_locations
+            restored_loc = fresh_story._live_locations["OffLoc"]
+            assert restored_loc.desc == "offscreen description"
+
+            scene2 = Scene.load(
+                plot / "scene2.toml",
+                fake_db,
+                config,
+                registry=fresh_story.registry,
+                live_characters=fresh_story._live_characters,
+                live_locations=fresh_story._live_locations,
+            )
+            assert scene2.character_by_name("OffChar") is restored_char
+            assert scene2.location_by_name("OffLoc") is restored_loc

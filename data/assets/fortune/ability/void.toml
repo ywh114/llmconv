@@ -1,0 +1,117 @@
+category = "elemental"
+# Void-elemental ability entries.
+
+prefix_values = [
+    { value = "void", prefixable = false, suffixible = true },
+    { value = "oblivio", prefixable = false, suffixible = true },
+    { value = "nihil", prefixable = false, suffixible = true },
+]
+
+suf_values = [
+    { value = "", prefixable = true, suffixible = false},
+]
+
+domain_values = [
+    { value = "oblivion", prefixable = false, suffixible = false },
+    { value = "vacuum", prefixable = false, suffixible = false },
+    { value = "the abyss", prefixable = false, suffixible = false },
+    { value = "nothing", prefixable = false, suffixible = false },
+    { value = "the hollow", prefixable = false, suffixible = false },
+    { value = "the void", prefixable = false, suffixible = false },
+]
+
+void_melee_values = [
+    { value = "annihilation", prefixable = false, suffixible = false },
+    { value = "erasure", prefixable = false, suffixible = false },
+]
+
+void_area_values = [
+    { value = "collapse", prefixable = false, suffixible = false },
+    { value = "annihilation", prefixable = false, suffixible = false },
+]
+
+void_ranged_values = [
+    { value = "siphon", prefixable = false, suffixible = false },
+    { value = "unmaking", prefixable = false, suffixible = false },
+]
+
+void_status_values = [
+    { value = "siphon", prefixable = false, suffixible = false },
+    { value = "erasure", prefixable = false, suffixible = false },
+    { value = "unmaking", prefixable = false, suffixible = false },
+]
+
+void_defence_values = [
+    { value = "negate", prefixable = false, suffixible = false },
+    { value = "nullify", prefixable = false, suffixible = false },
+    { value = "deny", prefixable = false, suffixible = false },
+]
+
+void_movement_values = [
+]
+
+verb_values = [
+    { value = "annihilation", prefixable = false, suffixible = false },
+    { value = "erase", prefixable = false, suffixible = false },
+    { value = "unmake", prefixable = false, suffixible = false },
+    { value = "consume", prefixable = false, suffixible = false },
+    { value = "negation", prefixable = false, suffixible = false },
+]
+
+noun_values = [
+    { value = "void", prefixable = false, suffixible = false },
+    { value = "abyss", prefixable = false, suffixible = false },
+    { value = "oblivion", prefixable = false, suffixible = false },
+    { value = "nothing", prefixable = false, suffixible = false },
+]
+
+adj_values = [
+    { value = "empty", prefixable = false, suffixible = false },
+    { value = "hollow", prefixable = false, suffixible = false },
+    { value = "crushing", prefixable = false, suffixible = false },
+    { value = "absolute", prefixable = false, suffixible = false },
+]
+
+
+[["melee"]]
+patterns = ["{void_melee_values}"]
+
+[["area"]]
+patterns = ["{void_area_values}"]
+
+[["ranged"]]
+patterns = ["{void_ranged_values}"]
+
+[["status"]]
+patterns = ["{void_status_values}"]
+
+[["defence"]]
+patterns = ["{void_defence_values}"]
+
+[[expose]]
+slot = "suf"
+from = ["suf_values"]
+
+[[expose]]
+slot = "prefix"
+from = ["prefix_values"]
+
+[[expose]]
+slot = "domain"
+from = ["domain_values"]
+
+[[expose]]
+slot = "technique"
+from = ["melee", "area", "ranged", "status", "defence", "movement"]
+
+[[expose]]
+slot = "verb"
+from = ["verb_values"]
+
+[[expose]]
+slot = "noun"
+from = ["noun_values"]
+
+[[expose]]
+slot = "adj"
+from = ["adj_values"]

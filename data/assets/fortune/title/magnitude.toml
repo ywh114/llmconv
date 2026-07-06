@@ -1,0 +1,28 @@
+prefix = [
+    { value = "nano", prefixable = true, suffixible = true },
+    { value = "micro", prefixable = true, suffixible = true },
+    { value = "milli", prefixable = true, suffixible = true },
+    { value = "kilo", prefixable = true, suffixible = true },
+    { value = "mega", prefixable = true, suffixible = true },
+    { value = "giga", prefixable = true, suffixible = true },
+    { value = "tera", prefixable = true, suffixible = true },
+    { value = "peta", prefixable = true, suffixible = true },
+    { value = "exa", prefixable = true, suffixible = true },
+]
+
+suf = [
+    { value = 'scale', prefixable = true, suffixible = true },
+    { value = 'class', prefixable = true, suffixible = true },
+    { value = 'kind', prefixable = true, suffixible = true },
+]
+
+[[expose]]
+slot = "prefix"
+from = [
+    "prefix",
+]
+[[expose]]
+slot = "suf"
+from = [
+    "suf",
+]

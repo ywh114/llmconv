@@ -1,0 +1,45 @@
+id = "tea_scene"
+name = "Teatime"
+language = "en"
+zeitgeist = "stability"
+tone = "温馨; warm color palette"
+
+[character]
+pool = ["Cheshire", "Champagne", "Commander", "Akashi"]
+inits = ["Cheshire", "Champagne", "Commander"]
+player = "Commander"
+narrator = "Akashi"
+
+[character.sprites]
+Cheshire = "default_neutral"
+Champagne = "white_neutral"
+Commander = "none"
+Akashi = "default_neutral"
+
+[location]
+pool = ["building_break_room"]
+init = "building_break_room"
+
+[plot]
+considerations = "Keep it short."
+scene = """
+(1)
+The characters enjoy a quiet tea time together.
+
+Cheshire talks about the tea.
+
+Champagne asks her about the book.
+
+The narrator says that they finish the tea.
+
+(2)
+Champagne suggests going to the garden.
+
+The player should agree."""
+
+[plot.next]
+considerations = "None"
+
+[plot.next.garden_scene]
+prereq_scenes = ["tea_scene"]
+desc = "After tea, go to the garden."

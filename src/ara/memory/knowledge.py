@@ -8,8 +8,14 @@ from dataclasses import dataclass, field
 from chromadb import Metadata
 from chromadb.api.types import OneOrMany
 
+from typing import TYPE_CHECKING
+
 from ara.memory.chroma import ChromaStore
 from ara.utils.logger import get_logger
+
+if TYPE_CHECKING:
+    from ara.llm.client import LLMClient
+    from ara.world.character import Character
 
 logger = get_logger(__name__)
 
@@ -46,9 +52,10 @@ class NullMemory:
     """No-op memory backend for characters that do not persist conversations."""
 
     def add_conversation(self, texts: list[str]) -> None:
-        pass
+        """Do nothing."""
 
     def recall(self, queries: list[str], depth: str = 'medium') -> list[str]:
+        """Return an empty list."""
         return []
 
 
@@ -70,6 +77,7 @@ class CharacterMemory:
     """Resolved collection name (``str(character_id)``)."""
 
     def __post_init__(self) -> None:
+        """Resolve the collection name from the character ID."""
         self.collection_name = str(self.character_id)
 
     def add_conversation(self, texts: list[str]) -> None:
@@ -91,17 +99,25 @@ class CharacterMemory:
             metadatas=metadatas,
         )
 
-    def recall(self, queries: list[str], depth: str = 'medium') -> list[str]:
-        logger.debug(
-            f'Recalling from {self.collection_name}: {queries!r} (depth={depth})'
-        )
+    def recall(
+        self,
+        queries: list[str],
+        depth: str = 'medium',
+        client: 'LLMClient | None' = None,
+        querier: 'Character | None' = None,
+    ) -> list[str]:
         """Retrieve semantically similar conversation snippets.
 
         :param queries: Search query strings.
-        :param depth: Recall breadth—one of ``shallow``, ``medium``, ``deep``,
+        :param depth: Recall breadth-one of ``shallow``, ``medium``, ``deep``,
             or ``very_deep``.
+        :param client: Optional LLM client for querier-aware filtering.
+        :param querier: Optional character whose perspective should shape the answer.
         :return: Flattened list of retrieved document strings.
         """
+        logger.debug(
+            f'Recalling from {self.collection_name}: {queries!r} (depth={depth})'
+        )
         n_results = _DEPTH_MAP.get(depth, 5)
         results = self.db.query(
             self.collection_name,
@@ -113,4 +129,29 @@ class CharacterMemory:
         flat: list[str] = []
         for group in docs:
             flat.extend(group or [])
+
+        if client is not None and querier is not None and flat:
+            context = (
+                f"Querier: {querier.name}\n"
+                f"Personality/expertise: {querier.card_fields.get('personality', '')}\n"
+                f"Scenario: {querier.card_fields.get('scenario', '')}\n"
+                f"Query: {queries[0] if queries else ''}\n\n"
+                f"Raw memories:\n" + "\n".join(f"- {d}" for d in flat)
+            )
+            filtered = client.complete_subagent(
+                task=(
+                    "Reframe the raw memories into an answer for the querier. "
+                    "If the querier is a child, simplify. "
+                    "If the querier is an expert, be detailed and precise. "
+                    "You must base your answer ONLY on the raw memories provided. "
+                    "If no memory answers the query, return exactly '-- nothing relevant found'. "
+                    "Do not invent, infer, or hallucinate facts that are not present. "
+                    "Return a short paragraph."
+                ),
+                context=context,
+                max_tokens=256,
+            )
+            if filtered.strip():
+                return [filtered.strip()]
+
         return flat

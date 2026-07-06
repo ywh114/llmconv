@@ -1,0 +1,9 @@
+name = "Commander"
+summary = ""
+personality = ""
+scenario = ""
+example_messages = ""
+
+[names]
+en = "Commander"
+zh = "指挥官"

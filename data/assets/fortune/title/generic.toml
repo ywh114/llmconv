@@ -1,0 +1,196 @@
+rank = [
+    { value = "master", prefixable = true, suffixible = true },
+    { value = "chief", prefixable = true, suffixible = true },
+    { value = "head", prefixable = true, suffixible = true },
+]
+class_root = [
+    { value = "person", prefixable = true, suffixible = true },
+    { value = "being", prefixable = true, suffixible = true },
+    { value = "walker", prefixable = true, suffixible = true },
+]
+class_suffix = [
+    { value = "ling", prefixable = true, suffixible = true },
+    { value = "kind", prefixable = true, suffixible = true },
+]
+
+prefix = [
+    { value = "neo", prefixable = true, suffixible = true },
+    { value = "proto", prefixable = true, suffixible = true },
+    { value = "pseudo", prefixable = true, suffixible = true },
+    { value = "meta", prefixable = true, suffixible = true },
+]
+adj = [
+    { value = "old", prefixable = true, suffixible = true },
+    { value = "new", prefixable = true, suffixible = true },
+    { value = "big", prefixable = true, suffixible = true },
+    { value = "small", prefixable = true, suffixible = true },
+    { value = "dark", prefixable = true, suffixible = true },
+    { value = "light", prefixable = true, suffixible = true },
+    { value = "good", prefixable = true, suffixible = true },
+    { value = "bad", prefixable = true, suffixible = true },
+    { value = "ancient", prefixable = true, suffixible = true },
+    { value = "elder", prefixable = true, suffixible = true },
+    { value = "high", prefixable = true, suffixible = true },
+    { value = "grand", prefixable = true, suffixible = true },
+]
+adj_sup = [
+    { value = "best", prefixable = true, suffixible = true },
+    { value = "worst", prefixable = true, suffixible = true },
+    { value = "first", prefixable = true, suffixible = true },
+    { value = "last", prefixable = true, suffixible = true },
+    { value = "greatest", prefixable = true, suffixible = true },
+    { value = "weakest", prefixable = true, suffixible = true },
+    { value = "least", prefixable = true, suffixible = true },
+]
+noun = [
+    { value = "one", prefixable = true, suffixible = true },
+    { value = "person", prefixable = true, suffixible = true },
+    { value = "being", prefixable = true, suffixible = true },
+]
+class_values = [
+    { value = "worker", prefixable = true, suffixible = true },
+    { value = "maker", prefixable = true, suffixible = true },
+    { value = "doer", prefixable = true, suffixible = true },
+    { value = "user", prefixable = true, suffixible = true },
+]
+thing = [
+    { value = "thing", prefixable = true, suffixible = true },
+    { value = "stuff", prefixable = true, suffixible = true },
+    { value = "power", prefixable = true, suffixible = true },
+    { value = "force", prefixable = true, suffixible = true },
+    { value = "matter", prefixable = true, suffixible = true },
+]
+
+[["prefix+"]]
+patterns = [
+    "{prefix}",
+    "{prefix}{prefix}",
+    "{prefix}{prefix}",
+    "{prefix}{prefix}{prefix}",
+]
+
+[[place]]
+value = "world"
+takes_of = true
+takes_in = false
+article = "the"
+proper_noun = false
+prefixable = true
+suffixible = true
+
+[[place]]
+value = "land"
+takes_of = true
+takes_in = false
+article = "the"
+proper_noun = false
+prefixable = true
+suffixible = true
+
+[[place]]
+value = "area"
+takes_of = true
+takes_in = false
+article = "the"
+proper_noun = false
+prefixable = true
+suffixible = true
+
+[[place]]
+value = "zone"
+takes_of = true
+takes_in = false
+article = "the"
+proper_noun = false
+prefixable = true
+suffixible = true
+
+[[class]]
+patterns = [
+    "{prefix}{class_root}",
+    "{class_root}",
+    "{class_root}{class_suffix}",
+]
+
+[[subject]]
+patterns = [
+    "{class}",
+    "{class}",
+    "{class}",
+    "{class}",
+    "{noun}",
+    "{noun}",
+    "{noun}",
+    "{noun}",
+    "{class}-{noun}",
+    "{noun}-{class}",
+]
+
+[[subject3]]
+patterns = [
+    "{subject}",
+    "{noun}{noun}",
+    "{class}{class}",
+]
+
+[["suf+"]]
+patterns = [
+    "{suf}",
+    "{suf}{suf}",
+]
+
+[[expose]]
+slot = "rank"
+from = [
+    "rank",
+]
+
+[[expose]]
+slot = "class"
+from = [
+    "class",
+    "class_values",
+]
+
+[[expose]]
+slot = "prefix"
+from = [
+    "prefix",
+]
+
+[[expose]]
+slot = "adj"
+from = [
+    "adj",
+]
+
+[[expose]]
+slot = "adj_sup"
+from = [
+    "adj_sup",
+]
+
+[[expose]]
+slot = "noun"
+from = [
+    "noun",
+]
+
+
+[[expose]]
+slot = "place"
+from = [
+    "place",
+]
+
+[[expose]]
+slot = "thing"
+from = [
+    "thing",
+]
+
+[[expose]]
+slot = "subject3"
+from = [
+    "subject3",
+]

@@ -42,6 +42,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">ara.world.scene</span><span class="w"> </span><span class="kn">import</span> <span class="n">Scene</span><span class="p">,</span> <span class="n">Location</span><span class="p">,</span> <span class="n">SceneChoice</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ara.world.character</span><span class="w"> </span><span class="kn">import</span> <span class="n">Character</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ara.world.orchestrator</span><span class="w"> </span><span class="kn">import</span> <span class="n">TurnDecision</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ara.world.system_page</span><span class="w"> </span><span class="kn">import</span> <span class="n">SystemPage</span>
 
 
 <div class="viewcode-block" id="character_to_dict">
@@ -54,6 +55,18 @@
         <span class="s2">&quot;importance&quot;</span><span class="p">:</span> <span class="n">char</span><span class="o">.</span><span class="n">importance</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
         <span class="s2">&quot;scratch&quot;</span><span class="p">:</span> <span class="n">char</span><span class="o">.</span><span class="n">scratch</span><span class="o">.</span><span class="n">text</span><span class="p">,</span>
         <span class="s2">&quot;card_summary&quot;</span><span class="p">:</span> <span class="n">char</span><span class="o">.</span><span class="n">card_fields</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;summary&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;sprite&quot;</span><span class="p">:</span> <span class="n">char</span><span class="o">.</span><span class="n">card_fields</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sprite&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;sprites&quot;</span><span class="p">:</span> <span class="n">char</span><span class="o">.</span><span class="n">sprites</span><span class="p">,</span>
+        <span class="s2">&quot;current_sprite&quot;</span><span class="p">:</span> <span class="n">char</span><span class="o">.</span><span class="n">current_sprite</span><span class="p">,</span>
+        <span class="s2">&quot;crops&quot;</span><span class="p">:</span> <span class="n">char</span><span class="o">.</span><span class="n">crops</span><span class="p">,</span>
+        <span class="s2">&quot;sprite_descriptions&quot;</span><span class="p">:</span> <span class="n">char</span><span class="o">.</span><span class="n">sprite_descriptions</span><span class="p">,</span>
+        <span class="s2">&quot;prev_scene_summary&quot;</span><span class="p">:</span> <span class="n">char</span><span class="o">.</span><span class="n">prev_scene_summary</span><span class="p">,</span>
+        <span class="s2">&quot;names&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">char</span><span class="o">.</span><span class="n">names</span><span class="p">),</span>
+        <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="n">char</span><span class="o">.</span><span class="n">title</span><span class="p">,</span>
+        <span class="s2">&quot;hidden&quot;</span><span class="p">:</span> <span class="n">char</span><span class="o">.</span><span class="n">hidden</span><span class="p">,</span>
+        <span class="s2">&quot;visible_to&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">char</span><span class="o">.</span><span class="n">visible_to</span><span class="p">),</span>
+        <span class="s2">&quot;inner_log&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">char</span><span class="o">.</span><span class="n">inner_log</span><span class="p">),</span>
+        <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">char</span><span class="o">.</span><span class="n">status</span><span class="p">),</span>
     <span class="p">}</span></div>
 
 
@@ -66,6 +79,11 @@
         <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">loc</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
         <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="n">loc</span><span class="o">.</span><span class="n">desc</span><span class="p">,</span>
         <span class="s2">&quot;lore&quot;</span><span class="p">:</span> <span class="n">loc</span><span class="o">.</span><span class="n">lore</span><span class="p">,</span>
+        <span class="s2">&quot;backgrounds&quot;</span><span class="p">:</span> <span class="n">loc</span><span class="o">.</span><span class="n">backgrounds</span><span class="p">,</span>
+        <span class="s2">&quot;current_background&quot;</span><span class="p">:</span> <span class="n">loc</span><span class="o">.</span><span class="n">current_background</span><span class="p">,</span>
+        <span class="s2">&quot;background_url&quot;</span><span class="p">:</span> <span class="n">loc</span><span class="o">.</span><span class="n">background_url</span><span class="p">(),</span>
+        <span class="s2">&quot;loading_background&quot;</span><span class="p">:</span> <span class="n">loc</span><span class="o">.</span><span class="n">loading_background</span><span class="p">,</span>
+        <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">loc</span><span class="o">.</span><span class="n">status</span><span class="p">),</span>
     <span class="p">}</span></div>
 
 
@@ -77,7 +95,7 @@
     <span class="k">return</span> <span class="p">{</span>
         <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">choice</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
         <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="n">choice</span><span class="o">.</span><span class="n">desc</span><span class="p">,</span>
-        <span class="s2">&quot;only_for&quot;</span><span class="p">:</span> <span class="n">choice</span><span class="o">.</span><span class="n">only_for</span><span class="p">,</span>
+        <span class="s2">&quot;prereq_scenes&quot;</span><span class="p">:</span> <span class="n">choice</span><span class="o">.</span><span class="n">prereq_scenes</span><span class="p">,</span>
     <span class="p">}</span></div>
 
 
@@ -88,9 +106,14 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Serialize a scene to a dict.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="p">{</span>
         <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">scene</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">scene</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+        <span class="s2">&quot;asset_story_name&quot;</span><span class="p">:</span> <span class="n">scene</span><span class="o">.</span><span class="n">asset_story_name</span><span class="p">,</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">scene</span><span class="o">.</span><span class="n">scene_type</span><span class="p">,</span>
         <span class="s2">&quot;language&quot;</span><span class="p">:</span> <span class="n">scene</span><span class="o">.</span><span class="n">language</span><span class="p">,</span>
         <span class="s2">&quot;tone&quot;</span><span class="p">:</span> <span class="n">scene</span><span class="o">.</span><span class="n">tone</span><span class="p">,</span>
         <span class="s2">&quot;zeitgeist&quot;</span><span class="p">:</span> <span class="n">scene</span><span class="o">.</span><span class="n">zeitgeist</span><span class="p">,</span>
+        <span class="s2">&quot;time&quot;</span><span class="p">:</span> <span class="n">scene</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
+        <span class="s2">&quot;world_map&quot;</span><span class="p">:</span> <span class="n">scene</span><span class="o">.</span><span class="n">world_map</span><span class="p">,</span>
         <span class="s2">&quot;player&quot;</span><span class="p">:</span> <span class="n">scene</span><span class="o">.</span><span class="n">player</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
         <span class="s2">&quot;narrator&quot;</span><span class="p">:</span> <span class="n">scene</span><span class="o">.</span><span class="n">narrator</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
         <span class="s2">&quot;characters&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">character_to_dict</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">scene</span><span class="o">.</span><span class="n">character_pool</span><span class="p">],</span>
@@ -112,12 +135,19 @@
         <span class="k">return</span> <span class="kc">None</span>
     <span class="k">return</span> <span class="p">{</span>
         <span class="s2">&quot;next_char&quot;</span><span class="p">:</span> <span class="n">dec</span><span class="o">.</span><span class="n">next_char</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+        <span class="s2">&quot;next_char_title&quot;</span><span class="p">:</span> <span class="n">dec</span><span class="o">.</span><span class="n">next_char</span><span class="o">.</span><span class="n">title</span><span class="p">,</span>
         <span class="s2">&quot;directive&quot;</span><span class="p">:</span> <span class="n">dec</span><span class="o">.</span><span class="n">directive</span><span class="p">,</span>
         <span class="s2">&quot;suggestions&quot;</span><span class="p">:</span> <span class="n">dec</span><span class="o">.</span><span class="n">suggestions</span><span class="p">,</span>
         <span class="s2">&quot;entering_chars&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">dec</span><span class="o">.</span><span class="n">entering_chars</span><span class="p">],</span>
         <span class="s2">&quot;exiting_chars&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">dec</span><span class="o">.</span><span class="n">exiting_chars</span><span class="p">],</span>
         <span class="s2">&quot;switch_location&quot;</span><span class="p">:</span> <span class="n">dec</span><span class="o">.</span><span class="n">switch_location</span><span class="o">.</span><span class="n">name</span> <span class="k">if</span> <span class="n">dec</span><span class="o">.</span><span class="n">switch_location</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
         <span class="s2">&quot;next_scene&quot;</span><span class="p">:</span> <span class="n">dec</span><span class="o">.</span><span class="n">next_scene</span><span class="p">,</span>
+        <span class="s2">&quot;change_sprite&quot;</span><span class="p">:</span> <span class="n">dec</span><span class="o">.</span><span class="n">change_sprite</span><span class="p">,</span>
+        <span class="s2">&quot;switch_background&quot;</span><span class="p">:</span> <span class="n">dec</span><span class="o">.</span><span class="n">switch_background</span><span class="p">,</span>
+        <span class="s2">&quot;spawn_anonymous&quot;</span><span class="p">:</span> <span class="n">dec</span><span class="o">.</span><span class="n">spawn_anonymous</span><span class="p">,</span>
+        <span class="s2">&quot;set_time&quot;</span><span class="p">:</span> <span class="n">dec</span><span class="o">.</span><span class="n">set_time</span><span class="p">,</span>
+        <span class="s2">&quot;system_changes&quot;</span><span class="p">:</span> <span class="n">dec</span><span class="o">.</span><span class="n">system_changes</span><span class="p">,</span>
+        <span class="s2">&quot;response_mode&quot;</span><span class="p">:</span> <span class="n">dec</span><span class="o">.</span><span class="n">response_mode</span><span class="p">,</span>
     <span class="p">}</span></div>
 
 
@@ -129,18 +159,82 @@
     <span class="n">ctx_len</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">if</span> <span class="n">engine</span><span class="o">.</span><span class="n">ctx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">ctx_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">engine</span><span class="o">.</span><span class="n">ctx</span><span class="o">.</span><span class="n">context</span><span class="p">)</span>
+    <span class="n">speaker_history</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">engine</span><span class="p">,</span> <span class="s2">&quot;_speaker_history&quot;</span><span class="p">,</span> <span class="p">[])</span>
+    <span class="n">current_speaker</span> <span class="o">=</span> <span class="n">speaker_history</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="n">speaker_history</span> <span class="k">else</span> <span class="kc">None</span>
     <span class="k">return</span> <span class="p">{</span>
         <span class="s2">&quot;finished&quot;</span><span class="p">:</span> <span class="n">engine</span><span class="o">.</span><span class="n">finished</span><span class="p">,</span>
-        <span class="s2">&quot;needs_player_input&quot;</span><span class="p">:</span> <span class="n">engine</span><span class="o">.</span><span class="n">needs_player_input</span><span class="p">,</span>
         <span class="s2">&quot;next_scene&quot;</span><span class="p">:</span> <span class="n">engine</span><span class="o">.</span><span class="n">next_scene</span><span class="p">,</span>
-        <span class="s2">&quot;here&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">engine</span><span class="o">.</span><span class="n">here_chars</span><span class="p">],</span>
-        <span class="s2">&quot;away&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">engine</span><span class="o">.</span><span class="n">away_chars</span><span class="p">],</span>
+        <span class="s2">&quot;here&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">title</span><span class="p">}</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">engine</span><span class="o">.</span><span class="n">here_chars</span><span class="p">],</span>
+        <span class="s2">&quot;away&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">title</span><span class="p">}</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">engine</span><span class="o">.</span><span class="n">away_chars</span><span class="p">],</span>
         <span class="s2">&quot;location&quot;</span><span class="p">:</span> <span class="n">engine</span><span class="o">.</span><span class="n">loc</span><span class="o">.</span><span class="n">name</span> <span class="k">if</span> <span class="n">engine</span><span class="o">.</span><span class="n">loc</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="s2">&quot;world_time&quot;</span><span class="p">:</span> <span class="n">engine</span><span class="o">.</span><span class="n">world_time</span><span class="p">,</span>
+        <span class="s2">&quot;current_speaker&quot;</span><span class="p">:</span> <span class="n">current_speaker</span><span class="p">,</span>
         <span class="s2">&quot;last_decision&quot;</span><span class="p">:</span> <span class="n">decision_to_dict</span><span class="p">(</span><span class="n">engine</span><span class="o">.</span><span class="n">last_decision</span><span class="p">),</span>
         <span class="s2">&quot;context_length&quot;</span><span class="p">:</span> <span class="n">ctx_len</span><span class="p">,</span>
         <span class="s2">&quot;directives_log&quot;</span><span class="p">:</span> <span class="p">{</span>
             <span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">d</span> <span class="k">for</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="p">(</span><span class="n">engine</span><span class="o">.</span><span class="n">directives_log</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
         <span class="p">},</span>
+        <span class="s2">&quot;player_status&quot;</span><span class="p">:</span> <span class="n">engine</span><span class="o">.</span><span class="n">player_status</span><span class="p">,</span>
+        <span class="s2">&quot;free_status&quot;</span><span class="p">:</span> <span class="n">engine</span><span class="o">.</span><span class="n">free_status</span><span class="p">,</span>
+        <span class="s2">&quot;character_statuses&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">SystemPage</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">status</span><span class="p">)</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="p">(</span><span class="n">engine</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">character_pool</span> <span class="k">if</span> <span class="n">engine</span><span class="o">.</span><span class="n">scene</span> <span class="k">else</span> <span class="p">[])</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;location_statuses&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="n">loc</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">SystemPage</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">loc</span><span class="o">.</span><span class="n">status</span><span class="p">)</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">loc</span> <span class="ow">in</span> <span class="p">(</span><span class="n">engine</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">location_pool</span> <span class="k">if</span> <span class="n">engine</span><span class="o">.</span><span class="n">scene</span> <span class="k">else</span> <span class="p">[])</span>
+        <span class="p">},</span>
+    <span class="p">}</span></div>
+
+
+
+<div class="viewcode-block" id="build_visual_state">
+<a class="viewcode-back" href="../../../api/ara.agent.html#ara.agent.state.build_visual_state">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">build_visual_state</span><span class="p">(</span><span class="n">story</span><span class="p">:</span> <span class="n">Story</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build the full visual state the browser needs to render the scene.</span>
+
+<span class="sd">    Includes the current scene, engine state, reconstructed dialogue history,</span>
+<span class="sd">    and which characters are currently present.  Used by ``/start``, ``/load``</span>
+<span class="sd">    and ``/reset`` so the browser can initialise its UI without waiting for a</span>
+<span class="sd">    ``scene_loaded`` event.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">engine</span> <span class="o">=</span> <span class="n">story</span><span class="o">.</span><span class="n">engine</span>
+    <span class="n">scene</span> <span class="o">=</span> <span class="n">story</span><span class="o">.</span><span class="n">current_scene</span>
+
+    <span class="c1"># Reconstruct visible history from the conversation context.</span>
+    <span class="n">history</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">engine</span><span class="o">.</span><span class="n">ctx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">scene</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">player_name</span> <span class="o">=</span> <span class="n">scene</span><span class="o">.</span><span class="n">player</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">for</span> <span class="n">msg</span> <span class="ow">in</span> <span class="n">engine</span><span class="o">.</span><span class="n">ctx</span><span class="o">.</span><span class="n">context</span><span class="p">:</span>
+            <span class="n">role</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;role&quot;</span><span class="p">)</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;content&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span>
+            <span class="k">if</span> <span class="n">role</span> <span class="o">==</span> <span class="s2">&quot;assistant&quot;</span> <span class="ow">and</span> <span class="n">content</span><span class="p">:</span>
+                <span class="n">history</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;speaker&quot;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="n">content</span><span class="p">})</span>
+            <span class="k">elif</span> <span class="n">role</span> <span class="o">==</span> <span class="s2">&quot;user&quot;</span> <span class="ow">and</span> <span class="n">name</span> <span class="o">==</span> <span class="n">player_name</span> <span class="ow">and</span> <span class="n">content</span><span class="p">:</span>
+                <span class="n">history</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;speaker&quot;</span><span class="p">:</span> <span class="s2">&quot;Player&quot;</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="n">content</span><span class="p">})</span>
+
+    <span class="c1"># Determine who is currently present.  After a fresh start the engine has</span>
+    <span class="c1"># not been started yet, so fall back to the scene&#39;s starting characters.</span>
+    <span class="n">here</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">engine</span><span class="o">.</span><span class="n">here_chars</span><span class="p">)</span> <span class="k">if</span> <span class="n">engine</span><span class="o">.</span><span class="n">here_chars</span> <span class="k">else</span> <span class="nb">list</span><span class="p">(</span><span class="n">scene</span><span class="o">.</span><span class="n">starting_characters</span><span class="p">)</span> <span class="k">if</span> <span class="n">scene</span> <span class="k">else</span> <span class="p">[]</span>
+    <span class="n">away</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">engine</span><span class="o">.</span><span class="n">away_chars</span><span class="p">)</span> <span class="k">if</span> <span class="n">engine</span><span class="o">.</span><span class="n">away_chars</span> <span class="k">else</span> <span class="p">[]</span>
+
+    <span class="n">engine_dict</span> <span class="o">=</span> <span class="n">engine_to_dict</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="c1"># Backward-compatible story fields</span>
+        <span class="s2">&quot;finished&quot;</span><span class="p">:</span> <span class="n">story</span><span class="o">.</span><span class="n">finished</span><span class="p">,</span>
+        <span class="s2">&quot;scene_history&quot;</span><span class="p">:</span> <span class="n">story</span><span class="o">.</span><span class="n">scene_history</span><span class="p">,</span>
+        <span class="s2">&quot;current_scene&quot;</span><span class="p">:</span> <span class="n">scene_to_dict</span><span class="p">(</span><span class="n">scene</span><span class="p">)</span> <span class="k">if</span> <span class="n">scene</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="c1"># Full visual state for browser init</span>
+        <span class="s2">&quot;scene&quot;</span><span class="p">:</span> <span class="n">scene_to_dict</span><span class="p">(</span><span class="n">scene</span><span class="p">)</span> <span class="k">if</span> <span class="n">scene</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="s2">&quot;engine&quot;</span><span class="p">:</span> <span class="n">engine_dict</span><span class="p">,</span>
+        <span class="s2">&quot;history&quot;</span><span class="p">:</span> <span class="n">history</span><span class="p">,</span>
+        <span class="s2">&quot;current_speaker&quot;</span><span class="p">:</span> <span class="n">engine_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;current_speaker&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;here&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">character_to_dict</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">here</span><span class="p">],</span>
+        <span class="s2">&quot;away&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">character_to_dict</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">away</span><span class="p">],</span>
+        <span class="s2">&quot;location&quot;</span><span class="p">:</span> <span class="n">location_to_dict</span><span class="p">(</span><span class="n">engine</span><span class="o">.</span><span class="n">loc</span><span class="p">)</span> <span class="k">if</span> <span class="n">engine</span><span class="o">.</span><span class="n">loc</span> <span class="k">else</span> <span class="p">(</span>
+            <span class="n">location_to_dict</span><span class="p">(</span><span class="n">scene</span><span class="o">.</span><span class="n">starting_location</span><span class="p">)</span> <span class="k">if</span> <span class="n">scene</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="p">),</span>
     <span class="p">}</span></div>
 
 
@@ -153,6 +247,7 @@
         <span class="s2">&quot;finished&quot;</span><span class="p">:</span> <span class="n">story</span><span class="o">.</span><span class="n">finished</span><span class="p">,</span>
         <span class="s2">&quot;scene_history&quot;</span><span class="p">:</span> <span class="n">story</span><span class="o">.</span><span class="n">scene_history</span><span class="p">,</span>
         <span class="s2">&quot;current_scene&quot;</span><span class="p">:</span> <span class="n">scene_to_dict</span><span class="p">(</span><span class="n">story</span><span class="o">.</span><span class="n">current_scene</span><span class="p">)</span> <span class="k">if</span> <span class="n">story</span><span class="o">.</span><span class="n">current_scene</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="s2">&quot;opening_text&quot;</span><span class="p">:</span> <span class="n">story</span><span class="o">.</span><span class="n">_story_meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;opening_text&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
     <span class="p">}</span></div>
 
 </pre></div>
@@ -185,6 +280,7 @@
 <p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../static_assets.html">Static assets</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Reference:</span></p>
 <ul>
@@ -193,9 +289,11 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../api/ara.agent.html">ara.agent package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api/ara.llm.html">ara.llm package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api/ara.memory.html">ara.memory package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/ara.persistence.html">ara.persistence package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api/ara.utils.html">ara.utils package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api/ara.config.html">ara.config module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../api/ara.models.html">ara.models module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/ara.webclient.html">ara.webclient package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/ara.cli.html">ara.cli package</a></li>
 </ul>
 
 <div class="relations">

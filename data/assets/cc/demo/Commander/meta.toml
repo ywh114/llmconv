@@ -1,0 +1,4 @@
+importance = "EIGEN"
+title = "Commander"
+sprites = ["default_neutral"]
+default_sprite = "default_neutral"

@@ -1,0 +1,6 @@
+name = "Player"
+summary = "The player character."
+personality = "You are the player."
+scenario = "You are exploring the world."
+greeting_message = "Hello."
+example_messages = ""

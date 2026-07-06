@@ -1,0 +1,123 @@
+category = "elemental"
+# Ice-elemental ability entries.
+
+prefix_values = [
+    { value = "cryo", prefixable = false, suffixible = true },
+]
+
+suf_values = [
+    { value = "", prefixable = true, suffixible = false},
+]
+
+domain_values = [
+    { value = "tundra", prefixable = false, suffixible = false },
+    { value = "mountain", prefixable = false, suffixible = false },
+    { value = "permafrost", prefixable = false, suffixible = false },
+    { value = "blizzard", prefixable = false, suffixible = false },
+    { value = "glacier", prefixable = false, suffixible = false },
+    { value = "avalanche", prefixable = false, suffixible = false },
+    { value = "hoarfrost", prefixable = false, suffixible = false },
+    { value = "shiver", prefixable = false, suffixible = true },
+    { value = "hail", prefixable = false, suffixible = true },
+    { value = "whiteout", prefixable = false, suffixible = false },
+]
+
+ice_melee_values = [
+    { value = "shatter", prefixable = false, suffixible = false },
+    { value = "spear", prefixable = false, suffixible = false },
+    { value = "fracture", prefixable = false, suffixible = false },
+    { value = "shear", prefixable = false, suffixible = false },
+]
+
+ice_area_values = [
+    { value = "storm", prefixable = false, suffixible = false },
+    { value = "avalanche", prefixable = false, suffixible = false },
+    { value = "blizzard", prefixable = false, suffixible = false },
+]
+
+ice_ranged_values = [
+    { value = "shard", prefixable = false, suffixible = false },
+    { value = "icicle", prefixable = false, suffixible = false },
+    { value = "spear", prefixable = false, suffixible = false },
+]
+
+ice_status_values = [
+    { value = "freeze", prefixable = false, suffixible = false },
+    { value = "preserve", prefixable = false, suffixible = false },
+    { value = "encase", prefixable = false, suffixible = false },
+]
+
+ice_defence_values = [
+    { value = "hibernate", prefixable = false, suffixible = false },
+    { value = "still", prefixable = false, suffixible = false },
+]
+
+ice_movement_values = [
+
+]
+
+verb_values = [
+]
+
+noun_values = [
+    { value = "rime", prefixable = false, suffixible = false },
+    { value = "ice", prefixable = false, suffixible = false },
+    { value = "black ice", prefixable = false, suffixible = false },
+    { value = "glacier", prefixable = false, suffixible = false },
+    { value = "blizzard", prefixable = false, suffixible = false },
+    { value = "permafrost", prefixable = false, suffixible = false },
+    { value = "whiteout", prefixable = false, suffixible = false },
+]
+
+adj_values = [
+    { value = "biting", prefixable = false, suffixible = false },
+    { value = "howling", prefixable = false, suffixible = false },
+    { value = "bitter", prefixable = false, suffixible = false },
+    { value = "frozen", prefixable = false, suffixible = false },
+    { value = "bleak", prefixable = false, suffixible = false },
+    { value = "white", prefixable = false, suffixible = false },
+]
+
+
+[["melee"]]
+patterns = ["{ice_melee_values}"]
+
+[["area"]]
+patterns = ["{ice_area_values}"]
+
+[["ranged"]]
+patterns = ["{ice_ranged_values}"]
+
+[["status"]]
+patterns = ["{ice_status_values}"]
+
+[["defence"]]
+patterns = ["{ice_defence_values}"]
+
+[[expose]]
+slot = "suf"
+from = ["suf_values"]
+
+[[expose]]
+slot = "prefix"
+from = ["prefix_values"]
+
+[[expose]]
+slot = "domain"
+from = ["domain_values"]
+
+[[expose]]
+slot = "technique"
+from = ["melee", "area", "ranged", "status", "defence", "movement"]
+
+[[expose]]
+slot = "verb"
+from = ["verb_values"]
+
+[[expose]]
+slot = "noun"
+from = ["noun_values"]
+
+[[expose]]
+slot = "adj"
+from = ["adj_values"]

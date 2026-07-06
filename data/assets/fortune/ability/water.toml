@@ -1,0 +1,135 @@
+category = "elemental"
+# Water-elemental ability entries.
+
+prefix_values = [
+    { value = "hydro", prefixable = false, suffixible = true },
+    { value = "aqua", prefixable = false, suffixible = true },
+]
+
+suf_values = [
+    { value = "", prefixable = true, suffixible = false},
+]
+
+domain_values = [
+    { value = "tsunami", prefixable = false, suffixible = false },
+    { value = "riptide", prefixable = false, suffixible = true },
+    { value = "undertow", prefixable = false, suffixible = false },
+    { value = "whirlpool", prefixable = false, suffixible = false },
+    { value = "maelstrom", prefixable = false, suffixible = false },
+    { value = "typhoon", prefixable = false, suffixible = false },
+    { value = "monsoon", prefixable = false, suffixible = false },
+    { value = "the abyss", prefixable = false, suffixible = false },
+    { value = "the deep", prefixable = false, suffixible = false },
+    { value = "coral", prefixable = false, suffixible = false },
+    { value = "sea cucumber", prefixable = false, suffixible = false },
+]
+
+water_melee_values = [
+    { value = "crash", prefixable = false, suffixible = false },
+    { value = "jet", prefixable = false, suffixible = true },
+]
+
+water_area_values = [
+    { value = "tide", prefixable = false, suffixible = true },
+    { value = "wave", prefixable = false, suffixible = true },
+    { value = "storm", prefixable = false, suffixible = true },
+    { value = "deluge", prefixable = false, suffixible = true },
+    { value = "engulf", prefixable = false, suffixible = false },
+    { value = "flood", prefixable = false, suffixible = false },
+]
+
+water_ranged_values = [
+    { value = "spout", prefixable = false, suffixible = false },
+    { value = "torrent", prefixable = false, suffixible = true },
+    { value = "jet", prefixable = false, suffixible = true },
+    { value = "spray", prefixable = false, suffixible = true },
+    { value = "siphon", prefixable = false, suffixible = false },
+]
+
+water_status_values = [
+    { value = "drown", prefixable = false, suffixible = false },
+    { value = "submerge", prefixable = false, suffixible = false },
+    { value = "brine", prefixable = false, suffixible = true },
+    { value = "engulf", prefixable = false, suffixible = false },
+    { value = "siphon", prefixable = false, suffixible = false },
+]
+
+water_defence_values = [
+    { value = "dam", prefixable = false, suffixible = false },
+    { value = "wave", prefixable = false, suffixible = false },
+]
+
+water_movement_values = [
+    { value = "surge", prefixable = false, suffixible = false },
+    { value = "flow", prefixable = false, suffixible = false },
+]
+
+verb_values = [
+]
+
+noun_values = [
+    { value = "tide", prefixable = false, suffixible = false },
+    { value = "wave", prefixable = false, suffixible = false },
+    { value = "flood", prefixable = false, suffixible = false },
+    { value = "storm", prefixable = false, suffixible = false },
+    { value = "torrent", prefixable = false, suffixible = false },
+    { value = "brine", prefixable = false, suffixible = false },
+    { value = "coral", prefixable = false, suffixible = false },
+    { value = "pearl", prefixable = false, suffixible = false },
+    { value = "sea cucumber", prefixable = false, suffixible = false },
+]
+
+adj_values = [
+    { value = "tidal", prefixable = false, suffixible = false },
+    { value = "abyssal", prefixable = false, suffixible = false },
+    { value = "torrential", prefixable = false, suffixible = false },
+    { value = "briny", prefixable = false, suffixible = false },
+    { value = "pelagic", prefixable = false, suffixible = false },
+    { value = "drowning", prefixable = false, suffixible = false },
+    { value = "pearl", prefixable = false, suffixible = false },
+    { value = "moist", prefixable = false, suffixible = false },
+]
+
+
+[["melee"]]
+patterns = ["{water_melee_values}"]
+
+[["area"]]
+patterns = ["{water_area_values}"]
+
+[["ranged"]]
+patterns = ["{water_ranged_values}"]
+
+[["status"]]
+patterns = ["{water_status_values}"]
+
+[["defence"]]
+patterns = ["{water_defence_values}"]
+
+[[expose]]
+slot = "suf"
+from = ["suf_values"]
+
+[[expose]]
+slot = "prefix"
+from = ["prefix_values"]
+
+[[expose]]
+slot = "domain"
+from = ["domain_values"]
+
+[[expose]]
+slot = "technique"
+from = ["melee", "area", "ranged", "status", "defence", "movement"]
+
+[[expose]]
+slot = "verb"
+from = ["verb_values"]
+
+[[expose]]
+slot = "noun"
+from = ["noun_values"]
+
+[[expose]]
+slot = "adj"
+from = ["adj_values"]

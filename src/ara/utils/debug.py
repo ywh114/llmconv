@@ -28,6 +28,12 @@ class DebugConsole:
     """
 
     def __init__(self, engine: Engine, auto_pause: bool = False) -> None:
+        """Create a debug console.
+
+        :param engine: The :class:`Engine` instance driving the scene.
+        :param auto_pause: When ``True``, the console opens automatically before
+            every turn.  When ``False``, it is only invoked on-demand.
+        """
         self.engine = engine
         self.auto_pause = auto_pause
 
@@ -71,7 +77,7 @@ class DebugConsole:
             self._run_one(state, noshell)
             return
 
-        print("\n[Debug console — type 'help' for commands, 'exit' to resume]")
+        print("\n[Debug console - type 'help' for commands, 'exit' to resume]")
         while True:
             try:
                 raw = input("Debug> ").strip()
@@ -141,20 +147,20 @@ class DebugConsole:
         """Show engine state summary."""
         print(f"Scene: {state.scene.id}")
         print(f"Location: {state.loc.name}")
-        print(f"Here: {[c.name for c in state.here_chars]}")
-        print(f"Away: {[c.name for c in state.away_chars]}")
+        print(f"Here: {[c.display_name_with_title() for c in state.here_chars]}")
+        print(f"Away: {[c.display_name_with_title() for c in state.away_chars]}")
         print(f"Context length: {len(state.ctx.context)} messages")
-        print(f"Last speaker: {state.decision.next_char.name if state.decision else 'N/A'}")
+        print(f"Last speaker: {state.decision.next_char.display_name_with_title() if state.decision else 'N/A'}")
 
     def _cmd_here(self, state: _DebugState, args: list[str]) -> None:
         """List present characters."""
         for c in sorted(state.here_chars, key=lambda x: x.name):
-            print(f"  {c.name} — {c.importance.name}")
+            print(f"  {c.display_name_with_title()} - {c.importance.name}")
 
     def _cmd_away(self, state: _DebugState, args: list[str]) -> None:
         """List away characters."""
         for c in sorted(state.away_chars, key=lambda x: x.name):
-            print(f"  {c.name} — {c.importance.name}")
+            print(f"  {c.display_name_with_title()} - {c.importance.name}")
 
     def _cmd_loc(self, state: _DebugState, args: list[str]) -> None:
         """Show current location."""
@@ -255,6 +261,7 @@ class _DebugState:
         loc: Location,
         decision: Any | None,
     ) -> None:
+        """Capture a snapshot of engine state for debug commands."""
         self.console = console
         self.engine = engine
         self.scene = scene

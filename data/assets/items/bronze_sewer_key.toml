@@ -1,0 +1,9 @@
+id = "bronze_sewer_key"
+name = "Bronze Sewer Key"
+description = "A tarnished key recovered from a dead agent. It opens a sealed grate deeper in the sewers."
+icon = "items/bronze_sewer_key"
+tags = ["key", "plot-critical"]
+
+[metadata]
+unlocks = "sealed_grate"
+durability = 1

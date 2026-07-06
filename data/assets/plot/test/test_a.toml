@@ -1,5 +1,5 @@
 id = "test_a"
-language = "english"
+language = "en"
 zeitgeist = "test"
 tone = "neutral"
 
@@ -13,9 +13,6 @@ narrator = "Narrator"
 [location]
 pool = ["room"]
 init = "room"
-
-[location.descs]
-room = "A simple room with a table and two chairs."
 
 [plot]
 considerations = "Keep it very short."

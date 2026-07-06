@@ -1,4 +1,4 @@
-"""Structured debug bridge — returns dicts instead of printing to stdout.
+"""Structured debug bridge - returns dicts instead of printing to stdout.
 
 Mirrors the commands from :class:`ara.utils.debug.DebugConsole` but emits
 JSON-serializable dictionaries so the agent API can return them over the
@@ -50,6 +50,8 @@ class StructuredDebugBridge:
                 "help, h",
                 "dump, d",
                 "info, i",
+                "engine, e",
+                "player, p",
                 "here",
                 "away",
                 "loc",
@@ -57,6 +59,11 @@ class StructuredDebugBridge:
                 "decision, dec",
                 "scratch <name>",
                 "summary <name>",
+                "status <name>",
+                "context <name>",
+                "attempts",
+                "history",
+                "last",
                 "exec, x <code>",
             ]
         }
@@ -65,23 +72,50 @@ class StructuredDebugBridge:
         return {"messages": self.state.ctx.to_list()}
 
     def _cmd_info(self, args: list[str]) -> dict[str, Any]:
+        last_title = (
+            self.state.decision.next_char.title
+            if self.state.decision
+            else None
+        )
         return {
             "scene": self.state.scene.id,
             "location": self.state.loc.name,
-            "here": [c.name for c in self.state.here_chars],
-            "away": [c.name for c in self.state.away_chars],
+            "here": [{"name": c.name, "title": c.title} for c in self.state.here_chars],
+            "away": [{"name": c.name, "title": c.title} for c in self.state.away_chars],
             "context_length": len(self.state.ctx.context),
             "last_speaker": (
                 self.state.decision.next_char.name
                 if self.state.decision
                 else None
             ),
+            "last_speaker_title": last_title,
+        }
+
+    def _cmd_engine(self, args: list[str]) -> dict[str, Any]:
+        engine = self.state.engine
+        return {
+            "needs_player_input": engine.needs_player_input,
+            "turn_count": getattr(engine, "_turn_count", None),
+            "speaker_history": list(getattr(engine, "_speaker_history", [])),
+            "pending_attempts": list(getattr(engine, "_pending_attempts", [])),
+            "finished": engine.finished,
+        }
+
+    def _cmd_player(self, args: list[str]) -> dict[str, Any]:
+        player = self.state.scene.player
+        return {
+            "name": player.name,
+            "title": player.title,
+            "canonical": player.canonical_name,
+            "hidden": player.hidden,
+            "visible_to": list(player.visible_to),
+            "importance": player.importance.name,
         }
 
     def _cmd_here(self, args: list[str]) -> dict[str, Any]:
         return {
             "characters": [
-                {"name": c.name, "importance": c.importance.name}
+                {"name": c.name, "title": c.title, "importance": c.importance.name}
                 for c in sorted(self.state.here_chars, key=lambda x: x.name)
             ]
         }
@@ -89,7 +123,7 @@ class StructuredDebugBridge:
     def _cmd_away(self, args: list[str]) -> dict[str, Any]:
         return {
             "characters": [
-                {"name": c.name, "importance": c.importance.name}
+                {"name": c.name, "title": c.title, "importance": c.importance.name}
                 for c in sorted(self.state.away_chars, key=lambda x: x.name)
             ]
         }
@@ -118,6 +152,7 @@ class StructuredDebugBridge:
             return {"error": "No decision yet."}
         return {
             "next": d.next_char.name,
+            "next_title": d.next_char.title,
             "directive": d.directive or None,
             "suggestions": d.suggestions or None,
             "enter": [c.name for c in d.entering_chars],
@@ -136,7 +171,7 @@ class StructuredDebugBridge:
         )
         if char is None:
             return {"error": f"Character '{name}' not found."}
-        return {"character": name, "scratch": char.scratch.text or "(empty)"}
+        return {"character": name, "title": char.title, "scratch": char.scratch.text or "(empty)"}
 
     def _cmd_summary(self, args: list[str]) -> dict[str, Any]:
         if not args:
@@ -150,8 +185,58 @@ class StructuredDebugBridge:
             return {"error": f"Character '{name}' not found."}
         return {
             "character": name,
+            "title": char.title,
             "prev_scene_summary": char.prev_scene_summary or "(empty)",
         }
+
+    def _cmd_status(self, args: list[str]) -> dict[str, Any]:
+        if not args:
+            return {"error": "Usage: status <character_name>"}
+        name = args[0]
+        char = next(
+            (c for c in self.state.scene.character_pool if c.name == name),
+            None,
+        )
+        if char is None:
+            return {"error": f"Character '{name}' not found."}
+        return {
+            "character": name,
+            "title": char.title,
+            "status": dict(char.status) if char.status else None,
+        }
+
+    def _cmd_context(self, args: list[str]) -> dict[str, Any]:
+        if not args:
+            return {"error": "Usage: context <character_name>"}
+        name = args[0]
+        char = self.state.scene.character_by_name(name)
+        if char is None:
+            return {"error": f"Character '{name}' not found."}
+        try:
+            context = self.state.engine.build_character_context(char)
+        except Exception as exc:
+            return {"error": f"{type(exc).__name__}: {exc}"}
+        return {
+            "character": char.name,
+            "title": char.title,
+            "canonical": char.canonical_name,
+            "importance": char.importance.name,
+            "has_tools": char.importance != 0,
+            "system_prompt": context["system_prompt"],
+            "messages": context["messages"],
+        }
+
+    def _cmd_attempts(self, args: list[str]) -> dict[str, Any]:
+        return {"pending_attempts": list(getattr(self.state.engine, "_pending_attempts", []))}
+
+    def _cmd_history(self, args: list[str]) -> dict[str, Any]:
+        return {"speaker_history": list(getattr(self.state.engine, "_speaker_history", []))}
+
+    def _cmd_last(self, args: list[str]) -> dict[str, Any]:
+        messages = self.state.ctx.to_list()
+        if not messages:
+            return {"last": None}
+        return {"last": messages[-1]}
 
     def _cmd_exec(self, args: list[str]) -> dict[str, Any]:
         code = " ".join(args)
