@@ -21,7 +21,8 @@ dependencies = [
 [project.scripts]
 ara = "ara.__main__:main"
 aractl = "ara.cli.aractl:main"
-ara-webclient = "ara.webclient.__main__:main"
+aragent = "ara.agent.__main__:main"
+arawc = "ara.webclient.__main__:main"
 
 [dependency-groups]
 dev = [

@@ -22,17 +22,17 @@ The web VN frontend is a thin polling GUI over the agent API.
 **Internal server mode** (single command, no UNIX socket):
 
 ```bash
-uv run python -m ara.webclient --internal --scene demo --port 8081 2>&1 | tee servlog
+uv run arawc --internal --scene demo --port 8081 2>&1 | tee servlog
 ```
 
 **Two-process mode**:
 
 ```bash
 # Terminal 1 - agent server
-uv run python -m ara.agent --scene demo 2>&1 | tee log
+uv run aragent --scene demo 2>&1 | tee log
 
 # Terminal 2 - web gateway
-uv run python -m ara.webclient --port 8081 2>&1 | tee servlog
+uv run arawc --port 8081 2>&1 | tee servlog
 ```
 
 Then open `http://localhost:8081` in your browser.
@@ -86,11 +86,11 @@ uv run aractl --kill
 | `away` | Characters away from the scene |
 | `loc` | Current location details |
 | `scene` | Scene metadata |
+| `state` | Game state metadata |
 | `decision`, `dec` | Last orchestrator decision |
 | `scratch <name>` | Show a character's scratchpad |
 | `summary <name>` | Show a character's prev-scene summary |
 | `dump`, `d` | Pretty-print the full LLM conversation context |
-| `exec`, `x <code>` | Execute arbitrary Python (DANGEROUS) |
 
 ## Asset layout
 
