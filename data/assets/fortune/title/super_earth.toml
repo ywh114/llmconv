@@ -4,7 +4,7 @@ rank = [
     { value = "admiral", prefixable = true, suffixible = true },
     { value = "citizen", prefixable = true, suffixible = true },
 ]
-class_root = [
+_class_root = [
     { value = "diver", prefixable = true, suffixible = true },
     { value = "patriot", prefixable = true, suffixible = true },
     { value = "liberator", prefixable = true, suffixible = true },
@@ -34,25 +34,20 @@ noun = [
     { value = "patriot", prefixable = true, suffixible = true },
     { value = "liberator", prefixable = true, suffixible = true },
     { value = "democrat", prefixable = true, suffixible = true },
-]
-thing = [
     { value = "democracy", prefixable = true, suffixible = true },
     { value = "liberty", prefixable = true, suffixible = true },
     { value = "freedom", prefixable = true, suffixible = true },
 ]
-
-suf = [
-    { value = 'born', prefixable = true, suffixible = true },
-    { value = 'kin', prefixable = true, suffixible = true },
-    { value = 'kind', prefixable = true, suffixible = true },
-    { value = 'child', prefixable = true, suffixible = true },
-    { value = 'seed', prefixable = true, suffixible = true },
+suffix = [
+    { value = "naut", prefixable = true, suffixible = true },
+    { value = "pod", prefixable = true, suffixible = true },
+    { value = "trooper", prefixable = true, suffixible = true },
 ]
 
 [[class]]
 patterns = [
-    "{prefix}{class_root}",
-    "{class_root}",
+    "{prefix}{_class_root}",
+    "{_class_root}",
 ]
 
 [[place]]
@@ -65,19 +60,19 @@ prefixable = false
 suffixible = false
 
 [[place]]
-value = "the terminid front"
+value = "terminid front"
 takes_of = true
 takes_in = false
-article = ""
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
 
 [[place]]
-value = "the automaton sector"
+value = "automaton sector"
 takes_of = true
 takes_in = false
-article = ""
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
@@ -125,12 +120,7 @@ from = [
 ]
 
 [[expose]]
-slot = "thing"
+slot = "suffix"
 from = [
-    "thing",
-]
-[[expose]]
-slot = "suf"
-from = [
-    "suf",
+    "suffix",
 ]

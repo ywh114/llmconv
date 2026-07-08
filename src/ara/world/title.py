@@ -11,60 +11,31 @@ from typing import Any
 from ara.config import AraSettings
 
 
-LEVELS = ["simple", "moderate", "complex", "insane"]
-_ALWAYS_LOAD = {"generic", "numbers", "templates"}
+from ara.world._fortune_tokens import (
+    expand as _expand,
+    expand_all as _expand_all,
+    expand_all_traced as _expand_all_traced,
+    expand_traced as _expand_traced,
+    title_case as _title_case,
+)
+
+
+LEVELS = ['simple', 'moderate', 'complex', 'insane']
+_ALWAYS_LOAD = {'generic', 'numbers', 'templates'}
 _GENERIC_SLOTS = {
-    "rank",
-    "class",
-    "noun",
-    "adj",
-    "adj_sup",
-    "prefix",
-    "place",
-    "thing",
-    "number",
-    "ordinal",
-    "roman_numeral",
-    "suf",
+    'rank',
+    'class',
+    'noun',
+    'entity',
+    'adj',
+    'adj_sup',
+    'prefix',
+    'place',
+    'number',
+    'ordinal',
+    'roman_numeral',
+    'suffix',
 }
-# Slot ordering: place/domain must expand before sufs so article stripping sees {suf}
-_PLACE_FIRST = {"place", "domain"}
-_SUF_LAST = {"suf"}
-
-# Slots whose entries may carry an "article" field (the/a/an)
-_ARTICLE_SLOTS = {"place", "domain"}
-
-# Words that expect their object to keep its article (e.g. "of the North", not "of North").
-# Includes conjunctions so that list items keep their own articles
-# (e.g. "of the Kuiper Belt and the World Map").
-_KEEP_ARTICLE_AFTER = frozenset({
-    "of", "from", "in", "on", "at", "to", "by", "for", "with", "without",
-    "upon", "over", "under", "against", "beyond", "through", "between",
-    "among", "within", "across", "behind", "beside", "near",
-    "inside", "outside", "toward", "towards", "about", "into", "onto",
-    "before", "after", "along", "around", "below", "beneath", "during",
-    "throughout", "via", "past", "despite", "except", "like",
-    "and", "or", "nor", "yet",
-})
-
-
-def _should_keep_article(before_text: str) -> bool:
-    """Return True if a slot's article should be kept, based on the preceding text.
-
-    A slot's article is normally dropped when it follows a regular word or
-    another slot placeholder — but preserved when the preceding word is a
-    conjunction (``and``, ``or``, etc.) or preposition (``of``, ``from``, …).
-    """
-    if not before_text:
-        return True
-    tokens = before_text.split()
-    last_token = tokens[-1] if tokens else before_text.rstrip()
-    if not last_token:
-        return True
-    last_char = last_token[-1]
-    if last_char.islower() or last_char == '}':
-        return last_token.lower() in _KEEP_ARTICLE_AFTER
-    return True
 
 
 def _title_dirs(
@@ -78,9 +49,9 @@ def _title_dirs(
     is used.
     """
     settings = config or AraSettings()
-    global_dir = settings.fortune_path(None) / "title"
+    global_dir = settings.fortune_path(None) / 'title'
     if story:
-        story_dir = settings.fortune_path(story) / "title"
+        story_dir = settings.fortune_path(story) / 'title'
         if story_dir.exists():
             return story_dir, global_dir
     return global_dir, None
@@ -90,11 +61,11 @@ def _load_toml(name: str, primary: Path, fallback: Path | None = None) -> dict:
     for directory in (primary, fallback):
         if directory is None:
             continue
-        path = directory / f"{name}.toml"
+        path = directory / f'{name}.toml'
         if path.exists():
-            with path.open("rb") as f:
+            with path.open('rb') as f:
                 return tomllib.load(f)
-    raise FileNotFoundError(f"Title TOML not found: {name}.toml")
+    raise FileNotFoundError(f'Title TOML not found: {name}.toml')
 
 
 def list_title_flavors(
@@ -108,7 +79,7 @@ def list_title_flavors(
         if directory is None:
             continue
         if directory.exists():
-            for path in directory.glob("*.toml"):
+            for path in directory.glob('*.toml'):
                 if path.stem not in _ALWAYS_LOAD:
                     stems.add(path.stem)
     return sorted(stems)
@@ -126,14 +97,14 @@ def categorized_title_flavors(
             continue
         if not directory.exists():
             continue
-        for path in directory.glob("*.toml"):
+        for path in directory.glob('*.toml'):
             stem = path.stem
             if stem in _ALWAYS_LOAD:
                 continue
-            cat = "other"
+            cat = 'other'
             try:
                 data = _load_toml(stem, primary, fallback)
-                cat = data.get("category", "other")
+                cat = data.get('category', 'other')
             except Exception:
                 pass
             by_cat.setdefault(cat, []).append(stem)
@@ -144,9 +115,9 @@ def categorized_title_flavors(
 
 def _apply_expose(grammar: dict) -> dict:
     """Populate generic slots from internal slots using [[expose]] mappings."""
-    for entry in grammar.get("expose", []):
-        generic_slot = entry["slot"]
-        internal_slots = entry["from"]
+    for entry in grammar.get('expose', []):
+        generic_slot = entry['slot']
+        internal_slots = entry['from']
         combined: list[dict] = []
         for internal in internal_slots:
             items = grammar.pop(internal, [])
@@ -166,68 +137,8 @@ def expand(
     depth: int = 0,
     max_depth: int = 10,
 ) -> str:
-    """Expand a title template into a concrete string."""
-    if depth >= max_depth:
-        return pattern
-
-    result = pattern
-
-    # Sort keys so place is expanded before sufs (article stripping depends on it)
-    ordered_slots = sorted(
-        grammar.keys(),
-        key=lambda k: (2 if k in _SUF_LAST else 0 if k in _PLACE_FIRST else 1),
-    )
-
-    while True:
-        replaced = False
-        for slot in ordered_slots:
-            placeholder = "{" + slot + "}"
-            while placeholder in result:
-                entries = grammar[slot]
-                if not entries:
-                    break
-                entry = random.choice(entries)
-                if isinstance(entry, dict) and "patterns" in entry:
-                    sub_pattern = random.choice(entry["patterns"])
-                    replacement = expand(sub_pattern, grammar, depth + 1, max_depth)
-                elif isinstance(entry, dict) and "value" in entry:
-                    value = entry["value"]
-                    article = entry.get("article", "")
-                    noun_form = entry.get("noun_form", "")
-                    if not article and slot in _ARTICLE_SLOTS and value:
-                        m = re.match(r'^(the|an?)\s+', value, re.IGNORECASE)
-                        if m:
-                            article = m.group(1)
-                            value = value[m.end():]
-                    if article and slot in _ARTICLE_SLOTS:
-                        placeholder_pos = result.find(placeholder)
-                        if not _should_keep_article(result[:placeholder_pos]):
-                            skip_article = True
-                        else:
-                            skip_article = False
-                            after_pos = placeholder_pos + len(placeholder)
-                            if after_pos < len(result) and result[after_pos:].startswith("{suf"):
-                                skip_article = True
-                        if not skip_article:
-                            value = article + " " + value
-                    elif noun_form:
-                        placeholder_pos = result.find(placeholder)
-                        after_pos = placeholder_pos + len(placeholder)
-                        if after_pos < len(result) and result[after_pos:].startswith(" of"):
-                            value = noun_form
-                    replacement = value
-                else:
-                    replacement = str(entry)
-                result = result.replace(placeholder, replacement, 1)
-                replaced = True
-        if not replaced:
-            break
-
-    stripped = re.sub(r'^([Tt]he)\s(\S+)$', r'\2', result, 1)
-    if stripped != result:
-        result = stripped
-
-    return result
+    """Expand a title template into a concrete, title-cased string."""
+    return _expand(pattern, grammar, depth, max_depth)
 
 
 def expand_traced(
@@ -235,88 +146,10 @@ def expand_traced(
     grammar: dict,
     depth: int = 0,
     max_depth: int = 10,
-    _parent: str = "",
+    _parent: str = '',
 ) -> tuple[str, list[dict]]:
-    """Like :func:`expand` but returns ``(text, trace)`` where *trace* is a
-    list of ``{"slot": str, "value": str, "source": str, "parent": str}`` dicts.
-    *parent* is set when the slot was resolved via a pattern in a parent slot
-    (e.g. ``place -> nato_name``).
-    """
-    if depth >= max_depth:
-        return pattern, []
-
-    trace: list[dict] = []
-
-    result = pattern
-
-    ordered_slots = sorted(
-        grammar.keys(),
-        key=lambda k: (2 if k in _SUF_LAST else 0 if k in _PLACE_FIRST else 1),
-    )
-
-    while True:
-        replaced = False
-        for slot in ordered_slots:
-            placeholder = "{" + slot + "}"
-            while placeholder in result:
-                entries = grammar[slot]
-                if not entries:
-                    break
-                entry = random.choice(entries)
-                src = entry.get("_source", "?")
-                if isinstance(entry, dict) and "patterns" in entry:
-                    sub_pattern = random.choice(entry["patterns"])
-                    replacement, sub_trace = expand_traced(
-                        sub_pattern, grammar, depth + 1, max_depth,
-                        _parent=slot,
-                    )
-                    trace.extend(sub_trace)
-                elif isinstance(entry, dict) and "value" in entry:
-                    value = entry["value"]
-                    article = entry.get("article", "")
-                    noun_form = entry.get("noun_form", "")
-                    if not article and slot in _ARTICLE_SLOTS and value:
-                        m = re.match(r'^(the|an?)\s+', value, re.IGNORECASE)
-                        if m:
-                            article = m.group(1)
-                            value = value[m.end():]
-                    if article and slot in _ARTICLE_SLOTS:
-                        placeholder_pos = result.find(placeholder)
-                        if not _should_keep_article(result[:placeholder_pos]):
-                            skip_article = True
-                        else:
-                            skip_article = False
-                            after_pos = placeholder_pos + len(placeholder)
-                            if after_pos < len(result) and result[after_pos:].startswith("{suf"):
-                                skip_article = True
-                        if not skip_article:
-                            value = article + " " + value
-                    elif noun_form:
-                        placeholder_pos = result.find(placeholder)
-                        after_pos = placeholder_pos + len(placeholder)
-                        if after_pos < len(result) and result[after_pos:].startswith(" of"):
-                            value = noun_form
-                    replacement = value
-                    tr = {"slot": slot, "value": value, "source": src}
-                    if _parent:
-                        tr["parent"] = _parent
-                    trace.append(tr)
-                else:
-                    replacement = str(entry)
-                    tr = {"slot": slot, "value": replacement, "source": src}
-                    if _parent:
-                        tr["parent"] = _parent
-                    trace.append(tr)
-                result = result.replace(placeholder, replacement, 1)
-                replaced = True
-        if not replaced:
-            break
-
-    stripped = re.sub(r'^([Tt]he)\s(\S+)$', r'\2', result, 1)
-    if stripped != result:
-        result = stripped
-
-    return result, trace
+    """Expand a title template into a concrete string with provenance trace."""
+    return _expand_traced(pattern, grammar, depth, max_depth, _parent)
 
 
 def expand_all(
@@ -326,63 +159,7 @@ def expand_all(
     max_depth: int = 10,
 ) -> list[str]:
     """Enumerate every expansion of a template."""
-    if depth >= max_depth:
-        return [pattern]
-
-    ordered_slots = sorted(
-        grammar.keys(),
-        key=lambda k: (2 if k in _SUF_LAST else 0 if k in _PLACE_FIRST else 1),
-    )
-    for slot in ordered_slots:
-        placeholder = "{" + slot + "}"
-        if placeholder in pattern:
-            entries = grammar.get(slot, [])
-            if not entries:
-                return [pattern]
-            results = []
-            for entry in entries:
-                if isinstance(entry, dict) and "patterns" in entry:
-                    for sub_pattern in entry["patterns"]:
-                        for replacement in expand_all(
-                            sub_pattern, grammar, depth + 1, max_depth
-                        ):
-                            new_pattern = pattern.replace(placeholder, replacement, 1)
-                            results.extend(
-                                expand_all(new_pattern, grammar, depth + 1, max_depth)
-                            )
-                elif isinstance(entry, dict) and "value" in entry:
-                    value = entry["value"]
-                    article = entry.get("article", "")
-                    noun_form = entry.get("noun_form", "")
-                    if not article and slot in _ARTICLE_SLOTS and value:
-                        m = re.match(r'^(the|an?)\s+', value, re.IGNORECASE)
-                        if m:
-                            article = m.group(1)
-                            value = value[m.end():]
-                    if article and slot in _ARTICLE_SLOTS:
-                        placeholder_pos = pattern.find(placeholder)
-                        if not _should_keep_article(pattern[:placeholder_pos]):
-                            skip_article = True
-                        else:
-                            skip_article = False
-                            after_pos = placeholder_pos + len(placeholder)
-                            if after_pos < len(pattern) and pattern[after_pos:].startswith("{suf"):
-                                skip_article = True
-                        if not skip_article:
-                            value = article + " " + value
-                    elif noun_form:
-                        placeholder_pos = pattern.find(placeholder)
-                        after_pos = placeholder_pos + len(placeholder)
-                        if after_pos < len(pattern) and pattern[after_pos:].startswith(" of"):
-                            value = noun_form
-                    new_pattern = pattern.replace(placeholder, value, 1)
-                    results.extend(expand_all(new_pattern, grammar, depth + 1, max_depth))
-                else:
-                    new_pattern = pattern.replace(placeholder, str(entry), 1)
-                    results.extend(expand_all(new_pattern, grammar, depth + 1, max_depth))
-            return results
-
-    return [pattern]
+    return _expand_all(pattern, grammar, depth, max_depth)
 
 
 def expand_all_traced(
@@ -390,140 +167,14 @@ def expand_all_traced(
     grammar: dict,
     depth: int = 0,
     max_depth: int = 10,
-    _parent: str = "",
 ) -> list[tuple[str, list[dict]]]:
     """Enumerate every expansion of a template with provenance traces."""
-    if depth >= max_depth:
-        return [(pattern, [])]
-
-    ordered_slots = sorted(
-        grammar.keys(),
-        key=lambda k: (2 if k in _SUF_LAST else 0 if k in _PLACE_FIRST else 1),
-    )
-    for slot in ordered_slots:
-        placeholder = "{" + slot + "}"
-        if placeholder in pattern:
-            entries = grammar.get(slot, [])
-            if not entries:
-                return [(pattern, [])]
-            results: list[tuple[str, list[dict]]] = []
-            for entry in entries:
-                src = entry.get("_source", "?")
-                if isinstance(entry, dict) and "patterns" in entry:
-                    for sub_pattern in entry["patterns"]:
-                        for repl_text, sub_trace in expand_all_traced(
-                            sub_pattern, grammar, depth + 1, max_depth,
-                            _parent=slot,
-                        ):
-                            new_pattern = pattern.replace(placeholder, repl_text, 1)
-                            for result_str, deeper in expand_all_traced(
-                                new_pattern, grammar, depth + 1, max_depth,
-                            ):
-                                results.append((result_str, sub_trace + deeper))
-                elif isinstance(entry, dict) and "value" in entry:
-                    value = entry["value"]
-                    article = entry.get("article", "")
-                    noun_form = entry.get("noun_form", "")
-                    if not article and slot in _ARTICLE_SLOTS and value:
-                        m = re.match(r'^(the|an?)\s+', value, re.IGNORECASE)
-                        if m:
-                            article = m.group(1)
-                            value = value[m.end():]
-                    if article and slot in _ARTICLE_SLOTS:
-                        placeholder_pos = pattern.find(placeholder)
-                        if not _should_keep_article(pattern[:placeholder_pos]):
-                            skip_article = True
-                        else:
-                            skip_article = False
-                            after_pos = placeholder_pos + len(placeholder)
-                            if after_pos < len(pattern) and pattern[after_pos:].startswith("{suf"):
-                                skip_article = True
-                        if not skip_article:
-                            value = article + " " + value
-                    elif noun_form:
-                        placeholder_pos = pattern.find(placeholder)
-                        after_pos = placeholder_pos + len(placeholder)
-                        if after_pos < len(pattern) and pattern[after_pos:].startswith(" of"):
-                            value = noun_form
-                    tr = {"slot": slot, "value": value, "source": src}
-                    if _parent:
-                        tr["parent"] = _parent
-                    new_pattern = pattern.replace(placeholder, value, 1)
-                    for result_str, deeper in expand_all_traced(
-                        new_pattern, grammar, depth + 1, max_depth,
-                    ):
-                        results.append((result_str, [tr] + deeper))
-                else:
-                    tr = {"slot": slot, "value": str(entry), "source": src}
-                    if _parent:
-                        tr["parent"] = _parent
-                    new_pattern = pattern.replace(placeholder, str(entry), 1)
-                    for result_str, deeper in expand_all_traced(
-                        new_pattern, grammar, depth + 1, max_depth,
-                    ):
-                        results.append((result_str, [tr] + deeper))
-            return results
-
-    return [(pattern, [])]
+    return _expand_all_traced(pattern, grammar, depth, max_depth)
 
 
 def title_case(text: str) -> str:
     """Title-case a generated title, preserving known acronyms and small words."""
-    small = {"of", "the", "in", "and", "for", "a", "an", "from", "over", "upon", "against", "beyond", "yet", "or", "without", "near", "under", "within", "through", "after", "before", "between", "among", "versus", "by"}
-    preserve = {
-        # SI unit symbols
-        "m",
-        "g",
-        "s",
-        "A",
-        "K",
-        "mol",
-        "cd",
-        "N",
-        "J",
-        "W",
-        "Pa",
-        "Hz",
-        "V",
-        "C",
-        "Ω",
-        # Group theory symbols
-        "Z",
-        "S",
-        "D",
-        "A",
-        "GL",
-        "SL",
-        "O",
-        "SO",
-        # Corporate acronyms
-        "CEO",
-        "CFO",
-        "CTO",
-        "COO",
-        "VP",
-        "KPIs",
-        "OKRs",
-        # Tech/buzzword acronyms
-        "AI",
-        "NFT",
-        "ROI",
-    }
-
-    words = text.split()
-    if not words:
-        return text
-    result = []
-    for i, word in enumerate(words):
-        if word in preserve:
-            result.append(word)
-        elif word.upper() in preserve:
-            result.append(word.upper())
-        elif i == 0 or word.lower() not in small:
-            result.append(word[:1].upper() + word[1:])
-        else:
-            result.append(word)
-    return " ".join(result)
+    return _title_case(text)
 
 
 def _resolve_level(
@@ -535,22 +186,26 @@ def _resolve_level(
     if isinstance(level, int):
         if 0 <= level < len(LEVELS):
             return LEVELS[level], False
-        raise ValueError(f"Level index {level} out of range (0-{len(LEVELS) - 1}).")
+        raise ValueError(
+            f'Level index {level} out of range (0-{len(LEVELS) - 1}).'
+        )
     raw = str(level).strip()
     exact = False
-    if raw.endswith("!"):
+    if raw.endswith('!'):
         exact = True
         raw = raw[:-1]
     if raw.isdigit():
         idx = int(raw)
         if 0 <= idx < len(LEVELS):
             return LEVELS[idx], exact
-        raise ValueError(f"Level index {idx} out of range (0-{len(LEVELS) - 1}).")
-    if raw == "all":
+        raise ValueError(
+            f'Level index {idx} out of range (0-{len(LEVELS) - 1}).'
+        )
+    if raw == 'all':
         return None, False
     if raw in LEVELS:
         return raw, exact
-    raise ValueError(f"Unknown level: {raw}. Use {', '.join(LEVELS)} or 0-3.")
+    raise ValueError(f'Unknown level: {raw}. Use {", ".join(LEVELS)} or 0-3.')
 
 
 def _load_templates(
@@ -559,7 +214,7 @@ def _load_templates(
     level: str | None = None,
     exact: bool = False,
 ) -> list[str]:
-    templates_data = _load_toml("templates", primary, fallback)
+    templates_data = _load_toml('templates', primary, fallback)
     if level:
         if exact:
             return list(templates_data.get(level, []))
@@ -573,6 +228,115 @@ def _load_templates(
     for lvl in LEVELS:
         templates.extend(templates_data.get(lvl, []))
     return templates
+
+
+def _deduplicate_entries(entries: list[dict]) -> list[dict]:
+    """Remove duplicate value entries from a slot, keeping the best one.
+
+    Priority:
+    1. More metadata fields (excluding value/patterns/_source).
+    2. Base form wins: if A.value == B.noun_form|gerund|past|..., B wins.
+    3. Otherwise keep the first encountered entry.
+    """
+    form_fields = (
+        'noun_form',
+        'gerund',
+        'past',
+        'plural',
+        'superlative',
+        'comparative',
+        'possessive',
+    )
+
+    def _meta_count(entry: dict) -> int:
+        return sum(
+            1 for k in entry if k not in ('value', 'patterns', '_source')
+        )
+
+    def _is_base_form(base: dict, derived: dict) -> bool:
+        base_value = str(base.get('value', '')).lower()
+        for field in form_fields:
+            if base_value == str(derived.get(field, '')).lower():
+                return True
+        return False
+
+    best: dict[str, dict] = {}
+    first_index: dict[str, int] = {}
+    result: list[dict] = []
+
+    for i, entry in enumerate(entries):
+        if (
+            not isinstance(entry, dict)
+            or 'patterns' in entry
+            or 'value' not in entry
+        ):
+            result.append(entry)
+            continue
+        key = str(entry['value']).lower()
+        if key not in best:
+            best[key] = entry
+            first_index[key] = i
+            continue
+        current = best[key]
+        if _meta_count(entry) > _meta_count(current):
+            best[key] = entry
+        elif _meta_count(entry) == _meta_count(current):
+            if _is_base_form(current, entry):
+                best[key] = entry
+            elif not _is_base_form(entry, current):
+                # Tie with no form relationship; keep current (first encountered).
+                pass
+    # Emit the chosen entries in first-encounter order.
+    for i, entry in enumerate(entries):
+        if (
+            not isinstance(entry, dict)
+            or 'patterns' in entry
+            or 'value' not in entry
+        ):
+            continue
+        key = str(entry['value']).lower()
+        if first_index.get(key) == i:
+            result.append(best[key])
+    return result
+
+
+def _cap_sources(
+    entries: list[dict],
+    slot: str,
+    max_share: float = 0.25,
+) -> list[dict]:
+    """Trim any single source so it cannot dominate a generic slot.
+
+    The cap defaults to ``max_share`` of the total slot size (minimum 1).
+    Sampling is deterministic, seeded on the slot name so repeated runs
+    produce the same grammar.  The process repeats until no source exceeds
+    the cap relative to the final slot size.
+    """
+    if not entries:
+        return entries
+    if not entries:
+        return entries
+    total = len(entries)
+    cap = max(1, int(total * max_share))
+    by_source: dict[str, list[int]] = {}
+    for i, entry in enumerate(entries):
+        src = entry.get('_source', '')
+        by_source.setdefault(src, []).append(i)
+    # Capping is only meaningful when there are enough sources for 25%
+    # to be a meaningful share. With one or two sources the user has
+    # explicitly narrowed the pool, so leave it untouched.
+    if len(by_source) <= 2:
+        return entries
+    if all(len(indices) <= cap for indices in by_source.values()):
+        return entries
+    keep_indices: set[int] = set()
+    rng = random.Random(slot)
+    for indices in by_source.values():
+        if len(indices) > cap:
+            keep_indices.update(rng.sample(indices, cap))
+        else:
+            keep_indices.update(indices)
+    return [entries[i] for i in sorted(keep_indices)]
 
 
 def build_grammar(
@@ -595,7 +359,7 @@ def build_grammar(
         else:
             _slot_groups[slot] = [sources]  # type: ignore[arg-type]
 
-    source_names = ["generic", "numbers"] + selected_flavors
+    source_names = ['generic', 'numbers'] + selected_flavors
     grammars: dict[str, dict] = {}
     for name in source_names:
         grammars[name] = _apply_expose(_load_toml(name, primary, fallback))
@@ -603,21 +367,21 @@ def build_grammar(
     flat: dict[str, list] = {}
     for g in grammars.values():
         for key, value in g.items():
-            if key in ("expose", "category"):
+            if key in ('expose', 'category'):
                 continue
             if isinstance(value, list):
                 flat.setdefault(key, []).extend(value)
 
     generic_slots: set[str] = set()
     for g in grammars.values():
-        for entry in g.get("expose", []):
-            generic_slots.add(entry["slot"])
+        for entry in g.get('expose', []):
+            generic_slots.add(entry['slot'])
 
     all_slots: set[str] = set()
     for g in grammars.values():
         all_slots.update(g.keys())
-    all_slots.discard("expose")
-    all_slots.discard("category")
+    all_slots.discard('expose')
+    all_slots.discard('category')
 
     merged: dict[str, list] = {}
     for slot in all_slots:
@@ -626,37 +390,41 @@ def build_grammar(
             groups = _slot_groups.get(slot)
             if groups is None:
                 flavor_sources = [
-                    s for s in source_names if s not in ("generic", "numbers")
+                    s for s in source_names if s not in ('generic', 'numbers')
                 ]
                 has_flavor = any(
-                    slot in grammars[s] and grammars[s][slot] for s in flavor_sources
+                    slot in grammars[s] and grammars[s][slot]
+                    for s in flavor_sources
                 )
                 groups = [flavor_sources if has_flavor else source_names]
             else:
                 # Filter out generic/numbers from each group
                 groups = [
-                    [s for s in grp if s not in ("generic", "numbers")]
+                    [s for s in grp if s not in ('generic', 'numbers')]
                     for grp in groups
                 ]
 
             for grp in groups:
                 for source in grp:
-                    if source.endswith("!"):
+                    if source.endswith('!'):
                         entries.append(
                             {
-                                "value": source[:-1],
-                                "prefixable": False,
-                                "suffixible": False,
-                                "_source": "literal",
+                                'value': source[:-1],
+                                'prefixable': False,
+                                'suffixible': False,
+                                '_source': 'literal',
                             }
                         )
-                    elif source.startswith("@"):
+                    elif source.startswith('@'):
                         # @flavor or @flavor:group
                         rest = source[1:]
-                        if ":" in rest:
-                            fname, group = rest.split(":", 1)
+                        if ':' in rest:
+                            fname, group = rest.split(':', 1)
                             if fname in grammars and group in grammars[fname]:
-                                tagged = [dict(e, _source=source) for e in grammars[fname][group]]
+                                tagged = [
+                                    dict(e, _source=source)
+                                    for e in grammars[fname][group]
+                                ]
                                 entries.extend(tagged)
                             else:
                                 raise ValueError(
@@ -664,40 +432,72 @@ def build_grammar(
                                 )
                         else:
                             if rest in grammars and slot in grammars[rest]:
-                                tagged = [dict(e, _source=source) for e in grammars[rest][slot]]
+                                tagged = [
+                                    dict(e, _source=source)
+                                    for e in grammars[rest][slot]
+                                ]
                                 entries.extend(tagged)
                             else:
                                 raise ValueError(
                                     f"Unknown @flavor '{rest}' for slot '{slot}'."
                                 )
-                    elif source.endswith(":"):
+                    elif source.endswith(':'):
                         ikey = source[:-1]
                         if ikey in flat:
-                            tagged = [dict(e, _source=source.rstrip(":")) for e in flat[ikey]]
+                            tagged = [
+                                dict(e, _source=source.rstrip(':'))
+                                for e in flat[ikey]
+                            ]
                             entries.extend(tagged)
                         else:
                             raise ValueError(
                                 f"Unknown internal group '{ikey}' for slot '{slot}'."
                             )
+                    elif (
+                        _slot_groups.get(slot) is not None
+                        and source in flat
+                        and flat[source]
+                        and isinstance(flat[source][0], dict)
+                        and 'patterns' in flat[source][0]
+                    ):
+                        # When the user explicitly restricts a slot to a bare
+                        # technique group name (melee, area, status, ...), resolve
+                        # it across all flavors, not just the flavor file with the
+                        # same name.  Flavor-specific selection is still available
+                        # via @melee, @area, etc.
+                        tagged = [dict(e, _source=source) for e in flat[source]]
+                        entries.extend(tagged)
                     elif source in grammars:
                         if slot in grammars[source]:
-                            tagged = [dict(e, _source=source) for e in grammars[source][slot]]
+                            tagged = [
+                                dict(e, _source=source)
+                                for e in grammars[source][slot]
+                            ]
                             entries.extend(tagged)
                             # If a merged internal group with the same name exists,
                             # include it too (it spans all flavours). Delivery
                             # groups (melee/ranged/area/status) only contribute to
                             # the "technique" slot.
-                            if source in flat and slot == "technique":
-                                tagged2 = [dict(e, _source=":" + source) for e in flat[source]]
+                            if source in flat and slot == 'technique':
+                                tagged2 = [
+                                    dict(e, _source=':' + source)
+                                    for e in flat[source]
+                                ]
                                 entries.extend(tagged2)
                     elif source in flat:
                         tagged = [dict(e, _source=source) for e in flat[source]]
                         entries.extend(tagged)
                     else:
-                        valid = [s for s in source_names if s in grammars and slot in grammars[s] and grammars[s][slot]]
-                        hint = ""
+                        valid = [
+                            s
+                            for s in source_names
+                            if s in grammars
+                            and slot in grammars[s]
+                            and grammars[s][slot]
+                        ]
+                        hint = ''
                         if valid:
-                            hint = f" Available: {', '.join(valid)}"
+                            hint = f' Available: {", ".join(valid)}'
                         raise ValueError(
                             f"Unknown source '{source}' for slot '{slot}'.{hint}"
                         )
@@ -705,15 +505,23 @@ def build_grammar(
             if not entries and _slot_groups.get(slot):
                 for source in source_names:
                     if source in grammars and slot in grammars[source]:
-                        tagged = [dict(e, _source=source) for e in grammars[source][slot]]
+                        tagged = [
+                            dict(e, _source=source)
+                            for e in grammars[source][slot]
+                        ]
                         entries.extend(tagged)
         else:
             for source in source_names:
                 if source in grammars and slot in grammars[source]:
-                    tagged = [dict(e, _source=source) for e in grammars[source][slot]]
+                    tagged = [
+                        dict(e, _source=source) for e in grammars[source][slot]
+                    ]
                     entries.extend(tagged)
         if entries:
-            merged[slot] = entries
+            deduped = _deduplicate_entries(entries)
+            if slot in generic_slots:
+                deduped = _cap_sources(deduped, slot)
+            merged[slot] = deduped
 
     return merged
 
@@ -741,7 +549,7 @@ def load_title_grammar(
 
     unknown = [s for s in selected if s not in available]
     if unknown:
-        raise ValueError(f"Unknown title flavor(s): {', '.join(unknown)}")
+        raise ValueError(f'Unknown title flavor(s): {", ".join(unknown)}')
 
     return build_grammar(
         selected,
@@ -756,7 +564,7 @@ def generate_title(
     config: AraSettings | None = None,
     template: str | None = None,
     flavors: list[str] | str | None = None,
-    level: str | int | None = "2",
+    level: str | int | None = '2',
     slot_sources: dict[str, list[str]] | None = None,
     required_slots: list[str] | set[str] | None = None,
 ) -> str:
@@ -777,11 +585,11 @@ def generate_title(
         templates = [
             tmpl
             for tmpl in templates
-            if required.issubset(set(re.findall(r"\{([^}+]+)\}", tmpl)))
+            if required.issubset(set(re.findall(r'\{([^}+]+)\}', tmpl)))
         ]
         if not templates:
             raise ValueError(
-                f"No templates contain all required slots: {', '.join(sorted(required))}"
+                f'No templates contain all required slots: {", ".join(sorted(required))}'
             )
 
     grammar = load_title_grammar(
@@ -795,4 +603,4 @@ def generate_title(
         tmpl = template
     else:
         tmpl = random.choice(templates)
-    return title_case(expand(tmpl, grammar))
+    return expand(tmpl, grammar)

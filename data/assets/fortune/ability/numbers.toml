@@ -1,6 +1,6 @@
 # Numbers for ability grammar.
 
-digit_values = [
+_digit_values = [
     { value = "0", prefixable = false, suffixible = false },
     { value = "1", prefixable = false, suffixible = false },
     { value = "2", prefixable = false, suffixible = false },
@@ -13,7 +13,7 @@ digit_values = [
     { value = "9", prefixable = false, suffixible = false },
 ]
 
-ordinal_values = [
+_ordinal_values = [
     { value = "1st", prefixable = false, suffixible = false },
     { value = "2nd", prefixable = false, suffixible = false },
     { value = "3rd", prefixable = false, suffixible = false },
@@ -26,7 +26,7 @@ ordinal_values = [
     { value = "10th", prefixable = false, suffixible = false },
 ]
 
-roman_numeral_values = [
+_roman_numeral_values = [
     { value = "I", prefixable = false, suffixible = false },
     { value = "II", prefixable = false, suffixible = false },
     { value = "III", prefixable = false, suffixible = false },
@@ -37,7 +37,7 @@ roman_numeral_values = [
     { value = "X", prefixable = false, suffixible = false },
 ]
 
-number_values = [
+_number_values = [
     { value = "0", prefixable = false, suffixible = false },
     { value = "1", prefixable = false, suffixible = false },
     { value = "2", prefixable = false, suffixible = false },
@@ -52,12 +52,31 @@ number_values = [
 
 [[expose]]
 slot = "ordinal"
-from = ["ordinal_values"]
+from = ["_ordinal_values"]
 
 [[expose]]
 slot = "number"
-from = ["number_values"]
+from = ["_number_values"]
 
 [[expose]]
 slot = "roman_numeral"
-from = ["roman_numeral_values"]
+from = ["_roman_numeral_values"]
+
+[[expose]]
+slot = "verb"
+from = [
+    "melee",
+    "area",
+    "ranged",
+    "status",
+    "defence",
+    "movement",
+    "other",
+]
+
+[[expose]]
+slot = "noun"
+from = [
+    "_domain_values",
+    "_noun_values",
+]

@@ -1,36 +1,28 @@
 rank = [
-    { value = "ceo", prefixable = true, suffixible = true },
-    { value = "cfo", prefixable = true, suffixible = true },
-    { value = "cto", prefixable = true, suffixible = true },
-    { value = "coo", prefixable = true, suffixible = true },
-    { value = "vp", prefixable = true, suffixible = true },
+    { value = "CEO", prefixable = true, suffixible = true },
+    { value = "CFO", prefixable = true, suffixible = true },
+    { value = "CTO", prefixable = true, suffixible = true },
+    { value = "COO", prefixable = true, suffixible = true },
+    { value = "VP", prefixable = true, suffixible = true },
     { value = "director", prefixable = true, suffixible = true },
     { value = "manager", prefixable = true, suffixible = true },
     { value = "lead", prefixable = true, suffixible = true },
     { value = "associate", prefixable = true, suffixible = true },
     { value = "intern", prefixable = true, suffixible = true },
 ]
-class_root = [
+_class_root = [
     { value = "drone", prefixable = true, suffixible = true },
     { value = "cog", prefixable = true, suffixible = true },
     { value = "grunt", prefixable = true, suffixible = true },
 ]
 prefix = [
-    { value = "senior", prefixable = true, suffixible = true },
-    { value = "junior", prefixable = true, suffixible = true },
-    { value = "executive", prefixable = true, suffixible = true },
-    { value = "principal", prefixable = true, suffixible = true },
-    { value = "staff", prefixable = true, suffixible = true },
-    { value = "chief", prefixable = true, suffixible = true },
 ]
 adj = [
     { value = "strategic", prefixable = true, suffixible = true },
-    { value = "agile", prefixable = true, suffixible = true },
     { value = "scalable", prefixable = true, suffixible = true },
     { value = "innovative", prefixable = true, suffixible = true },
     { value = "disruptive", prefixable = true, suffixible = true },
     { value = "lean", prefixable = true, suffixible = true },
-    { value = "synergistic", prefixable = true, suffixible = true },
 ]
 adj_sup = [
     { value = "chief", prefixable = true, suffixible = true },
@@ -47,8 +39,15 @@ noun = [
     { value = "director", prefixable = true, suffixible = true },
     { value = "manager", prefixable = true, suffixible = true },
     { value = "lead", prefixable = true, suffixible = true },
+    { value = "revenue", prefixable = true, suffixible = true },
+    { value = "synergy", prefixable = true, suffixible = true },
+    { value = "deliverables", prefixable = true, suffixible = true },
+    { value = "KPIs", prefixable = true, suffixible = true },
+    { value = "OKRs", prefixable = true, suffixible = true },
+    { value = "equity", prefixable = true, suffixible = true },
+    { value = "pipeline", prefixable = true, suffixible = true },
 ]
-class_values = [
+_class_values = [
     { value = "analyst", prefixable = true, suffixible = true },
     { value = "engineer", prefixable = true, suffixible = true },
     { value = "designer", prefixable = true, suffixible = true },
@@ -62,58 +61,46 @@ class_values = [
     { value = "marketer", prefixable = true, suffixible = true },
     { value = "founder", prefixable = true, suffixible = true },
 ]
-thing = [
-    { value = "revenue", prefixable = true, suffixible = true },
-    { value = "synergy", prefixable = true, suffixible = true },
-    { value = "deliverables", prefixable = true, suffixible = true },
-    { value = "kpis", prefixable = true, suffixible = true },
-    { value = "okrs", prefixable = true, suffixible = true },
-    { value = "equity", prefixable = true, suffixible = true },
-    { value = "pipeline", prefixable = true, suffixible = true },
-]
-
-suf = [
-    { value = 'lead', prefixable = true, suffixible = true },
-    { value = 'born', prefixable = true, suffixible = true },
-    { value = 'drone', prefixable = true, suffixible = true },
-    { value = 'cog', prefixable = true, suffixible = true },
-    { value = 'kind', prefixable = true, suffixible = true },
-    { value = 'maker', prefixable = true, suffixible = true },
-    { value = 'smith', prefixable = true, suffixible = true },
+suffix = [
+    { value = "exec", prefixable = true, suffixible = true },
+    { value = "associate", prefixable = true, suffixible = true },
+    { value = "inc", prefixable = true, suffixible = true },
+    { value = "corp", prefixable = true, suffixible = true },
+    { value = "solution", prefixable = true, suffixible = true },
 ]
 
 [[place]]
-value = "the office"
+value = "office"
 takes_of = true
 takes_in = false
-article = ""
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
 
 [[place]]
-value = "the boardroom"
+value = "boardroom"
 takes_of = true
 takes_in = false
-article = ""
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
 
 [[place]]
-value = "the cubicle"
+value = "cubicle"
 takes_of = true
 takes_in = false
-article = ""
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
 
 [[place]]
-value = "the campus"
+value = "campus"
 takes_of = true
 takes_in = false
-article = ""
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
@@ -129,8 +116,8 @@ suffixible = true
 
 [[class]]
 patterns = [
-    "{prefix}{class_root}",
-    "{class_root}",
+    "{prefix}{_class_root}",
+    "{_class_root}",
 ]
 
 [[expose]]
@@ -143,7 +130,7 @@ from = [
 slot = "class"
 from = [
     "class",
-    "class_values",
+    "_class_values",
 ]
 
 [[expose]]
@@ -170,7 +157,6 @@ from = [
     "noun",
 ]
 
-
 [[expose]]
 slot = "place"
 from = [
@@ -178,12 +164,7 @@ from = [
 ]
 
 [[expose]]
-slot = "thing"
+slot = "suffix"
 from = [
-    "thing",
-]
-[[expose]]
-slot = "suf"
-from = [
-    "suf",
+    "suffix",
 ]

@@ -1,11 +1,11 @@
-group_root = [
+_group_root = [
     { value = "group", prefixable = true, suffixible = true },
     { value = "ring", prefixable = true, suffixible = true },
     { value = "field", prefixable = true, suffixible = true },
     { value = "module", prefixable = true, suffixible = true },
     { value = "lattice", prefixable = true, suffixible = true },
 ]
-group_name = [
+_group_name = [
     { value = "Z", prefixable = true, suffixible = true },
     { value = "Z/{number}Z", prefixable = true, suffixible = true },
     { value = "S({number})", prefixable = true, suffixible = true },
@@ -31,25 +31,27 @@ adj_sup = [
 ]
 rank = [
     { value = "generator", prefixable = true, suffixible = true },
+    { value = "basis", prefixable = true, suffixible = true },
+    { value = "closure", prefixable = true, suffixible = true },
     { value = "relation", prefixable = true, suffixible = true },
 ]
-thing = [
+suffix = [
+    { value = "oid", prefixable = true, suffixible = true },
+    { value = "ic", prefixable = true, suffixible = true },
+    { value = "al", prefixable = true, suffixible = true },
+    { value = "ive", prefixable = true, suffixible = true },
+    { value = "ary", prefixable = true, suffixible = true },
+]
+noun = [
     { value = "symmetries", prefixable = true, suffixible = true },
     { value = "automorphisms", prefixable = true, suffixible = true },
     { value = "cosets", prefixable = true, suffixible = true },
 ]
 
-suf = [
-    { value = 'ring', prefixable = true, suffixible = true },
-    { value = 'field', prefixable = true, suffixible = true },
-    { value = 'group', prefixable = true, suffixible = true },
-    { value = 'kind', prefixable = true, suffixible = true },
-]
-
 [[group]]
 patterns = [
-    "{group_root}",
-    "{group_name}",
+    "{_group_root}",
+    "{_group_name}",
 ]
 
 [[expose]]
@@ -77,12 +79,7 @@ from = [
 ]
 
 [[expose]]
-slot = "thing"
+slot = "suffix"
 from = [
-    "thing",
-]
-[[expose]]
-slot = "suf"
-from = [
-    "suf",
+    "suffix",
 ]

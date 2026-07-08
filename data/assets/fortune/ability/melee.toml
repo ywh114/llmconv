@@ -1,33 +1,26 @@
 category = "delivery"
 # Generic melee delivery ability entries.
 
-melee_melee_values = [
+_melee_melee_values = [
     { value = "slash", prefixable = false, suffixible = false },
     { value = "cleave", prefixable = false, suffixible = false },
-    { value = "impale", prefixable = false, suffixible = false },
+    { value = "impale", prefixable = false, suffixible = false, noun_form = "impalement" },
     { value = "crush", prefixable = false, suffixible = false },
     { value = "lunge", prefixable = false, suffixible = false },
-    { value = "bisect", prefixable = false, suffixible = false },
+    { value = "bisect", prefixable = false, suffixible = false, noun_form = "bisection" },
     { value = "skewer", prefixable = false, suffixible = false },
     { value = "tackle", prefixable = false, suffixible = false },
     { value = "headbutt", prefixable = false, suffixible = false },
     { value = "uppercut", prefixable = false, suffixible = false },
 ]
 
-suf_values = []
-
-verb_values = [
-    { value = "slash", prefixable = false, suffixible = false },
-    { value = "cleave", prefixable = false, suffixible = false },
-    { value = "impale", prefixable = false, suffixible = false },
-    { value = "crush", prefixable = false, suffixible = false },
-    { value = "smash", prefixable = false, suffixible = false },
-    { value = "pummel", prefixable = false, suffixible = false },
-    { value = "tackle", prefixable = false, suffixible = false },
-    { value = "uppercut", prefixable = false, suffixible = false },
+_suffix_values = [
+    { value = "strike", prefixable = true, suffixible = false },
+    { value = "slash", prefixable = true, suffixible = false },
+    { value = "blow", prefixable = true, suffixible = false },
 ]
 
-noun_values = [
+_noun_values = [
     { value = "blade", prefixable = false, suffixible = false },
     { value = "fist", prefixable = false, suffixible = false },
     { value = "hammer", prefixable = false, suffixible = false },
@@ -37,34 +30,41 @@ noun_values = [
     { value = "maul", prefixable = false, suffixible = false },
 ]
 
-adj_values = [
+_adj_values = [
     { value = "brutal", prefixable = false, suffixible = false },
     { value = "savage", prefixable = false, suffixible = false },
     { value = "visceral", prefixable = false, suffixible = false },
     { value = "close-quarters", prefixable = false, suffixible = false },
 ]
 
-melee_movement_values = []
+_melee_movement_values = []
 
 [["melee"]]
-patterns = ["{melee_melee_values}"]
+patterns = ["{_melee_melee_values}"]
 
 [[expose]]
-slot = "suf"
-from = ["suf_values"]
-
-[[expose]]
-slot = "technique"
-from = ["melee", "movement"]
-
-[[expose]]
-slot = "verb"
-from = ["verb_values"]
-
-[[expose]]
-slot = "noun"
-from = ["noun_values"]
+slot = "suffix"
+from = ["_suffix_values"]
 
 [[expose]]
 slot = "adj"
-from = ["adj_values"]
+from = ["_adj_values"]
+
+[[expose]]
+slot = "verb"
+from = [
+    "melee",
+    "area",
+    "ranged",
+    "status",
+    "defence",
+    "movement",
+    "other",
+]
+
+[[expose]]
+slot = "noun"
+from = [
+    "_domain_values",
+    "_noun_values",
+]

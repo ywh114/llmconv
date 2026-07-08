@@ -1,7 +1,7 @@
 category = "tonal"
 # JRPG-theme ability entries (migrated from title spell pool).
 
-jrpg_melee_values = [
+_jrpg_melee_values = [
     { value = "rend", prefixable = false, suffixible = false },
     { value = "combo", prefixable = false, suffixible = false },
     { value = "bash", prefixable = false, suffixible = false },
@@ -9,21 +9,21 @@ jrpg_melee_values = [
     { value = "claw", prefixable = false, suffixible = false },
 ]
 
-jrpg_area_values = [
+_jrpg_area_values = [
     { value = "meteor", prefixable = false, suffixible = false },
     { value = "quake", prefixable = false, suffixible = false },
     { value = "storm", prefixable = false, suffixible = false },
     { value = "rain", prefixable = false, suffixible = false },
 ]
 
-jrpg_ranged_values = [
+_jrpg_ranged_values = [
     { value = "ball", prefixable = false, suffixible = false },
     { value = "beam", prefixable = false, suffixible = false },
     { value = "pulse", prefixable = false, suffixible = false },
     { value = "comet", prefixable = false, suffixible = false },
 ]
 
-jrpg_status_values = [
+_jrpg_status_values = [
     { value = "haste", prefixable = false, suffixible = false },
     { value = "slow", prefixable = false, suffixible = false },
     { value = "DPS effect", prefixable = false, suffixible = false },
@@ -31,7 +31,7 @@ jrpg_status_values = [
     { value = "berserk", prefixable = false, suffixible = false },
     { value = "taunt", prefixable = false, suffixible = false },
     { value = "regen", prefixable = false, suffixible = false },
-    { value = "revive", prefixable = false, suffixible = false },
+    { value = "revive", prefixable = false, suffixible = false, noun_form = "revival" },
     { value = "full cure", prefixable = false, suffixible = false },
     { value = "doublecast", prefixable = false, suffixible = false },
     { value = "triplecast", prefixable = false, suffixible = false },
@@ -43,17 +43,24 @@ jrpg_status_values = [
     { value = "curse", prefixable = false, suffixible = false },
 ]
 
-jrpg_defence_values = [
-    { value = "resist", prefixable = false, suffixible = false },
-    { value = "reflect", prefixable = false, suffixible = false },
+_jrpg_defence_values = [
+    { value = "resist", prefixable = false, suffixible = false, noun_form = "resistance" },
+    { value = "reflect", prefixable = false, suffixible = false, noun_form = "reflection" },
 ]
 
-jrpg_movement_values = [
+_jrpg_movement_values = [
     { value = "dash", prefixable = false, suffixible = false },
     { value = "warp", prefixable = false, suffixible = false },
 ]
 
-domain_values = [
+_suffix_values = [
+    { value = "edge", prefixable = true, suffixible = false },
+    { value = "slash", prefixable = true, suffixible = false },
+    { value = "strike", prefixable = true, suffixible = false },
+    { value = "blade", prefixable = true, suffixible = false },
+]
+
+_domain_values = [
     { value = "limit break", prefixable = false, suffixible = false },
     { value = "overdrive", prefixable = false, suffixible = false },
     { value = "trance", prefixable = false, suffixible = false },
@@ -69,10 +76,10 @@ domain_values = [
     { value = "skill tree", prefixable = false, suffixible = false },
 ]
 
-verb_values = [
+other = [
     { value = "level up", prefixable = false, suffixible = false },
     { value = "limit break", prefixable = false, suffixible = false },
-    { value = "grind", prefixable = false, suffixible = false },
+    { value = "grind", prefixable = false, suffixible = false, past = "ground" },
     { value = "minmax", prefixable = false, suffixible = false },
     { value = "speedrun", prefixable = false, suffixible = false },
     { value = "multiclass", prefixable = false, suffixible = false },
@@ -80,7 +87,7 @@ verb_values = [
     { value = "save scum", prefixable = false, suffixible = false },
 ]
 
-noun_values = [
+_noun_values = [
     { value = "guild", prefixable = false, suffixible = false },
     { value = "class", prefixable = false, suffixible = false },
     { value = "ability point", prefixable = false, suffixible = false },
@@ -93,38 +100,43 @@ noun_values = [
     { value = "potion", prefixable = false, suffixible = false },
 ]
 
-
 [["melee"]]
-patterns = ["{jrpg_melee_values}"]
+patterns = ["{_jrpg_melee_values}"]
 
 [["area"]]
-patterns = ["{jrpg_area_values}"]
+patterns = ["{_jrpg_area_values}"]
 
 [["ranged"]]
-patterns = ["{jrpg_ranged_values}"]
+patterns = ["{_jrpg_ranged_values}"]
 
 [["status"]]
-patterns = ["{jrpg_status_values}"]
+patterns = ["{_jrpg_status_values}"]
 
 [["defence"]]
-patterns = ["{jrpg_defence_values}"]
+patterns = ["{_jrpg_defence_values}"]
+
+[["movement"]]
+patterns = ["{_jrpg_movement_values}"]
 
 [[expose]]
-slot = "suf"
-from = ["suf_values"]
-
-[[expose]]
-slot = "technique"
-from = ["melee", "area", "ranged", "status", "defence", "movement"]
-
-[[expose]]
-slot = "domain"
-from = ["domain_values"]
+slot = "suffix"
+from = ["_suffix_values"]
 
 [[expose]]
 slot = "verb"
-from = ["verb_values"]
+from = [
+    "melee",
+    "area",
+    "ranged",
+    "status",
+    "defence",
+    "movement",
+    "other",
+]
 
 [[expose]]
 slot = "noun"
-from = ["noun_values"]
+from = [
+    "_domain_values",
+    "_noun_values",
+]

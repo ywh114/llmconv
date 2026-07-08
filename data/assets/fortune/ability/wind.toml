@@ -1,7 +1,7 @@
 category = "elemental"
 # Wind-elemental ability entries.
 
-prefix_values = [
+_prefix_values = [
     { value = "aero", prefixable = false, suffixible = true },
     { value = "vento", prefixable = false, suffixible = true },
     { value = "gale", prefixable = false, suffixible = true },
@@ -12,11 +12,14 @@ prefix_values = [
     { value = "vortex", prefixable = false, suffixible = true },
 ]
 
-suf_values = [
-    { value = "", prefixable = true, suffixible = false},
+_suffix_values = [
+    { value = "", prefixable = true, suffixible = false },
+    { value = "gale", prefixable = true, suffixible = false },
+    { value = "breeze", prefixable = true, suffixible = false },
+    { value = "draft", prefixable = true, suffixible = false },
 ]
 
-  domain_values = [
+  _domain_values = [
     { value = "hurricane", prefixable = false, suffixible = false },
     { value = "tornado", prefixable = false, suffixible = false },
     { value = "squall", prefixable = false, suffixible = false },
@@ -27,38 +30,38 @@ suf_values = [
     { value = "the high pressure", prefixable = false, suffixible = false },
 ]
 
-wind_melee_values = [
+_wind_melee_values = [
     { value = "scythe", prefixable = false, suffixible = false },
     { value = "shear", prefixable = false, suffixible = false },
 ]
 
-wind_area_values = [
+_wind_area_values = [
     { value = "cyclone", prefixable = false, suffixible = false },
     { value = "buffet", prefixable = false, suffixible = false },
-    { value = "asphyxiate", prefixable = false, suffixible = false },
+    { value = "asphyxiate", prefixable = false, suffixible = false, noun_form = "asphyxiation" },
 ]
 
-wind_ranged_values = [
+_wind_ranged_values = [
     { value = "gust", prefixable = false, suffixible = false },
     { value = "drift", prefixable = false, suffixible = false },
     { value = "updraft", prefixable = false, suffixible = false },
 ]
 
-wind_status_values = [
-    { value = "asphyxiate", prefixable = false, suffixible = false },
+_wind_status_values = [
+    { value = "asphyxiate", prefixable = false, suffixible = false, noun_form = "asphyxiation" },
 ]
 
-wind_defence_values = [
+_wind_defence_values = [
     { value = "headwind", prefixable = false, suffixible = false },
     { value = "buffer", prefixable = false, suffixible = false },
 ]
 
-wind_movement_values = [
+_wind_movement_values = [
     { value = "drift", prefixable = false, suffixible = false },
     { value = "soar", prefixable = false, suffixible = false },
 ]
 
-verb_values = [
+other = [
     { value = "buffet", prefixable = false, suffixible = false },
     { value = "shear", prefixable = false, suffixible = false },
     { value = "asphyxiation", prefixable = false, suffixible = false },
@@ -67,7 +70,7 @@ verb_values = [
     { value = "drift", prefixable = false, suffixible = false },
 ]
 
-noun_values = [
+_noun_values = [
     { value = "gale", prefixable = false, suffixible = false },
     { value = "zephyr", prefixable = false, suffixible = false },
     { value = "storm", prefixable = false, suffixible = false },
@@ -76,7 +79,7 @@ noun_values = [
     { value = "draft", prefixable = false, suffixible = false },
 ]
 
-adj_values = [
+_adj_values = [
     { value = "howling", prefixable = false, suffixible = false },
     { value = "gale-force", prefixable = false, suffixible = false },
     { value = "cyclonic", prefixable = false, suffixible = false },
@@ -87,44 +90,47 @@ adj_values = [
 
 
 [["melee"]]
-patterns = ["{wind_melee_values}"]
+patterns = ["{_wind_melee_values}"]
 
 [["area"]]
-patterns = ["{wind_area_values}"]
+patterns = ["{_wind_area_values}"]
 
 [["ranged"]]
-patterns = ["{wind_ranged_values}"]
+patterns = ["{_wind_ranged_values}"]
 
 [["status"]]
-patterns = ["{wind_status_values}"]
+patterns = ["{_wind_status_values}"]
 
 [["defence"]]
-patterns = ["{wind_defence_values}"]
+patterns = ["{_wind_defence_values}"]
 
 [[expose]]
-slot = "suf"
-from = ["suf_values"]
+slot = "suffix"
+from = ["_suffix_values"]
 
 [[expose]]
 slot = "prefix"
-from = ["prefix_values"]
-
-[[expose]]
-slot = "domain"
-from = ["domain_values"]
-
-[[expose]]
-slot = "technique"
-from = ["melee", "area", "ranged", "status", "defence", "movement"]
-
-[[expose]]
-slot = "verb"
-from = ["verb_values"]
-
-[[expose]]
-slot = "noun"
-from = ["noun_values"]
+from = ["_prefix_values"]
 
 [[expose]]
 slot = "adj"
-from = ["adj_values"]
+from = ["_adj_values"]
+
+[[expose]]
+slot = "verb"
+from = [
+    "melee",
+    "area",
+    "ranged",
+    "status",
+    "defence",
+    "movement",
+    "other",
+]
+
+[[expose]]
+slot = "noun"
+from = [
+    "_domain_values",
+    "_noun_values",
+]

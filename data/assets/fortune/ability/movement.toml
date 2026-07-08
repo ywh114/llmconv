@@ -1,7 +1,7 @@
 category = "delivery"
 # Generic movement / mobility ability entries.
 
-movement_movement_values = [
+_movement_movement_values = [
     { value = "dash", prefixable = false, suffixible = false },
     { value = "sprint", prefixable = false, suffixible = false },
     { value = "leap", prefixable = false, suffixible = false },
@@ -15,31 +15,18 @@ movement_movement_values = [
     { value = "bound", prefixable = false, suffixible = false },
     { value = "sidestep", prefixable = false, suffixible = false },
     { value = "backflip", prefixable = false, suffixible = false },
-    { value = "teleport", prefixable = false, suffixible = false },
+    { value = "teleport", prefixable = false, suffixible = false, noun_form = "teleportation" },
     { value = "somersault", prefixable = false, suffixible = false },
 ]
 
-suf_values = []
-
-verb_values = [
-    { value = "dash", prefixable = false, suffixible = false },
-    { value = "sprint", prefixable = false, suffixible = false },
-    { value = "leap", prefixable = false, suffixible = false },
-    { value = "vault", prefixable = false, suffixible = false },
-    { value = "blink", prefixable = false, suffixible = false },
-    { value = "phase", prefixable = false, suffixible = false },
-    { value = "slide", prefixable = false, suffixible = false },
-    { value = "soar", prefixable = false, suffixible = false },
-    { value = "pounce", prefixable = false, suffixible = false },
-    { value = "charge", prefixable = false, suffixible = false },
-    { value = "bound", prefixable = false, suffixible = false },
-    { value = "evade", prefixable = false, suffixible = false },
-    { value = "weave", prefixable = false, suffixible = false },
-    { value = "rush", prefixable = false, suffixible = false },
-    { value = "dart", prefixable = false, suffixible = false },
+_suffix_values = [
+    { value = "step", prefixable = true, suffixible = false },
+    { value = "dash", prefixable = true, suffixible = false },
+    { value = "stride", prefixable = true, suffixible = false },
+    { value = "leap", prefixable = true, suffixible = false },
 ]
 
-noun_values = [
+_noun_values = [
     { value = "step", prefixable = false, suffixible = false },
     { value = "stride", prefixable = false, suffixible = false },
     { value = "leap", prefixable = false, suffixible = false },
@@ -56,7 +43,7 @@ noun_values = [
     { value = "teleport", prefixable = false, suffixible = false },
 ]
 
-adj_values = [
+_adj_values = [
     { value = "swift", prefixable = false, suffixible = false },
     { value = "sudden", prefixable = false, suffixible = false },
     { value = "agile", prefixable = false, suffixible = false },
@@ -72,24 +59,31 @@ adj_values = [
 ]
 
 [["movement"]]
-patterns = ["{movement_movement_values}"]
+patterns = ["{_movement_movement_values}"]
 
 [[expose]]
-slot = "suf"
-from = ["suf_values"]
-
-[[expose]]
-slot = "technique"
-from = ["movement"]
-
-[[expose]]
-slot = "verb"
-from = ["verb_values"]
-
-[[expose]]
-slot = "noun"
-from = ["noun_values"]
+slot = "suffix"
+from = ["_suffix_values"]
 
 [[expose]]
 slot = "adj"
-from = ["adj_values"]
+from = ["_adj_values"]
+
+[[expose]]
+slot = "verb"
+from = [
+    "melee",
+    "area",
+    "ranged",
+    "status",
+    "defence",
+    "movement",
+    "other",
+]
+
+[[expose]]
+slot = "noun"
+from = [
+    "_domain_values",
+    "_noun_values",
+]

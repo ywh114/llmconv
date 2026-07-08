@@ -8,7 +8,7 @@ rank = [
     { value = "dear leader", prefixable = false, suffixible = false },
     { value = "supreme leader", prefixable = false, suffixible = false },
 ]
-class_root = [
+_class_root = [
     { value = "worker", prefixable = true, suffixible = true },
     { value = "peasant", prefixable = true, suffixible = true },
     { value = "soldier", prefixable = true, suffixible = true },
@@ -18,9 +18,7 @@ class_root = [
     { value = "revolutionary", prefixable = true, suffixible = true },
     { value = "red guard", prefixable = false, suffixible = false },
 ]
-class_suffix = [
-    { value = "ling", prefixable = true, suffixible = true },
-    { value = "kind", prefixable = true, suffixible = true },
+_class_suffix = [
 ]
 prefix = []
 adj = [
@@ -60,16 +58,6 @@ noun = [
     { value = "steel", prefixable = true, suffixible = true },
     { value = "rice", prefixable = true, suffixible = true },
     { value = "coal", prefixable = true, suffixible = true },
-]
-class_values = [
-    { value = "worker", prefixable = true, suffixible = true },
-    { value = "peasant", prefixable = true, suffixible = true },
-    { value = "soldier", prefixable = true, suffixible = true },
-    { value = "comrade", prefixable = true, suffixible = true },
-    { value = "revolutionary", prefixable = true, suffixible = true },
-    { value = "party member", prefixable = false, suffixible = false },
-]
-thing = [
     { value = "revolution", prefixable = true, suffixible = true },
     { value = "self-reliance", prefixable = true, suffixible = true },
     { value = "socialism", prefixable = true, suffixible = true },
@@ -85,15 +73,23 @@ thing = [
     { value = "songun", prefixable = true, suffixible = true },
     { value = "chollima", prefixable = true, suffixible = true },
     { value = "juche", prefixable = true, suffixible = true },
+    { value = "front", prefixable = true, suffixible = true },
 ]
-
-suf = [
-    { value = 'born', prefixable = true, suffixible = true },
-    { value = 'kin', prefixable = true, suffixible = true },
-    { value = 'kind', prefixable = true, suffixible = true },
-    { value = 'guard', prefixable = true, suffixible = true },
-    { value = 'child', prefixable = true, suffixible = true },
-    { value = 'seed', prefixable = true, suffixible = true },
+_class_values = [
+    { value = "worker", prefixable = true, suffixible = true },
+    { value = "peasant", prefixable = true, suffixible = true },
+    { value = "soldier", prefixable = true, suffixible = true },
+    { value = "comrade", prefixable = true, suffixible = true },
+    { value = "revolutionary", prefixable = true, suffixible = true },
+    { value = "party member", prefixable = false, suffixible = false },
+]
+suffix = [
+    { value = "born", prefixable = true, suffixible = true },
+    { value = "kin", prefixable = true, suffixible = true },
+    { value = "kind", prefixable = true, suffixible = true },
+    { value = "doctrine", prefixable = true, suffixible = true },
+    { value = "regime", prefixable = true, suffixible = true },
+    { value = "ideal", prefixable = true, suffixible = true },
 ]
 
 [[place]]
@@ -106,10 +102,10 @@ prefixable = true
 suffixible = true
 
 [[place]]
-value = "the DPRK"
+value = "DPRK"
 takes_of = true
 takes_in = false
-article = ""
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
@@ -124,46 +120,46 @@ prefixable = true
 suffixible = true
 
 [[place]]
-value = "the Workers' Party"
+value = "Workers' Party"
 takes_of = true
 takes_in = false
-article = ""
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
 
 [[place]]
-value = "the People's Army"
+value = "People's Army"
 takes_of = true
 takes_in = false
-article = ""
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
 
 [[place]]
-value = "the 38th parallel"
+value = "38th parallel"
 takes_of = true
 takes_in = false
-article = ""
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
 
 [[place]]
-value = "the DMZ"
+value = "DMZ"
 takes_of = true
 takes_in = false
-article = ""
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
 
 [[place]]
-value = "the Juche Tower"
+value = "Juche Tower"
 takes_of = true
 takes_in = false
-article = ""
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
@@ -197,9 +193,9 @@ suffixible = false
 
 [[class]]
 patterns = [
-    "{prefix}{class_root}",
-    "{class_root}",
-    "{class_root}{class_suffix}",
+    "{prefix}{_class_root}",
+    "{_class_root}",
+    "{_class_root}{_class_suffix}",
 ]
 
 [[expose]]
@@ -212,7 +208,7 @@ from = [
 slot = "class"
 from = [
     "class",
-    "class_values",
+    "_class_values",
 ]
 
 [[expose]]
@@ -239,20 +235,14 @@ from = [
     "noun",
 ]
 
-
-[[expose]]
-slot = "thing"
-from = [
-    "thing",
-]
-
 [[expose]]
 slot = "place"
 from = [
     "place",
 ]
+
 [[expose]]
-slot = "suf"
+slot = "suffix"
 from = [
-    "suf",
+    "suffix",
 ]

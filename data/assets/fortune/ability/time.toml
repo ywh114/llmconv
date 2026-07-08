@@ -1,42 +1,42 @@
 category = "concept"
 # Time-manipulation ability entries.
 
-prefix_values = [
+_prefix_values = [
     { value = "chrono", prefixable = false, suffixible = true },
     { value = "tempo", prefixable = false, suffixible = true },
     { value = "aeon", prefixable = false, suffixible = true },
 ]
 
-time_status_values = [
+_time_status_values = [
     { value = "haste", prefixable = false, suffixible = false },
     { value = "slow", prefixable = false, suffixible = false },
     { value = "stop", prefixable = false, suffixible = false },
     { value = "freeze", prefixable = false, suffixible = false },
     { value = "lag", prefixable = false, suffixible = false },
-    { value = "accelerate", prefixable = false, suffixible = false },
-    { value = "decelerate", prefixable = false, suffixible = false },
-    { value = "delay", prefixable = false, suffixible = false },
+    { value = "accelerate", prefixable = false, suffixible = false, noun_form = "acceleration" },
+    { value = "decelerate", prefixable = false, suffixible = false, noun_form = "deceleration" },
+    { value = "delay", prefixable = false, suffixible = false, noun_form = "delay" },
     { value = "loop", prefixable = false, suffixible = false },
 ]
 
-time_area_values = [
+_time_area_values = [
     { value = "loop", prefixable = false, suffixible = false },
     { value = "skip", prefixable = false, suffixible = false },
     { value = "rewind", prefixable = false, suffixible = false },
     { value = "paradox", prefixable = false, suffixible = false },
 ]
 
-time_ranged_values = [
+_time_ranged_values = [
     { value = "paradox", prefixable = false, suffixible = false },
 ]
 
-time_defence_values = [
+_time_defence_values = [
     { value = "halt", prefixable = false, suffixible = false },
-    { value = "suspend", prefixable = false, suffixible = false },
+    { value = "suspend", prefixable = false, suffixible = false, noun_form = "suspension" },
 ]
 
-verb_values = [
-    { value = "haste", prefixable = false, suffixible = false, noun_form = "hastening" },
+other = [
+    { value = "haste", prefixable = false, suffixible = false },
     { value = "slow", prefixable = false, suffixible = false },
     { value = "stop", prefixable = false, suffixible = false },
     { value = "rewind", prefixable = false, suffixible = false },
@@ -46,18 +46,13 @@ verb_values = [
     { value = "delay", prefixable = false, suffixible = false },
 ]
 
-suf_values = []
-
-domain_values = [
-    { value = "timeline", prefixable = false, suffixible = false },
-    { value = "paradox", prefixable = false, suffixible = false },
-    { value = "entropy", prefixable = false, suffixible = false },
-    { value = "causality", prefixable = false, suffixible = false },
-    { value = "dilation", prefixable = false, suffixible = false },
-    { value = "eternity", prefixable = false, suffixible = false },
+_suffix_values = [
+    { value = "chron", prefixable = true, suffixible = false },
+    { value = "second", prefixable = true, suffixible = false },
+    { value = "hour", prefixable = true, suffixible = false },
 ]
 
-noun_values = [
+_noun_values = [
     { value = "time", prefixable = false, suffixible = false },
     { value = "the clock", prefixable = false, suffixible = false },
     { value = "age", prefixable = false, suffixible = false },
@@ -65,7 +60,7 @@ noun_values = [
     { value = "paradox", prefixable = false, suffixible = false },
 ]
 
-adj_values = [
+_adj_values = [
     { value = "temporal", prefixable = false, suffixible = false },
     { value = "atemporal", prefixable = false, suffixible = false },
     { value = "dilated", prefixable = false, suffixible = false },
@@ -73,44 +68,47 @@ adj_values = [
     { value = "frozen", prefixable = false, suffixible = false },
 ]
 
-time_movement_values = []
+_time_movement_values = []
 
 [["status"]]
-patterns = ["{time_status_values}"]
+patterns = ["{_time_status_values}"]
 
 [["area"]]
-patterns = ["{time_area_values}"]
+patterns = ["{_time_area_values}"]
 
 [["ranged"]]
-patterns = ["{time_ranged_values}"]
+patterns = ["{_time_ranged_values}"]
 
 [["defence"]]
-patterns = ["{time_defence_values}"]
+patterns = ["{_time_defence_values}"]
 
 [[expose]]
-slot = "suf"
-from = ["suf_values"]
+slot = "suffix"
+from = ["_suffix_values"]
 
 [[expose]]
 slot = "prefix"
-from = ["prefix_values"]
-
-[[expose]]
-slot = "technique"
-from = ["status", "area", "ranged", "defence", "movement"]
-
-[[expose]]
-slot = "verb"
-from = ["verb_values"]
-
-[[expose]]
-slot = "domain"
-from = ["domain_values"]
-
-[[expose]]
-slot = "noun"
-from = ["noun_values"]
+from = ["_prefix_values"]
 
 [[expose]]
 slot = "adj"
-from = ["adj_values"]
+from = ["_adj_values"]
+
+[[expose]]
+slot = "verb"
+from = [
+    "melee",
+    "area",
+    "ranged",
+    "status",
+    "defence",
+    "movement",
+    "other",
+]
+
+[[expose]]
+slot = "noun"
+from = [
+    "_domain_values",
+    "_noun_values",
+]

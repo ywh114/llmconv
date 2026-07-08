@@ -1,21 +1,24 @@
 category = "silly"
 # Body-part-theme silly ability entries.
 
-
-prefix_values = [
+_prefix_values = [
     { value = "toenail", prefixable = false, suffixible = true },
 ]
 
-suf_values = [
+_suffix_values = [
     { value = "hair", prefixable = true, suffixible = false },
+    { value = "fist", prefixable = true, suffixible = false },
+    { value = "bone", prefixable = true, suffixible = false },
+    { value = "skin", prefixable = true, suffixible = false },
+    { value = "gut", prefixable = true, suffixible = false },
 ]
 
-domain_values = [
+_domain_values = [
     { value = "fist", prefixable = false, suffixible = false },
     { value = "gut", prefixable = false, suffixible = false },
     { value = "elbow", prefixable = false, suffixible = false },
     { value = "knee", prefixable = false, suffixible = false },
-    { value = "tooth", prefixable = false, suffixible = false },
+    { value = "tooth", prefixable = false, suffixible = false, plural = "teeth" },
     { value = "nostril", prefixable = false, suffixible = false },
     { value = "spine", prefixable = false, suffixible = false },
     { value = "knuckle", prefixable = false, suffixible = false },
@@ -24,7 +27,7 @@ domain_values = [
     { value = "elbow grease", prefixable = false, suffixible = false },
 ]
 
-body_part_melee_values = [
+_body_part_melee_values = [
     { value = "slam", prefixable = false, suffixible = false },
     { value = "drop", prefixable = false, suffixible = false },
     { value = "poke", prefixable = false, suffixible = false },
@@ -36,37 +39,37 @@ body_part_melee_values = [
     { value = "backhand", prefixable = false, suffixible = false },
 ]
 
-body_part_area_values = [
+_body_part_area_values = [
     { value = "drop", prefixable = false, suffixible = false },
     { value = "slam", prefixable = false, suffixible = false },
 ]
 
-body_part_ranged_values = [
+_body_part_ranged_values = [
     { value = "throw", prefixable = false, suffixible = false },
     { value = "hurl", prefixable = false, suffixible = false },
     { value = "flick", prefixable = false, suffixible = false },
 ]
 
-body_part_status_values = [
+_body_part_status_values = [
     { value = "jam", prefixable = false, suffixible = false },
     { value = "wedge", prefixable = false, suffixible = false },
 ]
 
-body_part_defence_values = [
+_body_part_defence_values = [
     { value = "brace", prefixable = false, suffixible = false },
     { value = "block", prefixable = false, suffixible = false },
 ]
 
-body_part_movement_values = [
+_body_part_movement_values = [
   #redundant with generic
 ]
 
-verb_values = [
+other = [
 ]
 
-noun_values = [
+_noun_values = [
     { value = "fist", prefixable = false, suffixible = false },
-    { value = "foot", prefixable = false, suffixible = false },
+    { value = "foot", prefixable = false, suffixible = false, plural = "feet" },
     { value = "head", prefixable = false, suffixible = false },
     { value = "elbow", prefixable = false, suffixible = false },
     { value = "knee", prefixable = false, suffixible = false },
@@ -74,38 +77,40 @@ noun_values = [
     { value = "nostril", prefixable = false, suffixible = false },
 ]
 
-
 [["melee"]]
-patterns = ["{body_part_melee_values}"]
+patterns = ["{_body_part_melee_values}"]
 
 [["area"]]
-patterns = ["{body_part_area_values}"]
+patterns = ["{_body_part_area_values}"]
 
 [["ranged"]]
-patterns = ["{body_part_ranged_values}"]
+patterns = ["{_body_part_ranged_values}"]
 
 [["status"]]
-patterns = ["{body_part_status_values}"]
+patterns = ["{_body_part_status_values}"]
 
 [["defence"]]
-patterns = ["{body_part_defence_values}"]
+patterns = ["{_body_part_defence_values}"]
 
 [[expose]]
-slot = "suf"
-from = ["suf_values"]
-
-[[expose]]
-slot = "domain"
-from = ["domain_values"]
-
-[[expose]]
-slot = "technique"
-from = ["melee", "area", "ranged", "status", "defence", "movement"]
+slot = "suffix"
+from = ["_suffix_values"]
 
 [[expose]]
 slot = "verb"
-from = ["verb_values"]
+from = [
+    "melee",
+    "area",
+    "ranged",
+    "status",
+    "defence",
+    "movement",
+    "other",
+]
 
 [[expose]]
 slot = "noun"
-from = ["noun_values"]
+from = [
+    "_domain_values",
+    "_noun_values",
+]

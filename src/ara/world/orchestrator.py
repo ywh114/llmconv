@@ -451,7 +451,7 @@ DO NOT add extraneous events just to fill time.
     - Use `fortune_iching()` to cast an I-Ching hexagram for omens and general direction.
     - Use `fortune_inspiration()` to receive a random keyword or phrase to consider.
     - Use `fortune_title(flavor, level, template, count)` to generate one or more random titles, epithets, or honorifics. Useful for naming NPCs, items, factions, or locations on the fly.
-     - Use `fortune_ability(flavor, level, template, count, slot, require, verbose)` to generate combat abilities, spells, or techniques. Each flavor contributes to generic slots (domain, technique, verb, noun, prefix, suf, adj, adj_sup). Flavor names include elemental (fire, ice, lightning, void, earth, water, wind), delivery (melee, ranged, area, status), concept (magic, quantum, space, time, math), tonal (corporate, plague_doctor, buzzword, tfr, jrpg), and silly (food, office, body_part). Use the `slot` parameter for cross-flavor composition: `{{"domain": ["fire"], "technique": ["melee"]}}` pulls fire domains and melee techniques (from all flavors that have melee groups) to produce combinations like "Inferno Cleave". The delivery sources (melee, ranged, area, status) are special — they aggregate internal groups from every loaded flavor, so `"technique": ["melee"]` gives you fire:melee, ice:melee, corporate:melee, etc. all at once.
+     - Use `fortune_ability(flavor, level, template, count, slot, require, verbose)` to generate combat abilities, spells, or techniques. Each flavor contributes to generic slots (domain, technique, verb, noun, prefix, suffix, adj, adj_sup). Flavor names include elemental (fire, ice, lightning, void, earth, water, wind), delivery (melee, ranged, area, status), concept (magic, quantum, space, time, math), tonal (corporate, plague_doctor, buzzword, tfr, jrpg), and silly (food, office, body_part). Use the `slot` parameter for cross-flavor composition: `{{"domain": ["fire"], "technique": ["melee"]}}` pulls fire domains and melee techniques (from all flavors that have melee groups) to produce combinations like "Inferno Cleave". The delivery sources (melee, ranged, area, status) are special — they aggregate internal groups from every loaded flavor, so `"technique": ["melee"]` gives you fire:melee, ice:melee, corporate:melee, etc. all at once.
     - Use `fortune_name(style, n_parts)` to generate a random realistic human name (first+last, with optional middle). Useful for naming background NPCs or when a human name is needed.
     - Use `fortune_suite()` to receive several independent random inputs at once.
     - Use `wiki_recall(query)` to look up established world facts from the permanent wiki. When in doubt, query liberally — looking up a fact is better than guessing. Characters also have their own `wiki_recall` tool for world facts filtered to their perspective, and a separate `recall` tool for personal memories.
@@ -1135,7 +1135,7 @@ Recent speakers: {recent_speakers_str}
                     'description': (
                         'Only use templates that contain ALL of these slot names. '
                         f'Available slots: {_t_slot_names}. '
-                        'Example: ["place", "suf"] ensures the title includes a place and suffix. '
+                        'Example: ["place", "suffix"] ensures the title includes a place and suffix. '
                         'Useful for constraining output shape without specifying a full template.'
                     ),
                 },
@@ -1201,7 +1201,7 @@ Recent speakers: {recent_speakers_str}
                 'Use this to assign thematic attacks to fighters, generate item effects, or '
                 'name special moves. '
                 'Each flavor contributes words to generic slots (domain, technique, verb, noun, '
-                'prefix, suf, adj, adj_sup). Delivery sources (melee, ranged, area, status) are '
+                'prefix, suffix, adj, adj_sup). Delivery sources (melee, ranged, area, status) are '
                 'cross-flavor aggregators: picking "melee" for the technique slot pulls fire-melee, '
                 'ice-melee, corporate-melee etc. from every loaded flavor simultaneously. '
                 f'Available flavors by category: {_abl_blurb}.'

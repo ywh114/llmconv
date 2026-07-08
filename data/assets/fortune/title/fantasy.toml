@@ -7,15 +7,17 @@ rank = [
     { value = "duchess", prefixable = true, suffixible = true },
     { value = "emperor", prefixable = true, suffixible = true },
     { value = "empress", prefixable = true, suffixible = true },
-    { value = "high chancellor", prefixable = false, suffixible = false },
-    { value = "archmage", prefixable = true, suffixible = true },
+    { value = "chieftan", prefixable = true, suffixible = true },
+    { value = "elder", prefixable = true, suffixible = true },
 ]
-class_root = [
+_class_root = [
+    { value = "lich", prefixable = true, suffixible = true },
     { value = "mage", prefixable = true, suffixible = true },
     { value = "knight", prefixable = true, suffixible = true },
     { value = "lord", prefixable = true, suffixible = true },
     { value = "warden", prefixable = true, suffixible = true },
     { value = "hunter", prefixable = true, suffixible = true },
+    { value = "archer", prefixable = true, suffixible = true },
     { value = "priest", prefixable = true, suffixible = true },
     { value = "wielder", prefixable = true, suffixible = true },
     { value = "bearer", prefixable = true, suffixible = true },
@@ -30,58 +32,46 @@ class_root = [
     { value = "necromancer", prefixable = true, suffixible = true },
     { value = "shaman", prefixable = true, suffixible = true },
     { value = "witch", prefixable = true, suffixible = true },
-    { value = "vampire hunter", prefixable = false, suffixible = false },
-    { value = "dragon rider", prefixable = false, suffixible = false },
-    { value = "rune smith", prefixable = false, suffixible = false },
+    { value = "rider", prefixable = false, suffixible = false },
+    { value = "runesmith", prefixable = false, suffixible = false },
     { value = "rogue", prefixable = true, suffixible = true },
     { value = "assassin", prefixable = true, suffixible = true },
     { value = "bard", prefixable = true, suffixible = true },
     { value = "cleric", prefixable = true, suffixible = true },
 ]
-class_suffix = [
+_class_suffix = [
     { value = "blade", prefixable = true, suffixible = true },
     { value = "caller", prefixable = true, suffixible = true },
     { value = "walker", prefixable = true, suffixible = true },
-    { value = "weaver", prefixable = true, suffixible = true },
-    { value = "keeper", prefixable = true, suffixible = true },
     { value = "slayer", prefixable = true, suffixible = true },
-    { value = "bane", prefixable = true, suffixible = true },
+    { value = "sbane", prefixable = true, suffixible = true },
     { value = "heart", prefixable = true, suffixible = true },
-    { value = "seeker", prefixable = true, suffixible = true },
-    { value = "hunter", prefixable = true, suffixible = true },
 ]
 prefix = [
     { value = "arch", prefixable = true, suffixible = true },
-    { value = "grand", prefixable = true, suffixible = true },
     { value = "dark", prefixable = true, suffixible = true },
     { value = "high", prefixable = true, suffixible = true },
     { value = "blood", prefixable = true, suffixible = true },
     { value = "shadow", prefixable = true, suffixible = true },
     { value = "storm", prefixable = true, suffixible = true },
-    { value = "abyssal", prefixable = true, suffixible = true },
-    { value = "verdant", prefixable = true, suffixible = true },
-    { value = "frost", prefixable = true, suffixible = true },
-    { value = "flame", prefixable = true, suffixible = true },
-    { value = "doom", prefixable = true, suffixible = true },
-    { value = "void", prefixable = true, suffixible = true },
     { value = "silver", prefixable = true, suffixible = true },
-    { value = "golden", prefixable = true, suffixible = true },
+    { value = "gold", prefixable = true, suffixible = true },
     { value = "iron", prefixable = true, suffixible = true },
     { value = "crystal", prefixable = true, suffixible = true },
-    { value = "rune", prefixable = true, suffixible = true },
     { value = "wild", prefixable = true, suffixible = true },
-    { value = "grim", prefixable = true, suffixible = true },
-    { value = "soul", prefixable = true, suffixible = true },
     { value = "were", prefixable = true, suffixible = true },
+    { value = "elven", prefixable = true, suffixible = true },
 ]
 adj = [
     { value = "dark", prefixable = true, suffixible = true },
     { value = "eternal", prefixable = true, suffixible = true },
     { value = "ashen", prefixable = true, suffixible = true },
+    { value = "elven", prefixable = true, suffixible = true },
     { value = "elder", prefixable = true, suffixible = true },
     { value = "arcane", prefixable = true, suffixible = true },
     { value = "mystical", prefixable = true, suffixible = true },
     { value = "fey", prefixable = true, suffixible = true },
+    { value = "fell", prefixable = true, suffixible = true },
     { value = "infernal", prefixable = true, suffixible = true },
     { value = "celestial", prefixable = true, suffixible = true },
     { value = "primeval", prefixable = true, suffixible = true },
@@ -112,63 +102,14 @@ noun = [
     { value = "warden", prefixable = true, suffixible = true },
     { value = "oracle", prefixable = true, suffixible = true },
     { value = "herald", prefixable = true, suffixible = true },
-    { value = "dragon", prefixable = true, suffixible = true },
-    { value = "griffin", prefixable = true, suffixible = true },
-    { value = "phoenix", prefixable = true, suffixible = true },
-    { value = "kraken", prefixable = true, suffixible = true },
     { value = "chimera", prefixable = true, suffixible = true },
     { value = "basilisk", prefixable = true, suffixible = true },
     { value = "manticore", prefixable = true, suffixible = true },
     { value = "wyvern", prefixable = true, suffixible = true },
-    { value = "beholder", prefixable = true, suffixible = true },
-    { value = "lich", prefixable = true, suffixible = true },
     { value = "golem", prefixable = true, suffixible = true },
     { value = "titan", prefixable = true, suffixible = true },
     { value = "fae", prefixable = true, suffixible = true },
     { value = "spirit", prefixable = true, suffixible = true },
-    { value = "wraith", prefixable = true, suffixible = true },
-    { value = "vampire", prefixable = true, suffixible = true },
-]
-race = [
-    { value = "dwarf", prefixable = true, suffixible = true },
-    { value = "elf", prefixable = true, suffixible = true },
-    { value = "goblin", prefixable = true, suffixible = true },
-    { value = "orc", prefixable = true, suffixible = true },
-    { value = "troll", prefixable = true, suffixible = true },
-    { value = "ogre", prefixable = true, suffixible = true },
-    { value = "kobold", prefixable = true, suffixible = true },
-    { value = "gnome", prefixable = true, suffixible = true },
-    { value = "halfling", prefixable = true, suffixible = true },
-    { value = "human", prefixable = true, suffixible = true },
-    { value = "vampire", prefixable = true, suffixible = true },
-    { value = "werewolf", prefixable = true, suffixible = true },
-    { value = "zombie", prefixable = true, suffixible = true },
-    { value = "skeleton", prefixable = true, suffixible = true },
-    { value = "demon", prefixable = true, suffixible = true },
-    { value = "angel", prefixable = true, suffixible = true },
-    { value = "forgotten beast", prefixable = false, suffixible = false },
-    { value = "titan", prefixable = true, suffixible = true },
-    { value = "dragon", prefixable = true, suffixible = true },
-    { value = "hydra", prefixable = true, suffixible = true },
-    { value = "griffin", prefixable = true, suffixible = true },
-    { value = "unicorn", prefixable = true, suffixible = true },
-    { value = "centaur", prefixable = true, suffixible = true },
-    { value = "minotaur", prefixable = true, suffixible = true },
-    { value = "naga", prefixable = true, suffixible = true },
-    { value = "ghoul", prefixable = true, suffixible = true },
-    { value = "wraith", prefixable = true, suffixible = true },
-    { value = "banshee", prefixable = true, suffixible = true },
-    { value = "sprite", prefixable = true, suffixible = true },
-    { value = "pixie", prefixable = true, suffixible = true },
-    { value = "faerie", prefixable = true, suffixible = true },
-    { value = "golem", prefixable = true, suffixible = true },
-    { value = "elemental", prefixable = true, suffixible = true },
-    { value = "ent", prefixable = true, suffixible = true },
-    { value = "dryad", prefixable = true, suffixible = true },
-    { value = "nymph", prefixable = true, suffixible = true },
-    { value = "satyr", prefixable = true, suffixible = true },
-]
-thing = [
     { value = "destiny", prefixable = true, suffixible = true },
     { value = "doom", prefixable = true, suffixible = true },
     { value = "fire", prefixable = true, suffixible = true },
@@ -189,183 +130,193 @@ thing = [
     { value = "portal", prefixable = true, suffixible = true },
     { value = "void", prefixable = true, suffixible = true },
 ]
-
-suf = [
-    { value = 'blade', prefixable = true, suffixible = true },
-    { value = 'born', prefixable = true, suffixible = true },
-    { value = 'craft', prefixable = true, suffixible = true },
-    { value = 'spawn', prefixable = true, suffixible = true },
-    { value = 'lord', prefixable = true, suffixible = true },
-    { value = 'king', prefixable = true, suffixible = true },
-    { value = 'kin', prefixable = true, suffixible = true },
-    { value = 'kind', prefixable = true, suffixible = true },
-    { value = 'ling', prefixable = true, suffixible = true },
-    { value = 'heart', prefixable = true, suffixible = true },
-    { value = 'bane', prefixable = true, suffixible = true },
-    { value = 'seeker', prefixable = true, suffixible = true },
-    { value = 'hunter', prefixable = true, suffixible = true },
-    { value = 'slayer', prefixable = true, suffixible = true },
-    { value = 'walker', prefixable = true, suffixible = true },
-    { value = 'weaver', prefixable = true, suffixible = true },
-    { value = 'keeper', prefixable = true, suffixible = true },
-    { value = 'breaker', prefixable = true, suffixible = true },
-    { value = 'binder', prefixable = true, suffixible = true },
-    { value = 'bearer', prefixable = true, suffixible = true },
-    { value = 'caller', prefixable = true, suffixible = true },
-    { value = 'dancer', prefixable = true, suffixible = true },
-    { value = 'singer', prefixable = true, suffixible = true },
-    { value = 'rider', prefixable = true, suffixible = true },
-    { value = 'smith', prefixable = true, suffixible = true },
-    { value = 'forged', prefixable = true, suffixible = true },
-    { value = 'mage', prefixable = true, suffixible = true },
-    { value = 'knight', prefixable = true, suffixible = true },
-    { value = 'priest', prefixable = true, suffixible = true },
-    { value = 'witch', prefixable = true, suffixible = true },
-    { value = 'guard', prefixable = true, suffixible = true },
-    { value = 'warden', prefixable = true, suffixible = true },
-    { value = 'thane', prefixable = true, suffixible = true },
-    { value = 'child', prefixable = true, suffixible = true },
-    { value = 'seed', prefixable = true, suffixible = true },
-    { value = 'master', prefixable = true, suffixible = true },
-    { value = 'saint', prefixable = true, suffixible = true },
-    { value = 'fiend', prefixable = true, suffixible = true },
-    { value = 'beast', prefixable = true, suffixible = true },
-    { value = 'rune', prefixable = true, suffixible = true },
-    { value = 'spirit', prefixable = true, suffixible = true },
-    { value = 'drake', prefixable = true, suffixible = true },
-    { value = 'shard', prefixable = true, suffixible = true },
-    { value = 'flame', prefixable = true, suffixible = true },
-    { value = 'frost', prefixable = true, suffixible = true },
-    { value = 'storm', prefixable = true, suffixible = true },
-    { value = 'shadow', prefixable = true, suffixible = true },
-    { value = 'light', prefixable = true, suffixible = true },
-    { value = 'dream', prefixable = true, suffixible = true },
-    { value = 'doom', prefixable = true, suffixible = true },
-    { value = 'crown', prefixable = true, suffixible = true },
-    { value = 'sword', prefixable = true, suffixible = true },
-    { value = 'shield', prefixable = true, suffixible = true },
+race = [
+    { value = "dragon", prefixable = true, suffixible = true },
+    { value = "dwarf", prefixable = true, suffixible = true },
+    { value = "elf", prefixable = true, suffixible = true },
+    { value = "goblin", prefixable = true, suffixible = true },
+    { value = "orc", prefixable = true, suffixible = true },
+    { value = "troll", prefixable = true, suffixible = true },
+    { value = "ogre", prefixable = true, suffixible = true },
+    { value = "kobold", prefixable = true, suffixible = true },
+    { value = "gnome", prefixable = true, suffixible = true },
+    { value = "halfling", prefixable = true, suffixible = true },
+    { value = "human", prefixable = true, suffixible = true },
+    { value = "vampire", prefixable = true, suffixible = true },
+    { value = "werewolf", prefixable = true, suffixible = true },
+    { value = "zombie", prefixable = true, suffixible = true },
+    { value = "skeleton", prefixable = true, suffixible = true },
+    { value = "demon", prefixable = true, suffixible = true },
+    { value = "angel", prefixable = true, suffixible = true },
+    { value = "titan", prefixable = true, suffixible = true },
+    { value = "hydra", prefixable = true, suffixible = true },
+    { value = "griffin", prefixable = true, suffixible = true },
+    { value = "unicorn", prefixable = true, suffixible = true },
+    { value = "centaur", prefixable = true, suffixible = true },
+    { value = "minotaur", prefixable = true, suffixible = true },
+    { value = "naga", prefixable = true, suffixible = true },
+    { value = "ghoul", prefixable = true, suffixible = true },
+    { value = "wraith", prefixable = true, suffixible = true },
+    { value = "banshee", prefixable = true, suffixible = true },
+    { value = "sprite", prefixable = true, suffixible = true },
+    { value = "faerie", prefixable = true, suffixible = true },
+    { value = "golem", prefixable = true, suffixible = true },
+    { value = "elemental", prefixable = true, suffixible = true },
+    { value = "ent", prefixable = true, suffixible = true },
+    { value = "dryad", prefixable = true, suffixible = true },
+    { value = "nymph", prefixable = true, suffixible = true },
+]
+suffix = [
+    { value = "blade", prefixable = true, suffixible = true },
+    { value = "born", prefixable = true, suffixible = true },
+    { value = "craft", prefixable = true, suffixible = true },
+    { value = "spawn", prefixable = true, suffixible = true },
+    { value = "bane", prefixable = true, suffixible = true },
+    { value = "seeker", prefixable = true, suffixible = true },
+    { value = "slayer", prefixable = true, suffixible = true },
+    { value = "weaver", prefixable = true, suffixible = true },
+    { value = "keeper", prefixable = true, suffixible = true },
+    { value = "breaker", prefixable = true, suffixible = true },
+    { value = "binder", prefixable = true, suffixible = true },
+    { value = "bearer", prefixable = true, suffixible = true },
+    { value = "caller", prefixable = true, suffixible = true },
+    { value = "dancer", prefixable = true, suffixible = true },
+    { value = "singer", prefixable = true, suffixible = true },
+    { value = "rider", prefixable = true, suffixible = true },
+    { value = "smith", prefixable = true, suffixible = true },
+    { value = "forged", prefixable = true, suffixible = true },
+    { value = "vale", prefixable = true, suffixible = true },
 ]
 
 [[class]]
 patterns = [
-    "{prefix}{class_root}",
-    "{class_root}",
-    "{class_root}{class_suffix}",
+    "{prefix}{_class_root}",
+    "{_class_root}",
+    "{_class_root}{_class_suffix}",
 ]
 
 [[place]]
-value = "the north"
-takes_of = true
-takes_in = true
+value = "north"
+article = "the"
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "south"
+article = "the"
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "east"
+article = "the"
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "west"
+article = "the"
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "empire"
+article = "the"
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "kingdom"
+article = "the"
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "underdark"
+article = "the"
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "wild"
+article = "the"
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "shadowfell"
 article = ""
 proper_noun = false
 prefixable = false
 suffixible = false
 
 [[place]]
-value = "the empire"
-takes_of = true
-takes_in = false
-article = ""
+value = "astral sea"
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
 
 [[place]]
-value = "the underdark"
-takes_of = true
-takes_in = true
-article = ""
+value = "elemental plane"
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
 
 [[place]]
-value = "the feywild"
-takes_of = true
-takes_in = true
-article = ""
+value = "nine hells"
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
 
 [[place]]
-value = "the shadowfell"
-takes_of = true
-takes_in = true
-article = ""
+value = "{ordinal} hell"
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
 
 [[place]]
-value = "the astral sea"
-takes_of = true
-takes_in = true
-article = ""
+value = "infinite abyss"
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
 
 [[place]]
-value = "the elemental chaos"
-takes_of = true
-takes_in = true
-article = ""
+value = "mountain"
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
 
 [[place]]
-value = "the nine hells"
-takes_of = true
-takes_in = true
-article = ""
+value = "forest"
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
 
 [[place]]
-value = "the abyss"
-takes_of = true
-takes_in = true
-article = ""
+value = "sunken city"
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
 
 [[place]]
-value = "the celestial mountain"
-takes_of = true
-takes_in = true
-article = ""
-proper_noun = false
-prefixable = false
-suffixible = false
-
-[[place]]
-value = "the emerald forest"
-takes_of = true
-takes_in = true
-article = ""
-proper_noun = false
-prefixable = false
-suffixible = false
-
-[[place]]
-value = "the sunken city"
-takes_of = true
-takes_in = true
-article = ""
-proper_noun = false
-prefixable = false
-suffixible = false
-
-[[place]]
-value = "the frozen waste"
-takes_of = true
-takes_in = true
-article = ""
+value = "frozen waste"
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
@@ -415,12 +366,7 @@ from = [
 ]
 
 [[expose]]
-slot = "thing"
+slot = "suffix"
 from = [
-    "thing",
-]
-[[expose]]
-slot = "suf"
-from = [
-    "suf",
+    "suffix",
 ]

@@ -20,7 +20,7 @@ astro_noun = [
     { value = "pulsar", prefixable = true, suffixible = true },
     { value = "quasar", prefixable = true, suffixible = true },
     { value = "galaxy", prefixable = true, suffixible = true },
-    { value = "nebula", prefixable = true, suffixible = true },
+    { value = "nebula", prefixable = true, suffixible = true, plural = "nebulae" },
     { value = "supernova", prefixable = true, suffixible = true },
     { value = "nova", prefixable = true, suffixible = true },
     { value = "comet", prefixable = true, suffixible = true },
@@ -39,20 +39,17 @@ astro_noun = [
 ]
 
 astro_suf = [
-    { value = 'born', prefixable = true, suffixible = true },
-    { value = 'kin', prefixable = true, suffixible = true },
     { value = 'star', prefixable = true, suffixible = true },
     { value = 'hole', prefixable = true, suffixible = true },
     { value = 'void', prefixable = true, suffixible = true },
     { value = 'jet', prefixable = true, suffixible = true },
-    { value = 'moon', prefixable = true, suffixible = true },
 ]
 
 [[place]]
-value = "the milky way"
+value = "milky way"
 takes_of = true
 takes_in = false
-article = ""
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
@@ -67,109 +64,109 @@ prefixable = true
 suffixible = true
 
 [[place]]
-value = "the large magellanic cloud"
+value = "large magellanic cloud"
 takes_of = true
 takes_in = false
-article = ""
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
 
 [[place]]
-value = "the small magellanic cloud"
+value = "small magellanic cloud"
 takes_of = true
 takes_in = false
-article = ""
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
 
 [[place]]
-value = "the virgo cluster"
+value = "virgo cluster"
 takes_of = true
 takes_in = false
-article = ""
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
 
 [[place]]
-value = "the coma cluster"
+value = "coma cluster"
 takes_of = true
 takes_in = false
-article = ""
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
 
 [[place]]
-value = "the sombrero galaxy"
+value = "sombrero galaxy"
 takes_of = true
 takes_in = false
-article = ""
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
 
 [[place]]
-value = "the whirlpool galaxy"
+value = "whirlpool galaxy"
 takes_of = true
 takes_in = false
-article = ""
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
 
 [[place]]
-value = "the local group"
+value = "local group"
 takes_of = true
 takes_in = false
-article = ""
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
 
 [[place]]
-value = "the solar system"
+value = "solar system"
 takes_of = true
 takes_in = false
-article = ""
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
 
 [[place]]
-value = "the oort cloud"
+value = "oort cloud"
 takes_of = true
 takes_in = false
-article = ""
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
 
 [[place]]
-value = "the kuiper belt"
+value = "kuiper belt"
 takes_of = true
 takes_in = false
-article = ""
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
 
 [[place]]
-value = "the void"
+value = "void"
 takes_of = true
 takes_in = true
-article = ""
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
 
 [[place]]
-value = "the big bang"
+value = "big bang"
 takes_of = true
 takes_in = false
-article = ""
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
@@ -198,7 +195,7 @@ from = [
     "place",
 ]
 [[expose]]
-slot = "suf"
+slot = "suffix"
 from = [
     "astro_suf",
 ]

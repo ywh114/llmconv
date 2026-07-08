@@ -1,9 +1,9 @@
-class_values = [
+_class_values = [
     { value = "physician", prefixable = true, suffixible = true },
     { value = "apothecary", prefixable = true, suffixible = true },
     { value = "barber-surgeon", prefixable = true, suffixible = true },
 ]
-class_root = [
+_class_root = [
     { value = "doctor", prefixable = true, suffixible = true },
     { value = "crow", prefixable = true, suffixible = true },
     { value = "mask", prefixable = true, suffixible = true },
@@ -30,8 +30,6 @@ noun = [
     { value = "crow", prefixable = true, suffixible = true },
     { value = "mask", prefixable = true, suffixible = true },
     { value = "plague", prefixable = true, suffixible = true },
-]
-thing = [
     { value = "miasma", prefixable = true, suffixible = true },
     { value = "pestilence", prefixable = true, suffixible = true },
     { value = "buboes", prefixable = true, suffixible = true },
@@ -51,53 +49,45 @@ disease = [
     { value = "arthritis", prefixable = true, suffixible = true },
     { value = "osteoperosis", prefixable = true, suffixible = true },
 ]
-
-suf = [
-    { value = 'born', prefixable = true, suffixible = true },
-    { value = 'kin', prefixable = true, suffixible = true },
-    { value = 'kind', prefixable = true, suffixible = true },
-    { value = 'pox', prefixable = true, suffixible = true },
-    { value = 'fever', prefixable = true, suffixible = true },
-    { value = 'ague', prefixable = true, suffixible = true },
-    { value = 'mask', prefixable = true, suffixible = true },
-    { value = 'crow', prefixable = true, suffixible = true },
-    { value = 'leech', prefixable = true, suffixible = true },
+suffix = [
+    { value = "pox", prefixable = true, suffixible = true },
+    { value = "ague", prefixable = true, suffixible = true },
+    { value = "blight", prefixable = true, suffixible = true },
 ]
 
 [[class]]
 patterns = [
-    "{prefix}{class_root}",
-    "{class_root}",
+    "{prefix}{_class_root}",
+    "{_class_root}",
     "{disease}",
     "{prefix}{disease}",
 ]
 
 [[class_extra]]
 patterns = [
-    "{class_root}",
-    "{class_values}",
-    "{prefix} {class_root}",
-    "{prefix} {class_values}",
+    "{_class_root}",
+    "{_class_values}",
+    "{prefix} {_class_root}",
+    "{prefix} {_class_values}",
 ]
 
 [[place]]
-value = "the quarantine"
+value = "quarantine"
 takes_of = true
 takes_in = false
-article = ""
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
 
 [[place]]
-value = "the ward"
+value = "ward"
 takes_of = true
 takes_in = false
-article = ""
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
-
 
 [[expose]]
 slot = "class"
@@ -138,12 +128,7 @@ from = [
 ]
 
 [[expose]]
-slot = "thing"
+slot = "suffix"
 from = [
-    "thing",
-]
-[[expose]]
-slot = "suf"
-from = [
-    "suf",
+    "suffix",
 ]

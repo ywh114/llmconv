@@ -1,47 +1,42 @@
 category = "silly"
 # Food-theme silly ability entries.
 
-food_melee_values = [
+_food_melee_values = [
     { value = "baste", prefixable = false, suffixible = false },
     { value = "braise", prefixable = false, suffixible = false },
-    { value = "tenderize", prefixable = false, suffixible = false },
+    { value = "tenderize", prefixable = false, suffixible = false, noun_form = "tenderization" },
     { value = "julienne", prefixable = false, suffixible = false },
 ]
 
-food_area_values = [
+_food_area_values = [
     { value = "flambé", prefixable = false, suffixible = false },
-    { value = "reduce", prefixable = false, suffixible = false },
+    { value = "reduce", prefixable = false, suffixible = false, noun_form = "reduction" },
     { value = "whisk", prefixable = false, suffixible = false },
 ]
 
-food_ranged_values = [
+_food_ranged_values = [
     { value = "flambé", prefixable = false, suffixible = false },
 ]
 
-food_status_values = [
-    { value = "marinate", prefixable = false, suffixible = false },
+_food_status_values = [
+    { value = "marinate", prefixable = false, suffixible = false, noun_form = "marination" },
     { value = "glaze", prefixable = false, suffixible = false },
     { value = "garnish", prefixable = false, suffixible = false },
 ]
 
-food_defence_values = [
-    { value = "preserve", prefixable = false, suffixible = false },
+_food_defence_values = [
+    { value = "preserve", prefixable = false, suffixible = false, noun_form = "preservation" },
     { value = "chill", prefixable = false, suffixible = false },
 ]
 
-suf_values = []
-
-domain_values = [
-    { value = "sauce", prefixable = false, suffixible = false },
-    { value = "stock", prefixable = false, suffixible = false },
-    { value = "roux", prefixable = false, suffixible = false },
-    { value = "gravy", prefixable = false, suffixible = false },
-    { value = "fond", prefixable = false, suffixible = false },
-    { value = "demi-glace", prefixable = false, suffixible = false },
-    { value = "béchamel", prefixable = false, suffixible = false },
+_suffix_values = [
+    { value = "cuisine", prefixable = true, suffixible = false },
+    { value = "glaze", prefixable = true, suffixible = false },
+    { value = "fry", prefixable = true, suffixible = false },
+    { value = "roast", prefixable = true, suffixible = false },
 ]
 
-verb_values = [
+other = [
     { value = "flambé", prefixable = false, suffixible = false },
     { value = "braise", prefixable = false, suffixible = false },
     { value = "glaze", prefixable = false, suffixible = false },
@@ -50,7 +45,7 @@ verb_values = [
     { value = "debone", prefixable = false, suffixible = false },
 ]
 
-noun_values = [
+_noun_values = [
     { value = "sauce", prefixable = false, suffixible = false },
     { value = "stock", prefixable = false, suffixible = false },
     { value = "roux", prefixable = false, suffixible = false },
@@ -59,39 +54,42 @@ noun_values = [
     { value = "ragout", prefixable = false, suffixible = false },
 ]
 
-food_movement_values = []
+_food_movement_values = []
 
 [["melee"]]
-patterns = ["{food_melee_values}"]
+patterns = ["{_food_melee_values}"]
 
 [["area"]]
-patterns = ["{food_area_values}"]
+patterns = ["{_food_area_values}"]
 
 [["ranged"]]
-patterns = ["{food_ranged_values}"]
+patterns = ["{_food_ranged_values}"]
 
 [["status"]]
-patterns = ["{food_status_values}"]
+patterns = ["{_food_status_values}"]
 
 [["defence"]]
-patterns = ["{food_defence_values}"]
+patterns = ["{_food_defence_values}"]
 
 [[expose]]
-slot = "suf"
-from = ["suf_values"]
-
-[[expose]]
-slot = "technique"
-from = ["melee", "area", "ranged", "status", "defence", "movement"]
-
-[[expose]]
-slot = "domain"
-from = ["domain_values"]
+slot = "suffix"
+from = ["_suffix_values"]
 
 [[expose]]
 slot = "verb"
-from = ["verb_values"]
+from = [
+    "melee",
+    "area",
+    "ranged",
+    "status",
+    "defence",
+    "movement",
+    "other",
+]
 
 [[expose]]
 slot = "noun"
-from = ["noun_values"]
+from = [
+    "_domain_values",
+    "_noun_values",
+]

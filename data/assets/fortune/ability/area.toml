@@ -1,7 +1,7 @@
 category = "delivery"
 # Generic area-of-effect delivery ability entries.
 
-area_area_values = [
+_area_area_values = [
     { value = "storm", prefixable = false, suffixible = false },
     { value = "pulse", prefixable = false, suffixible = false },
     { value = "nova", prefixable = false, suffixible = false },
@@ -14,53 +14,57 @@ area_area_values = [
     { value = "cascade", prefixable = false, suffixible = false },
 ]
 
-suf_values = []
-
-verb_values = [
-    { value = "blanket", prefixable = false, suffixible = false, noun_form = "blanketing" },
-    { value = "carpet", prefixable = false, suffixible = false },
-    { value = "flood", prefixable = false, suffixible = false },
-    { value = "spread", prefixable = false, suffixible = false },
-    { value = "detonation", prefixable = false, suffixible = false },
-    { value = "irradiation", prefixable = false, suffixible = false },
+_suffix_values = [
+    { value = "storm", prefixable = true, suffixible = false },
+    { value = "wave", prefixable = true, suffixible = false },
+    { value = "burst", prefixable = true, suffixible = false },
+    { value = "blast", prefixable = true, suffixible = false },
+    { value = "field", prefixable = true, suffixible = false },
 ]
 
-noun_values = [
+_noun_values = [
     { value = "blast", prefixable = false, suffixible = false },
-    { value = "radius", prefixable = false, suffixible = false },
+    { value = "radius", prefixable = false, suffixible = false, plural = "radii" },
     { value = "splash", prefixable = false, suffixible = false },
     { value = "shockwave", prefixable = false, suffixible = false },
     { value = "fallout", prefixable = false, suffixible = false },
 ]
 
-adj_values = [
+_adj_values = [
     { value = "wide-area", prefixable = false, suffixible = false },
     { value = "carpet", prefixable = false, suffixible = false },
     { value = "saturation", prefixable = false, suffixible = false },
     { value = "indiscriminate", prefixable = false, suffixible = false },
 ]
 
-area_movement_values = []
+_area_movement_values = []
 
 [["area"]]
-patterns = ["{area_area_values}"]
+patterns = ["{_area_area_values}"]
 
 [[expose]]
-slot = "suf"
-from = ["suf_values"]
-
-[[expose]]
-slot = "technique"
-from = ["area", "movement"]
-
-[[expose]]
-slot = "verb"
-from = ["verb_values"]
-
-[[expose]]
-slot = "noun"
-from = ["noun_values"]
+slot = "suffix"
+from = ["_suffix_values"]
 
 [[expose]]
 slot = "adj"
-from = ["adj_values"]
+from = ["_adj_values"]
+
+[[expose]]
+slot = "verb"
+from = [
+    "melee",
+    "area",
+    "ranged",
+    "status",
+    "defence",
+    "movement",
+    "other",
+]
+
+[[expose]]
+slot = "noun"
+from = [
+    "_domain_values",
+    "_noun_values",
+]

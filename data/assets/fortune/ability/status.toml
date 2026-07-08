@@ -2,18 +2,18 @@ category = "delivery"
 
 # Generic status-effect (buff + debuff) ability entries.
 
-status_status_values = [
-    { value = "fortify", prefixable = false, suffixible = false },
-    { value = "enhance", prefixable = false, suffixible = false },
+_status_status_values = [
+    { value = "fortify", prefixable = false, suffixible = false, noun_form = "fortification", past = "fortified" },
+    { value = "enhance", prefixable = false, suffixible = false, noun_form = "enhancement" },
     { value = "bless", prefixable = false, suffixible = false },
     { value = "bolster", prefixable = false, suffixible = false },
     { value = "charge", prefixable = false, suffixible = false },
-    { value = "empower", prefixable = false, suffixible = false },
-    { value = "galvanize", prefixable = false, suffixible = false },
+    { value = "empower", prefixable = false, suffixible = false, noun_form = "empowerment" },
+    { value = "galvanize", prefixable = false, suffixible = false, noun_form = "galvanization" },
     { value = "harden", prefixable = false, suffixible = false },
     { value = "sharpen", prefixable = false, suffixible = false },
     { value = "quicken", prefixable = false, suffixible = false },
-    { value = "regenerate", prefixable = false, suffixible = false },
+    { value = "regenerate", prefixable = false, suffixible = false, noun_form = "regeneration" },
     # Debuff half
     { value = "weaken", prefixable = false, suffixible = false },
     { value = "sap", prefixable = false, suffixible = false },
@@ -21,20 +21,19 @@ status_status_values = [
     { value = "wither", prefixable = false, suffixible = false },
     { value = "curse", prefixable = false, suffixible = false },
     { value = "hex", prefixable = false, suffixible = false },
-    { value = "enfeeble", prefixable = false, suffixible = false },
+    { value = "enfeeble", prefixable = false, suffixible = false, noun_form = "enfeeblement" },
     { value = "slow", prefixable = false, suffixible = false },
     { value = "cripple", prefixable = false, suffixible = false },
     { value = "poison", prefixable = false, suffixible = false },
     { value = "blind", prefixable = false, suffixible = false },
     { value = "silence", prefixable = false, suffixible = false },
-    { value = "petrify", prefixable = false, suffixible = false },
+    { value = "petrify", prefixable = false, suffixible = false, noun_form = "petrification" },
 ]
 
-verb_values = [
+other = [
     { value = "fortification", prefixable = false, suffixible = false },
-    { value = "enhance", prefixable = false, suffixible = false },
+    { value = "enhance", prefixable = false, suffixible = false, noun_form = "enhancement" },
     { value = "empower", prefixable = false, suffixible = false, noun_form = "empowerment" },
-    { value = "galvanization", prefixable = false, suffixible = false },
     { value = "bless", prefixable = false, suffixible = false },
     { value = "weaken", prefixable = false, suffixible = false },
     { value = "sap", prefixable = false, suffixible = false },
@@ -43,21 +42,13 @@ verb_values = [
     { value = "cripple", prefixable = false, suffixible = false },
 ]
 
-suf_values = []
-
-domain_values = [
-    { value = "aura", prefixable = false, suffixible = false },
-    { value = "mantle", prefixable = false, suffixible = false },
-    { value = "blessing", prefixable = false, suffixible = false },
-    { value = "ward", prefixable = false, suffixible = false },
-    { value = "boon", prefixable = false, suffixible = false },
-    { value = "bane", prefixable = false, suffixible = false },
-    { value = "hex", prefixable = false, suffixible = false },
-    { value = "aura of fortitude", prefixable = false, suffixible = false },
-    { value = "aura of decay", prefixable = false, suffixible = false },
+_suffix_values = [
+    { value = "ward", prefixable = true, suffixible = false },
+    { value = "bane", prefixable = true, suffixible = false },
+    { value = "hex", prefixable = true, suffixible = false },
 ]
 
-noun_values = [
+_noun_values = [
     { value = "blessing", prefixable = false, suffixible = false },
     { value = "aura", prefixable = false, suffixible = false },
     { value = "chant", prefixable = false, suffixible = false },
@@ -68,7 +59,7 @@ noun_values = [
     { value = "blight", prefixable = false, suffixible = false },
 ]
 
-adj_values = [
+_adj_values = [
     { value = "fortifying", prefixable = false, suffixible = false },
     { value = "empowering", prefixable = false, suffixible = false },
     { value = "blessed", prefixable = false, suffixible = false },
@@ -78,31 +69,34 @@ adj_values = [
     { value = "draining", prefixable = false, suffixible = false },
 ]
 
-status_movement_values = []
+_status_movement_values = []
 
 [["status"]]
-patterns = ["{status_status_values}"]
+patterns = ["{_status_status_values}"]
 
 [[expose]]
-slot = "suf"
-from = ["suf_values"]
-
-[[expose]]
-slot = "technique"
-from = ["status", "movement"]
-
-[[expose]]
-slot = "verb"
-from = ["verb_values"]
-
-[[expose]]
-slot = "domain"
-from = ["domain_values"]
-
-[[expose]]
-slot = "noun"
-from = ["noun_values"]
+slot = "suffix"
+from = ["_suffix_values"]
 
 [[expose]]
 slot = "adj"
-from = ["adj_values"]
+from = ["_adj_values"]
+
+[[expose]]
+slot = "verb"
+from = [
+    "melee",
+    "area",
+    "ranged",
+    "status",
+    "defence",
+    "movement",
+    "other",
+]
+
+[[expose]]
+slot = "noun"
+from = [
+    "_domain_values",
+    "_noun_values",
+]

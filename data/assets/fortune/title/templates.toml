@@ -1,10 +1,10 @@
 # Generic high-level title templates.
 #
 # The core indirection is the ``subject`` slot defined in ``generic.toml``.
-# A subject can be any interchangeable head: a rank, class, noun, class,
-# thing, or a compound of those (prefixed, adjectival, hyphenated, etc.).
+# A subject can be any interchangeable head: a rank, class, noun, or a
+# compound of those (prefixed, adjectival, hyphenated, etc.).
 #
-# Templates combine subjects with raw slots (place, thing, ordinal, number)
+# Templates combine subjects with raw slots (place, noun, ordinal, number)
 # and other indirections as needed.
 #
 # Complexity levels:
@@ -14,19 +14,27 @@
 #   insane    — maximalist cross-flavor soup
 
 simple = [
-    # Bare subject
+    # Subject
     "{subject}",
     "The {subject}",
+    "{prefix}{subject}",
 
     # Direct rank / class (also reachable via {subject})
     "{rank}",
     "{class}",
+    "{rank} {class}",
     "The {rank}",
     "The {class}",
 
+    # Other simple
+    "{noun} {subject}",
+    "{noun} {prefix}{subject}",
+    "The {noun}",
+    "{entity:possessive} {subject}",
+
     # Subject + prepositional phrase
+    "{subject} of {entity}",
     "{subject} of {place}",
-    "{subject} of {thing}",
     "{subject} in {place}",
     "{subject} from {place}",
     "{subject} over {place}",
@@ -35,121 +43,174 @@ simple = [
     "{subject} under {place}",
     "{subject} within {place}",
 
-    # Direct rank/class + prepositional phrase
+    # Direct rank/class/noun
     "{rank} of {place}",
-    "{rank} of {thing}",
+    "{rank} of {entity}",
+    "{noun} {rank}",
+    "{entity:possessive} {rank}",
+    "{noun} {rank} of {place}",
     "{class} of {place}",
-    "{class} of {thing}",
+    "{class} of {entity}",
+    "{entity:possessive} {class}",
+    "{noun} {class}",
+    "{noun} {class} of {place}",
+    "{entity:possessive} {noun}",
 
     # Descriptors
     "The {adj}",
     "The {adj_sup}",
 
-    # Modified subject
+    # Modified
     "{adj} {subject}",
-    "{adj_sup} {subject}",
-
-    # Modified rank/class
     "{adj} {rank}",
     "{adj} {class}",
+    "{adj_sup} {subject}",
+    "{adj_sup} {rank}",
+    "{adj_sup} {class}",
+    "The {adj} {subject}",
+    "The {adj} {rank}",
+    "The {adj} {class}",
+    "The {adj_sup} {subject}",
+    "The {adj_sup} {rank}",
+    "The {adj_sup} {class}",
 
     # Attributive place in front
     "{place} {subject}",
 
-    # Number/ordinal after subject
-    "{subject} {ordinal}",
+    # Numbers/oridnals subject
     "{subject} {roman_numeral}",
     "{subject} {number}",
     "{subject}-{number}",
+    "{ordinal:<6} {subject}",
 
-    # Number/ordinal before subject
-    "{ordinal} {subject}",
-    "{roman_numeral} {subject}",
+    # Prefix compounds (short, natural)
+    "{prefix}{noun}",
+    "{prefix}{rank}",
+    "{prefix}{class}",
+    "The {prefix}{noun}",
+    "The {prefix}{rank}",
+    "The {prefix}{class}",
 
     # Suffix compounds (short, natural)
-    "{noun}{suf}",
-    "{thing}{suf}",
-    "{place}{suf}",
-    "{rank}{suf}",
-    "{class}{suf}",
+    "{noun}{suffix}",
+    "{noun}{suffix}",
+    "{place}{suffix}",
+    "{rank}{suffix}",
+    "{class}{suffix}",
 ]
 
 moderate = [
     # Coordination
     "{subject} of {place} and {place}",
-    "{subject} of {place} and {subject}",
-    "{subject} and {subject}",
-    "{subject} or {subject}",
-    "{subject} yet {subject}",
+    "{subject} of {place}, {subject}",
+    "{adj} {subject;0}, {adj} {subject;0}",
+    "{subject;0}! {subject;0}!",
     "{rank} and {rank}",
     "{rank} of {place} and {place}",
 
+    # (adjective)
+    "{subject} ({adj})",
+    "{adj} {rank} ({adj})",
+    "{adj} {class} ({adj})",
+    "{prefix}{noun} ({adj})",
+    "{prefix}{noun} ({adj})",
+    "{prefix}{place} ({adj})",
+    "{prefix}{rank} ({adj})",
+    "{prefix}{class} ({adj})",
+    "{noun}{suffix} ({adj})",
+    "{noun}{suffix} ({adj})",
+    "{place}{suffix} ({adj})",
+    "{rank}{suffix} ({adj})",
+    "{class}{suffix} ({adj})",
+    "{subject} ({adj_sup})",
+    "{adj} {rank} ({adj_sup})",
+    "{adj} {class} ({adj_sup})",
+    "{prefix}{noun} ({adj_sup})",
+    "{prefix}{noun} ({adj_sup})",
+    "{prefix}{place} ({adj_sup})",
+    "{prefix}{rank} ({adj_sup})",
+    "{prefix}{class} ({adj_sup})",
+    "{noun}{suffix} ({adj_sup})",
+    "{noun}{suffix} ({adj_sup})",
+    "{place}{suffix} ({adj_sup})",
+    "{rank}{suffix} ({adj_sup})",
+    "{class}{suffix} ({adj_sup})",
+
     # More descriptors
-    "{adj} and {adj}",
-    "{adj_sup} and {adj_sup}",
-    "{adj} and {adj_sup}",
-    "{adj_sup} and {adj}",
+    "{adj} {rank} {subject}",
+    "{adj_sup} {subject}",
+    "{adj_sup} {adj} {subject}",
+    "{adj} {adj} {subject}",
 
     # Prefix stacks on the subject
     "{prefix+} {subject}",
-    "{prefix+}{subject}",
-    "{prefix+} {rank}",
-    "{prefix+} {class}",
 
     # Modified subject + prepositional phrase
     "{adj} {subject} of {place}",
-    "{adj} {subject} of {thing}",
     "{adj_sup} {subject} of {place}",
-    "{adj_sup} {subject} of {thing}",
-    "{adj} {rank} of {place}",
-    "{adj} {class} of {place}",
+    "{adj}, {adj} {subject}",
+    "{adj}, {adj_sup} {subject}",
 
     # Prepositional phrases
-    "{subject} before {thing}",
+    "{subject} before {noun}",
     "{subject} from {place}",
     "{subject} over {place}",
     "{subject} upon {place}",
     "{subject} near {place}",
     "{subject} under {place}",
     "{subject} within {place}",
-    "{subject} without {place}",
-    "{rank} against {place}",
-
-    # Double adjective
-    "{adj} {adj} {subject}",
+    "{class}-{rank} against {place}",
 
     # Place attribution with adjective
-    "{adj} {place} {subject}",
+    "{adj} {place:possessive} {subject}",
+    "{adj} {place:possessive} {adj} {subject}",
+    "{adj} {place:possessive} {adj_sup} {subject}",
+    "{adj_sup} {place}'s {adj_sup} {subject}",
+    "{place:possessive} {adj_sup} {subject}",
+    "{place:possessive} {adj_sup} {subject} ({adj})",
 
     # Suffix compounds
-    "{adj} {adj}{suf}",
-    "{adj_sup} {adj}{suf}",
-    "{adj}{suf} of {place} and {place}",
-    "{adj}{suf} of {thing}, {adj_sup}",
-    "{prefix+}{adj}{suf}",
-    "{prefix+}{noun}{suf}",
-    "{rank}{suf} of {place}",
-    "{class}{suf}",
+    "{adj} {adj}{suffix}",
+    "{adj_sup} {adj}{suffix}",
+    "{adj}{suffix} of {place} and {place}",
+    "{adj}{suffix} of {entity}, {adj_sup}",
+    "{prefix+}{noun}{suffix}",
+    "{rank}{suffix} of {place}",
+    "{class}{suffix}, {rank}",
+
+    # Modifier-driven templates
+    "{adj} {noun} of {place}",
+    "{noun:possessive} {subject}",
+    "{ordinal:<100} {subject}",
 ]
 
 complex = [
     # Multi-clause coordination
     "{subject} of {place} and {subject} of {place}",
-    "{subject} of {thing} and {subject} of {thing}",
+    "{subject} of {noun} and {subject} of {entity}",
 
     # Heavy modification
     "{adj} {adj} {subject} of {place}",
-    "{adj} {adj} {subject} of {thing}",
-    "{prefix+} {adj} {subject}",
+    "{adj} {adj} {subject} of {noun}",
+    "{adj} {adj} {subject} of {entity}",
+    "{prefix+}, {adj} {subject}",
+    "{adj_sup} {subject;0}, {adj_sup} {subject;0}",
+    "{adj_sup} {subject}, {adj_sup} {subject}",
+    "{adj} {subject;0}, {adj} {subject;0}, {adj} {subject;0}",
+    "{adj} {subject}, {adj} {subject}, {adj} {subject}",
+    "{adj_sup} {prefix}{subject}, {adj_sup} {prefix}{subject}",
+    "{subject;0}! {subject;0}! {subject;0}!",
+    "{subject}? {subject}!",
 
     # Prefix stack + subject + prepositional phrase
     "{prefix+}{subject} of {place}",
-    "{prefix+}{subject} of {thing}",
+    "{prefix+}{subject} of {noun}",
+    "{prefix+}{subject} of {entity}",
 
     # Appositive-style
     "{subject}, {adj_sup}",
     "{subject}, {adj} {subject}",
-    "{subject}, yet {adj_sup}",
+    "{rank} {subject}, {adj_sup}",
 
     # Locative/attributive place before subject
     "{place} {subject}",
@@ -157,26 +218,33 @@ complex = [
 
     # Prepositional phrases
     "{subject} against {place}",
+    "{subject} against {entity}",
     "{subject} beyond {place}",
     "{prefix+}{subject} upon {place}",
 
     # Nested of-and
-    "{subject} of {thing} and {place}",
-    "{subject} of {place} and {thing}",
+    "{noun} {subject} of {entity} from {place}",
+    "{subject} of {entity} and {entity}",
 
     # Suffix chains
-    "{adj} {adj}{suf} of {place}",
-    "{adj_sup} {noun}{suf} of {thing}",
-    "{prefix+}{adj}{suf} {subject}",
-    "{adj}{suf} of {place}, {adj_sup}",
-    "{adj}{suf} and {adj}{suf}",
+    "{adj} {adj}{suffix} of {place}",
+    "{adj_sup} {noun}{suffix} of {noun:plural}",
+    "{adj_sup} {noun}{suffix} of {entity}",
+    "{prefix+}{suffix} {subject}",
+    "{adj}{suffix} of {place}, {adj_sup}",
+    "{adj}{suffix} and {adj}{suffix}",
+
+    # Modifier-driven templates
+    "{adj_sup} {noun} of {place}",
+    "{noun:possessive} {subject} of {place}",
+    "{ordinal} {adj} {subject}",
 ]
 
 insane = [
     # Triple adjectives
     "{adj} {adj} {adj} {subject3}",
     "{adj} {adj} {adj} {subject3} of {place}",
-    "{adj} {adj} {adj} {subject3} of {thing}",
+    "{adj} {adj} {adj} {subject3} of {noun:plural}",
 
     # Deep prefix stacks
     "{prefix+}{prefix+}{subject3}",
@@ -185,6 +253,7 @@ insane = [
     # Many coordinated clauses
     "{subject3} of {place} and {place} and {place}",
     "{subject3} and {subject3} and {subject3}",
+    "{subject3} of {entity}, {entity}, and {entity}",
 
     # Roman numeral + place
     "{subject3} {roman_numeral} of {place}",
@@ -196,16 +265,56 @@ insane = [
     "{prefix+}{subject3} of {prefix+}{subject3}",
 
     # Everything-at-once
-    "{prefix+} {adj} {adj} {subject3} of {place} and {place}",
-    "{adj_sup} {adj} {subject3} of {thing}, {adj_sup}",
+    "{prefix+} {adj} {adj} {subject3} of {prefix}{place} and {place}",
+    "{adj_sup} {adj} {subject3} of {noun:plural}, {adj_sup}",
     "{adj} {prefix+}{subject3} of {place}, {adj_sup}",
-    "{thing} {prefix+}{adj} {subject3} of {place}",
+    "{noun} {prefix+}, {adj} {subject3} of {place}",
 
     # Suffix madness
-    "{prefix+}{suf} {adj} of {place} and {place}",
-    "{adj_sup}{suf} {adj} {subject3} of {thing}",
-    "{adj} {noun}{suf} and {noun}{suf} {subject3}",
-    "{prefix+}{noun}{suf} of {place} and {thing}",
-    "{prefix+}{noun}{suf} of {thing} and {place}",
-    "{adj} {noun}{suf} {prefix+}{subject3}",
+    "{prefix+}{suffix} {adj} of {place} and {place}",
+    "{adj_sup}{suffix} {adj} {subject3} of {noun:plural}",
+    "{adj} {noun}{suffix} and {noun}{suffix} {subject3}",
+    "{prefix+}{noun}{suffix} of {place} and {noun:plural}",
+    "{prefix+}{noun}{suffix} of {noun} and {place}",
+    "{adj} {noun}{suffix} {prefix+}{subject3}",
+
+    # Modifier-driven templates
+    "{adj_sup} {adj_sup} {noun:plural}",
+    "{ordinal} {adj_sup} {subject} of {place}",
+    "{noun:possessive} {subject3} of {place}",
+    "{subject;0}? {subject;0}? {subject;1}!",
+
+    # Entity
+    "{entity}",
+    "{adj_sup} {entity}",
+    "{prefix+} {entity}",
+    "{entity} of {place}",
+
+    # Fun
+    "{subject} of {place} (hates {place})",
+    "{subject} of {prefix}{place} (hates {place})",
+    "{entity} (hates {place})",
+    "{entity} (loves {place})",
+    "{entity} (hates {noun:plural})",
+    "{entity} (loves {noun:plural})",
+    "{subject} (actually {subject} in disguise)",
+    "{subject} (actually {entity} in disguise)",
+    "{entity} (actually {subject} in disguise)",
+    "{entity} (actually {entity} in disguise)",
+
+    "Two {noun:plural}",
+    "{digit} {noun:plural}",
+    "{number} {noun:plural}",
+
+    "Two {rank:plural}",
+    "{digit} {rank:plural}",
+    "{number} {rank:plural}",
+
+    "Two {class:plural}",
+    "{digit} {class:plural}",
+    "{number} {class:plural}",
+
+    "Two {entity:plural}",
+    "{digit} {entity:plural}",
+    "{number} {entity:plural}",
 ]

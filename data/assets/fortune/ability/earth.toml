@@ -1,18 +1,22 @@
 category = "elemental"
 # Earth-elemental ability entries.
 
-prefix_values = [
+_prefix_values = [
     { value = "geo", prefixable = false, suffixible = true },
     { value = "terra", prefixable = false, suffixible = true },
     { value = "petra", prefixable = false, suffixible = true },
     { value = "litho", prefixable = false, suffixible = true },
 ]
 
-suf_values = [
-    { value = "lith", prefixable = true, suffixible = false},
+_suffix_values = [
+    { value = "lith", prefixable = true, suffixible = false },
+    { value = "scape", prefixable = true, suffixible = false },
+    { value = "stone", prefixable = true, suffixible = false },
+    { value = "quake", prefixable = true, suffixible = false },
+    { value = "core", prefixable = true, suffixible = false },
 ]
 
-domain_values = [
+_domain_values = [
     { value = "earthquake", prefixable = false, suffixible = false },
     { value = "bedrock", prefixable = false, suffixible = false },
     { value = "canyon", prefixable = false, suffixible = false },
@@ -23,7 +27,7 @@ domain_values = [
     { value = "the crust", prefixable = false, suffixible = false },
 ]
 
-earth_melee_values = [
+_earth_melee_values = [
     { value = "rupture", prefixable = false, suffixible = false },
     { value = "shatter", prefixable = false, suffixible = false },
     { value = "sunder", prefixable = false, suffixible = false },
@@ -31,44 +35,44 @@ earth_melee_values = [
     { value = "bulldoze", prefixable = false, suffixible = false },
 ]
 
-earth_area_values = [
+_earth_area_values = [
     { value = "fissure", prefixable = false, suffixible = false },
     { value = "landslide", prefixable = false, suffixible = false },
     { value = "quake", prefixable = false, suffixible = true },
 ]
 
-earth_ranged_values = [
+_earth_ranged_values = [
     { value = "erosion", prefixable = false, suffixible = false },
     { value = "shard", prefixable = false, suffixible = false },
     { value = "tremor", prefixable = false, suffixible = false },
 ]
 
-earth_status_values = [
-    { value = "petrify", prefixable = false, suffixible = false },
-    { value = "entomb", prefixable = false, suffixible = false },
-    { value = "fossilize", prefixable = false, suffixible = false },
+_earth_status_values = [
+    { value = "petrify", prefixable = false, suffixible = false, noun_form = "petrification" },
+    { value = "entomb", prefixable = false, suffixible = false, noun_form = "entombment" },
+    { value = "fossilize", prefixable = false, suffixible = false, noun_form = "fossilization" },
 ]
 
-earth_defence_values = [
+_earth_defence_values = [
     { value = "slab", prefixable = false, suffixible = false },
     { value = "case", prefixable = false, suffixible = false },
 ]
 
-earth_movement_values = [
+_earth_movement_values = [
 
 ]
 
-verb_values = [
+other = [
 ]
 
-noun_values = [
+_noun_values = [
     { value = "rock", prefixable = false, suffixible = false },
     { value = "soil", prefixable = false, suffixible = false },
     { value = "boulder", prefixable = false, suffixible = false },
     { value = "crystal", prefixable = false, suffixible = false },
     { value = "granite", prefixable = false, suffixible = false },
     { value = "bedrock", prefixable = false, suffixible = false },
-    { value = "rubble", prefixable = false, suffixible = false },
+    { value = "rubble", prefixable = false, suffixible = false, plural = "rubble" },
     { value = "obsidian", prefixable = false, suffixible = false },
     { value = "pebble", prefixable = false, suffixible = false },
     { value = "geode", prefixable = false, suffixible = false },
@@ -78,7 +82,7 @@ noun_values = [
     { value = "gold", prefixable = false, suffixible = false },
 ]
 
-adj_values = [
+_adj_values = [
     { value = "seismic", prefixable = false, suffixible = false },
     { value = "tectonic", prefixable = false, suffixible = false },
     { value = "shattering", prefixable = false, suffixible = false },
@@ -89,44 +93,47 @@ adj_values = [
 
 
 [["melee"]]
-patterns = ["{earth_melee_values}"]
+patterns = ["{_earth_melee_values}"]
 
 [["area"]]
-patterns = ["{earth_area_values}"]
+patterns = ["{_earth_area_values}"]
 
 [["ranged"]]
-patterns = ["{earth_ranged_values}"]
+patterns = ["{_earth_ranged_values}"]
 
 [["status"]]
-patterns = ["{earth_status_values}"]
+patterns = ["{_earth_status_values}"]
 
 [["defence"]]
-patterns = ["{earth_defence_values}"]
+patterns = ["{_earth_defence_values}"]
 
 [[expose]]
-slot = "suf"
-from = ["suf_values"]
+slot = "suffix"
+from = ["_suffix_values"]
 
 [[expose]]
 slot = "prefix"
-from = ["prefix_values"]
-
-[[expose]]
-slot = "domain"
-from = ["domain_values"]
-
-[[expose]]
-slot = "technique"
-from = ["melee", "area", "ranged", "status", "defence", "movement"]
-
-[[expose]]
-slot = "verb"
-from = ["verb_values"]
-
-[[expose]]
-slot = "noun"
-from = ["noun_values"]
+from = ["_prefix_values"]
 
 [[expose]]
 slot = "adj"
-from = ["adj_values"]
+from = ["_adj_values"]
+
+[[expose]]
+slot = "verb"
+from = [
+    "melee",
+    "area",
+    "ranged",
+    "status",
+    "defence",
+    "movement",
+    "other",
+]
+
+[[expose]]
+slot = "noun"
+from = [
+    "_domain_values",
+    "_noun_values",
+]

@@ -11,22 +11,14 @@ prefix = [
     { value = "quantum", prefixable = true, suffixible = true },
     { value = "blockchain", prefixable = true, suffixible = true },
 ]
-buzzword_rank_values = [
+rank = [
     { value = "visionary", prefixable = true, suffixible = true },
     { value = "founder", prefixable = true, suffixible = true },
     { value = "evangelist", prefixable = true, suffixible = true },
     { value = "influencer", prefixable = true, suffixible = true },
     { value = "thought leader", prefixable = false, suffixible = false },
 ]
-buzzword_class_root_values = [
-    { value = "ninja", prefixable = true, suffixible = true },
-    { value = "rockstar", prefixable = true, suffixible = true },
-    { value = "guru", prefixable = true, suffixible = true },
-    { value = "hustler", prefixable = true, suffixible = true },
-    { value = "pioneer", prefixable = true, suffixible = true },
-    { value = "architect", prefixable = true, suffixible = true },
-]
-buzzword_adj_values = [
+adj = [
     { value = "disruptive", prefixable = true, suffixible = true },
     { value = "innovative", prefixable = true, suffixible = true },
     { value = "scalable", prefixable = true, suffixible = true },
@@ -46,15 +38,14 @@ buzzword_adj_values = [
     { value = "blockchain-based", prefixable = true, suffixible = true },
     { value = "quantum-enhanced", prefixable = true, suffixible = true },
 ]
-buzzword_adj_sup_values = [
+adj_sup = [
     { value = "most innovative", prefixable = false, suffixible = false },
     { value = "highest tech", prefixable = false, suffixible = false },
     { value = "visionary", prefixable = true, suffixible = true },
     { value = "serial", prefixable = true, suffixible = true },
-    { value = "most scammy", prefixable = false, suffixible = false },
     { value = "least innovative", prefixable = false, suffixible = false },
 ]
-buzzword_noun_values = [
+noun = [
     { value = "influencer", prefixable = true, suffixible = true },
     { value = "guru", prefixable = true, suffixible = true },
     { value = "ninja", prefixable = true, suffixible = true },
@@ -66,7 +57,7 @@ buzzword_noun_values = [
     { value = "pioneer", prefixable = true, suffixible = true },
     { value = "architect", prefixable = true, suffixible = true },
 ]
-buzzword_class_values = [
+class = [
     { value = "influencer", prefixable = true, suffixible = true },
     { value = "guru", prefixable = true, suffixible = true },
     { value = "ninja", prefixable = true, suffixible = true },
@@ -77,7 +68,7 @@ buzzword_class_values = [
     { value = "pioneer", prefixable = true, suffixible = true },
     { value = "architect", prefixable = true, suffixible = true },
 ]
-buzzword_thing_values = [
+thing = [
     { value = "blockchain", prefixable = true, suffixible = true },
     { value = "crypto", prefixable = true, suffixible = true },
     { value = "AI", prefixable = true, suffixible = true },
@@ -98,99 +89,68 @@ buzzword_thing_values = [
     { value = "leverage", prefixable = true, suffixible = true },
     { value = "ROI", prefixable = true, suffixible = true },
 ]
-
-buzzword_suf_values = [
-    { value = 'born', prefixable = true, suffixible = true },
-    { value = 'kin', prefixable = true, suffixible = true },
-    { value = 'kind', prefixable = true, suffixible = true },
-    { value = 'maker', prefixable = true, suffixible = true },
-]
-
-[[buzzword_suf]]
-patterns = [
-    "{buzzword_suf_values}",
+suffix = [
 ]
 
 [[place]]
-value = "the cloud"
-takes_of = true
-takes_in = false
-article = ""
+value = "cloud"
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
 
 [[place]]
-value = "the blockchain"
-takes_of = true
-takes_in = false
-article = ""
+value = "blockchain"
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
 
 [[place]]
-value = "the metaverse"
-takes_of = true
-takes_in = false
-article = ""
+value = "metaverse"
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
 
 [[place]]
 value = "web3"
-takes_of = true
-takes_in = false
 article = ""
 proper_noun = true
 prefixable = true
 suffixible = true
 
 [[place]]
-value = "the pipeline"
-takes_of = true
-takes_in = false
-article = ""
+value = "pipeline"
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
 
 [[place]]
-value = "the ecosystem"
-takes_of = true
-takes_in = false
-article = ""
+value = "ecosystem"
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
 
 [[place]]
-value = "the loop"
-takes_of = true
-takes_in = false
-article = ""
+value = "loop"
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
-
-[[class]]
-patterns = [
-    "{prefix}{class_root}",
-    "{class_root}",
-]
 
 [[expose]]
 slot = "rank"
 from = [
-    "buzzword_rank",
+    "rank",
 ]
 
 [[expose]]
 slot = "class"
 from = [
     "class",
-    "buzzword_class",
 ]
 
 [[expose]]
@@ -202,21 +162,21 @@ from = [
 [[expose]]
 slot = "adj"
 from = [
-    "buzzword_adj",
+    "adj",
 ]
 
 [[expose]]
 slot = "adj_sup"
 from = [
-    "buzzword_adj_sup",
+    "adj_sup",
 ]
 
 [[expose]]
 slot = "noun"
 from = [
-    "buzzword_noun",
+    "noun",
+    "thing",
 ]
-
 
 [[expose]]
 slot = "place"
@@ -225,47 +185,7 @@ from = [
 ]
 
 [[expose]]
-slot = "thing"
+slot = "suffix"
 from = [
-    "buzzword_thing",
-]
-
-[[buzzword_rank]]
-patterns = [
-    "{buzzword_rank_values}",
-]
-
-[[class_root]]
-patterns = [
-    "{buzzword_class_root_values}",
-]
-
-[[buzzword_adj]]
-patterns = [
-    "{buzzword_adj_values}",
-]
-
-[[buzzword_adj_sup]]
-patterns = [
-    "{buzzword_adj_sup_values}",
-]
-
-[[buzzword_noun]]
-patterns = [
-    "{buzzword_noun_values}",
-]
-
-[[buzzword_class]]
-patterns = [
-    "{buzzword_class_values}",
-]
-
-[[buzzword_thing]]
-patterns = [
-    "{buzzword_thing_values}",
-]
-[[expose]]
-slot = "suf"
-from = [
-    "buzzword_suf",
+    "suffix",
 ]

@@ -1,51 +1,47 @@
 category = "tonal"
 # Buzzword-toned ability entries.
 
-buzzword_melee_values = [
-    { value = "disrupt", prefixable = false, suffixible = false },
+_buzzword_melee_values = [
+    { value = "disrupt", prefixable = false, suffixible = false, noun_form = "disruption" },
 ]
 
-buzzword_area_values = [
+_buzzword_area_values = [
     { value = "scale", prefixable = false, suffixible = false },
-    { value = "iterate", prefixable = false, suffixible = false },
+    { value = "iterate", prefixable = false, suffixible = false, noun_form = "iteration" },
 ]
 
-buzzword_status_values = [
-    { value = "disrupt", prefixable = false, suffixible = false },
+_buzzword_status_values = [
+    { value = "disrupt", prefixable = false, suffixible = false, noun_form = "disruption" },
     { value = "pivot", prefixable = false, suffixible = false },
     { value = "onboard", prefixable = false, suffixible = false },
     { value = "benchmark", prefixable = false, suffixible = false },
-    { value = "optimize", prefixable = false, suffixible = false },
+    { value = "optimize", prefixable = false, suffixible = false, noun_form = "optimization" },
     { value = "leverage", prefixable = false, suffixible = false },
 ]
 
-buzzword_defence_values = [
+_buzzword_defence_values = [
     { value = "safeguard", prefixable = false, suffixible = false },
-    { value = "secure", prefixable = false, suffixible = false },
+    { value = "secure", prefixable = false, suffixible = false, noun_form = "security" },
 ]
 
-suf_values = []
-
-domain_values = [
-    { value = "synergy", prefixable = false, suffixible = false },
-    { value = "bandwidth", prefixable = false, suffixible = false },
-    { value = "ecosystem", prefixable = false, suffixible = false },
-    { value = "blockchain", prefixable = false, suffixible = false },
-    { value = "ROI", prefixable = false, suffixible = false },
-    { value = "web3", prefixable = false, suffixible = false },
-    { value = "the cloud", prefixable = false, suffixible = false },
+_suffix_values = [
+    { value = "ify", prefixable = true, suffixible = false },
+    { value = "ize", prefixable = true, suffixible = false },
+    { value = "tion", prefixable = true, suffixible = false },
+    { value = "omics", prefixable = true, suffixible = false },
+    { value = "verse", prefixable = true, suffixible = false },
 ]
 
-verb_values = [
-    { value = "disrupt", prefixable = false, suffixible = false },
+other = [
+    { value = "disrupt", prefixable = false, suffixible = false, noun_form = "disruption" },
     { value = "pivot", prefixable = false, suffixible = false },
-    { value = "iteration", prefixable = false, suffixible = false },
+    { value = "iterate", prefixable = false, suffixible = false, noun_form = "iteration" },
     { value = "leverage", prefixable = false, suffixible = false },
-    { value = "synergization", prefixable = false, suffixible = false },
+    { value = "synergize", prefixable = false, suffixible = false, noun_form = "synergization" },
     { value = "onboard", prefixable = false, suffixible = false },
 ]
 
-noun_values = [
+_noun_values = [
     { value = "MVP", prefixable = false, suffixible = false },
     { value = "pipeline", prefixable = false, suffixible = false },
     { value = "roadmap", prefixable = false, suffixible = false },
@@ -54,7 +50,7 @@ noun_values = [
     { value = "velocity", prefixable = false, suffixible = false },
 ]
 
-adj_values = [
+_adj_values = [
     { value = "disruptive", prefixable = false, suffixible = false },
     { value = "scalable", prefixable = false, suffixible = false },
     { value = "holistic", prefixable = false, suffixible = false },
@@ -63,7 +59,7 @@ adj_values = [
     { value = "world-class", prefixable = false, suffixible = false },
 ]
 
-adj_sup_values = [
+_adj_sup_values = [
     { value = "disruptive", prefixable = false, suffixible = false },
     { value = "scalable", prefixable = false, suffixible = false },
     { value = "holistic", prefixable = false, suffixible = false },
@@ -72,44 +68,47 @@ adj_sup_values = [
     { value = "world-class", prefixable = false, suffixible = false },
 ]
 
-buzzword_movement_values = []
+_buzzword_movement_values = []
 
 [["melee"]]
-patterns = ["{buzzword_melee_values}"]
+patterns = ["{_buzzword_melee_values}"]
 
 [["area"]]
-patterns = ["{buzzword_area_values}"]
+patterns = ["{_buzzword_area_values}"]
 
 [["status"]]
-patterns = ["{buzzword_status_values}"]
+patterns = ["{_buzzword_status_values}"]
 
 [["defence"]]
-patterns = ["{buzzword_defence_values}"]
+patterns = ["{_buzzword_defence_values}"]
 
 [[expose]]
-slot = "suf"
-from = ["suf_values"]
-
-[[expose]]
-slot = "technique"
-from = ["melee", "area", "status", "defence", "movement"]
-
-[[expose]]
-slot = "domain"
-from = ["domain_values"]
-
-[[expose]]
-slot = "verb"
-from = ["verb_values"]
-
-[[expose]]
-slot = "noun"
-from = ["noun_values"]
+slot = "suffix"
+from = ["_suffix_values"]
 
 [[expose]]
 slot = "adj"
-from = ["adj_values"]
+from = ["_adj_values"]
 
 [[expose]]
 slot = "adj_sup"
-from = ["adj_sup_values"]
+from = ["_adj_sup_values"]
+
+[[expose]]
+slot = "verb"
+from = [
+    "melee",
+    "area",
+    "ranged",
+    "status",
+    "defence",
+    "movement",
+    "other",
+]
+
+[[expose]]
+slot = "noun"
+from = [
+    "_domain_values",
+    "_noun_values",
+]

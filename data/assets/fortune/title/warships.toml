@@ -31,10 +31,6 @@ rank = [
 ]
 
 ship_suf = [
-    { value = 'born', prefixable = true, suffixible = true },
-    { value = 'kin', prefixable = true, suffixible = true },
-    { value = 'kind', prefixable = true, suffixible = true },
-    { value = 'craft', prefixable = true, suffixible = true },
 ]
 
 [[noun]]
@@ -61,7 +57,7 @@ from = [
     "rank",
 ]
 [[expose]]
-slot = "suf"
+slot = "suffix"
 from = [
     "ship_suf",
 ]

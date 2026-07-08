@@ -1,23 +1,18 @@
-class_root = [
+_class_root = [
     { value = "chef", prefixable = true, suffixible = true },
     { value = "cuisinier", prefixable = true, suffixible = true },
     { value = "patissier", prefixable = true, suffixible = true },
     { value = "sommelier", prefixable = true, suffixible = true },
 ]
 prefix = [
-    { value = "sous", prefixable = true, suffixible = true },
-    { value = "grand", prefixable = true, suffixible = true },
-    { value = "chef", prefixable = true, suffixible = true },
-    { value = "maitre", prefixable = true, suffixible = true },
 ]
-class_values = [
+_class_values = [
     { value = "chef", prefixable = true, suffixible = true },
-    { value = "sous chef", prefixable = false, suffixible = false },
     { value = "patissier", prefixable = true, suffixible = true },
     { value = "sommelier", prefixable = true, suffixible = true },
-    { value = "garcon", prefixable = true, suffixible = true },
 ]
 adj = [
+    { value = "sous", prefixable = true, suffixible = true },
     { value = "haute", prefixable = true, suffixible = true },
     { value = "petit", prefixable = true, suffixible = true },
     { value = "grande", prefixable = true, suffixible = true },
@@ -36,8 +31,6 @@ noun = [
     { value = "macaron", prefixable = true, suffixible = true },
     { value = "escargot", prefixable = true, suffixible = true },
     { value = "wine", prefixable = true, suffixible = true },
-]
-thing = [
     { value = "cuisine", prefixable = true, suffixible = true },
     { value = "sauce", prefixable = true, suffixible = true },
     { value = "baguettes", prefixable = true, suffixible = true },
@@ -45,32 +38,34 @@ thing = [
     { value = "escargot", prefixable = true, suffixible = true },
     { value = "wine", prefixable = true, suffixible = true },
 ]
-
-suf = [
-    { value = 'born', prefixable = true, suffixible = true },
-    { value = 'kin', prefixable = true, suffixible = true },
+suffix = [
+    { value = "iere", prefixable = true, suffixible = true },
+    { value = "ier", prefixable = true, suffixible = true },
+    { value = "eur", prefixable = true, suffixible = true },
+    { value = "age", prefixable = true, suffixible = true },
+    { value = "ade", prefixable = true, suffixible = true },
 ]
 
 [[class]]
 patterns = [
-    "{prefix}{class_root}",
-    "{class_root}",
+    "{prefix}{_class_root}",
+    "{_class_root}",
 ]
 
 [[place]]
-value = "the kitchen"
+value = "kitchen"
 takes_of = true
 takes_in = false
-article = ""
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
 
 [[place]]
-value = "the bistro"
+value = "bistro"
 takes_of = true
 takes_in = false
-article = ""
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
@@ -79,7 +74,7 @@ suffixible = false
 slot = "class"
 from = [
     "class",
-    "class_values",
+    "_class_values",
 ]
 
 [[expose]]
@@ -87,7 +82,6 @@ slot = "prefix"
 from = [
     "prefix",
 ]
-
 
 [[expose]]
 slot = "adj"
@@ -114,12 +108,7 @@ from = [
 ]
 
 [[expose]]
-slot = "thing"
+slot = "suffix"
 from = [
-    "thing",
-]
-[[expose]]
-slot = "suf"
-from = [
-    "suf",
+    "suffix",
 ]

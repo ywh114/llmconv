@@ -28,7 +28,19 @@ digit = [
     { value = "8", prefixable = true, suffixible = true },
     { value = "9", prefixable = true, suffixible = true },
 ]
-ordinal = [
+_nonzero_digit = [
+    { value = "1", prefixable = true, suffixible = true },
+    { value = "2", prefixable = true, suffixible = true },
+    { value = "3", prefixable = true, suffixible = true },
+    { value = "4", prefixable = true, suffixible = true },
+    { value = "5", prefixable = true, suffixible = true },
+    { value = "6", prefixable = true, suffixible = true },
+    { value = "7", prefixable = true, suffixible = true },
+    { value = "8", prefixable = true, suffixible = true },
+    { value = "9", prefixable = true, suffixible = true },
+]
+_ordinal_root = [
+    { value = "0th", prefixable = true, suffixible = true },
     { value = "1st", prefixable = true, suffixible = true },
     { value = "2nd", prefixable = true, suffixible = true },
     { value = "3rd", prefixable = true, suffixible = true },
@@ -38,29 +50,37 @@ ordinal = [
     { value = "7th", prefixable = true, suffixible = true },
     { value = "8th", prefixable = true, suffixible = true },
     { value = "9th", prefixable = true, suffixible = true },
-    { value = "10th", prefixable = true, suffixible = true },
-    { value = "11th", prefixable = true, suffixible = true },
-    { value = "12th", prefixable = true, suffixible = true },
-    { value = "13th", prefixable = true, suffixible = true },
-    { value = "21st", prefixable = true, suffixible = true },
-    { value = "22nd", prefixable = true, suffixible = true },
-    { value = "23rd", prefixable = true, suffixible = true },
-    { value = "24th", prefixable = true, suffixible = true },
+]
+
+[[ordinal]]
+patterns = [
+  "{_ordinal_root}",
+  "{_nonzero_number}{_ordinal_root}"
 ]
 
 [[number]]
 patterns = [
     "{digit}",
-    "{digit}{digit}",
-    "{digit}{digit}{digit}",
-    "{digit}{digit}{digit}{digit}",
-    "{digit}{digit}{digit}{digit}{digit}",
+    "{_nonzero_digit}{digit}",
+    "{_nonzero_digit}{digit}{digit}",
+    "{_nonzero_digit}{digit}{digit}{digit}",
+    "{_nonzero_digit}{digit}{digit}{digit}{digit}",
+]
+
+[[_nonzero_number]]
+patterns = [
+    "{digit}",
+    "{_nonzero_digit}{digit}",
+    "{_nonzero_digit}{digit}{digit}",
+    "{_nonzero_digit}{digit}{digit}{digit}",
+    "{_nonzero_digit}{digit}{digit}{digit}{digit}",
 ]
 
 [[expose]]
 slot = "number"
 from = [
     "number",
+    "digit",
 ]
 
 [[expose]]

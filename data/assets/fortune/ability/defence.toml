@@ -2,35 +2,35 @@ category = "delivery"
 
 # Generic defence delivery ability entries.
 
-defence_defence_values = [
+_defence_defence_values = [
     { value = "block", prefixable = false, suffixible = false },
     { value = "parry", prefixable = false, suffixible = false },
     { value = "guard", prefixable = false, suffixible = false },
-    { value = "deflect", prefixable = false, suffixible = false },
+    { value = "deflect", prefixable = false, suffixible = false, noun_form = "deflection" },
     { value = "counter", prefixable = false, suffixible = false },
     { value = "riposte", prefixable = false, suffixible = false },
-    { value = "endure", prefixable = false, suffixible = false },
+    { value = "endure", prefixable = false, suffixible = false, noun_form = "endurance" },
     { value = "shield", prefixable = false, suffixible = false },
     { value = "barrier", prefixable = false, suffixible = false },
     { value = "brace", prefixable = false, suffixible = false },
     { value = "ward", prefixable = false, suffixible = false },
-    { value = "repel", prefixable = false, suffixible = false },
-    { value = "reflect", prefixable = false, suffixible = false },
-    { value = "absorb", prefixable = false, suffixible = false },
+    { value = "repel", prefixable = false, suffixible = false, noun_form = "repulsion" },
+    { value = "reflect", prefixable = false, suffixible = false, noun_form = "reflection" },
+    { value = "absorb", prefixable = false, suffixible = false, noun_form = "absorption" },
     { value = "bulwark", prefixable = false, suffixible = false },
 ]
 
-verb_values = [
-    { value = "defend", prefixable = false, suffixible = false },
+other = [
+    { value = "defend", prefixable = false, suffixible = false, noun_form = "defense" },
     { value = "block", prefixable = false, suffixible = false },
     { value = "guard", prefixable = false, suffixible = false },
     { value = "parry", prefixable = false, suffixible = false },
-    { value = "repel", prefixable = false, suffixible = false },
+    { value = "repel", prefixable = false, suffixible = false, noun_form = "repulsion" },
     { value = "withstand", prefixable = false, suffixible = false },
-    { value = "absorb", prefixable = false, suffixible = false },
+    { value = "absorb", prefixable = false, suffixible = false, noun_form = "absorption" },
 ]
 
-noun_values = [
+_noun_values = [
     { value = "shield", prefixable = false, suffixible = false },
     { value = "barrier", prefixable = false, suffixible = false },
     { value = "wall", prefixable = false, suffixible = false },
@@ -42,7 +42,7 @@ noun_values = [
     { value = "fortress", prefixable = false, suffixible = false },
 ]
 
-adj_values = [
+_adj_values = [
     { value = "defensive", prefixable = false, suffixible = false },
     { value = "fortified", prefixable = false, suffixible = false },
     { value = "stalwart", prefixable = false, suffixible = false },
@@ -53,43 +53,42 @@ adj_values = [
     { value = "ironclad", prefixable = false, suffixible = false },
 ]
 
-suf_values = []
-
-domain_values = [
-    { value = "the bulwark", prefixable = false, suffixible = false },
-    { value = "the aegis", prefixable = false, suffixible = false },
-    { value = "the rampart", prefixable = false, suffixible = false },
-    { value = "the bastion", prefixable = false, suffixible = false },
-    { value = "iron", prefixable = false, suffixible = false },
-    { value = "adamant", prefixable = false, suffixible = false },
-    { value = "the shield", prefixable = false, suffixible = false },
+_suffix_values = [
+    { value = "ward", prefixable = true, suffixible = false },
+    { value = "guard", prefixable = true, suffixible = false },
+    { value = "wall", prefixable = true, suffixible = false },
+    { value = "shell", prefixable = true, suffixible = false },
+    { value = "skin", prefixable = true, suffixible = false },
 ]
 
-defence_movement_values = []
+_defence_movement_values = []
 
 [["defence"]]
-patterns = ["{defence_defence_values}"]
+patterns = ["{_defence_defence_values}"]
 
 [[expose]]
-slot = "suf"
-from = ["suf_values"]
-
-[[expose]]
-slot = "technique"
-from = ["defence", "movement"]
-
-[[expose]]
-slot = "verb"
-from = ["verb_values"]
-
-[[expose]]
-slot = "noun"
-from = ["noun_values"]
+slot = "suffix"
+from = ["_suffix_values"]
 
 [[expose]]
 slot = "adj"
-from = ["adj_values"]
+from = ["_adj_values"]
 
 [[expose]]
-slot = "domain"
-from = ["domain_values"]
+slot = "verb"
+from = [
+    "melee",
+    "area",
+    "ranged",
+    "status",
+    "defence",
+    "movement",
+    "other",
+]
+
+[[expose]]
+slot = "noun"
+from = [
+    "_domain_values",
+    "_noun_values",
+]

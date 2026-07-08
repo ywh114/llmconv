@@ -9,11 +9,13 @@ prefix = [
     { value = "peta", prefixable = true, suffixible = true },
     { value = "exa", prefixable = true, suffixible = true },
 ]
-
-suf = [
-    { value = 'scale', prefixable = true, suffixible = true },
-    { value = 'class', prefixable = true, suffixible = true },
-    { value = 'kind', prefixable = true, suffixible = true },
+suffix = [
+    { value = "meter", prefixable = true, suffixible = true },
+    { value = "gram", prefixable = true, suffixible = true },
+    { value = "level", prefixable = true, suffixible = true },
+    { value = "index", prefixable = true, suffixible = true },
+    { value = "point", prefixable = true, suffixible = true },
+    { value = "scale", prefixable = true, suffixible = true },
 ]
 
 [[expose]]
@@ -21,8 +23,9 @@ slot = "prefix"
 from = [
     "prefix",
 ]
+
 [[expose]]
-slot = "suf"
+slot = "suffix"
 from = [
-    "suf",
+    "suffix",
 ]

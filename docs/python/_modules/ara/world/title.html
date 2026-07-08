@@ -44,6 +44,15 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">ara.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">AraSettings</span>
 
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">ara.world._fortune_tokens</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">expand</span> <span class="k">as</span> <span class="n">_expand</span><span class="p">,</span>
+    <span class="n">expand_all</span> <span class="k">as</span> <span class="n">_expand_all</span><span class="p">,</span>
+    <span class="n">expand_all_traced</span> <span class="k">as</span> <span class="n">_expand_all_traced</span><span class="p">,</span>
+    <span class="n">expand_traced</span> <span class="k">as</span> <span class="n">_expand_traced</span><span class="p">,</span>
+    <span class="n">title_case</span> <span class="k">as</span> <span class="n">_title_case</span><span class="p">,</span>
+<span class="p">)</span>
+
+
 <span class="n">LEVELS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;simple&quot;</span><span class="p">,</span> <span class="s2">&quot;moderate&quot;</span><span class="p">,</span> <span class="s2">&quot;complex&quot;</span><span class="p">,</span> <span class="s2">&quot;insane&quot;</span><span class="p">]</span>
 <span class="n">_ALWAYS_LOAD</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;generic&quot;</span><span class="p">,</span> <span class="s2">&quot;numbers&quot;</span><span class="p">,</span> <span class="s2">&quot;templates&quot;</span><span class="p">}</span>
 <span class="n">_GENERIC_SLOTS</span> <span class="o">=</span> <span class="p">{</span>
@@ -58,46 +67,8 @@
     <span class="s2">&quot;number&quot;</span><span class="p">,</span>
     <span class="s2">&quot;ordinal&quot;</span><span class="p">,</span>
     <span class="s2">&quot;roman_numeral&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;suf&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;suffix&quot;</span><span class="p">,</span>
 <span class="p">}</span>
-<span class="c1"># Slot ordering: place/domain must expand before sufs so article stripping sees {suf}</span>
-<span class="n">_PLACE_FIRST</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;place&quot;</span><span class="p">,</span> <span class="s2">&quot;domain&quot;</span><span class="p">}</span>
-<span class="n">_SUF_LAST</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;suf&quot;</span><span class="p">}</span>
-
-<span class="c1"># Slots whose entries may carry an &quot;article&quot; field (the/a/an)</span>
-<span class="n">_ARTICLE_SLOTS</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;place&quot;</span><span class="p">,</span> <span class="s2">&quot;domain&quot;</span><span class="p">}</span>
-
-<span class="c1"># Words that expect their object to keep its article (e.g. &quot;of the North&quot;, not &quot;of North&quot;).</span>
-<span class="c1"># Includes conjunctions so that list items keep their own articles</span>
-<span class="c1"># (e.g. &quot;of the Kuiper Belt and the World Map&quot;).</span>
-<span class="n">_KEEP_ARTICLE_AFTER</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">({</span>
-    <span class="s2">&quot;of&quot;</span><span class="p">,</span> <span class="s2">&quot;from&quot;</span><span class="p">,</span> <span class="s2">&quot;in&quot;</span><span class="p">,</span> <span class="s2">&quot;on&quot;</span><span class="p">,</span> <span class="s2">&quot;at&quot;</span><span class="p">,</span> <span class="s2">&quot;to&quot;</span><span class="p">,</span> <span class="s2">&quot;by&quot;</span><span class="p">,</span> <span class="s2">&quot;for&quot;</span><span class="p">,</span> <span class="s2">&quot;with&quot;</span><span class="p">,</span> <span class="s2">&quot;without&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;upon&quot;</span><span class="p">,</span> <span class="s2">&quot;over&quot;</span><span class="p">,</span> <span class="s2">&quot;under&quot;</span><span class="p">,</span> <span class="s2">&quot;against&quot;</span><span class="p">,</span> <span class="s2">&quot;beyond&quot;</span><span class="p">,</span> <span class="s2">&quot;through&quot;</span><span class="p">,</span> <span class="s2">&quot;between&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;among&quot;</span><span class="p">,</span> <span class="s2">&quot;within&quot;</span><span class="p">,</span> <span class="s2">&quot;across&quot;</span><span class="p">,</span> <span class="s2">&quot;behind&quot;</span><span class="p">,</span> <span class="s2">&quot;beside&quot;</span><span class="p">,</span> <span class="s2">&quot;near&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;inside&quot;</span><span class="p">,</span> <span class="s2">&quot;outside&quot;</span><span class="p">,</span> <span class="s2">&quot;toward&quot;</span><span class="p">,</span> <span class="s2">&quot;towards&quot;</span><span class="p">,</span> <span class="s2">&quot;about&quot;</span><span class="p">,</span> <span class="s2">&quot;into&quot;</span><span class="p">,</span> <span class="s2">&quot;onto&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;before&quot;</span><span class="p">,</span> <span class="s2">&quot;after&quot;</span><span class="p">,</span> <span class="s2">&quot;along&quot;</span><span class="p">,</span> <span class="s2">&quot;around&quot;</span><span class="p">,</span> <span class="s2">&quot;below&quot;</span><span class="p">,</span> <span class="s2">&quot;beneath&quot;</span><span class="p">,</span> <span class="s2">&quot;during&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;throughout&quot;</span><span class="p">,</span> <span class="s2">&quot;via&quot;</span><span class="p">,</span> <span class="s2">&quot;past&quot;</span><span class="p">,</span> <span class="s2">&quot;despite&quot;</span><span class="p">,</span> <span class="s2">&quot;except&quot;</span><span class="p">,</span> <span class="s2">&quot;like&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;and&quot;</span><span class="p">,</span> <span class="s2">&quot;or&quot;</span><span class="p">,</span> <span class="s2">&quot;nor&quot;</span><span class="p">,</span> <span class="s2">&quot;yet&quot;</span><span class="p">,</span>
-<span class="p">})</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">_should_keep_article</span><span class="p">(</span><span class="n">before_text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return True if a slot&#39;s article should be kept, based on the preceding text.</span>
-
-<span class="sd">    A slot&#39;s article is normally dropped when it follows a regular word or</span>
-<span class="sd">    another slot placeholder — but preserved when the preceding word is a</span>
-<span class="sd">    conjunction (``and``, ``or``, etc.) or preposition (``of``, ``from``, …).</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">before_text</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">True</span>
-    <span class="n">tokens</span> <span class="o">=</span> <span class="n">before_text</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
-    <span class="n">last_token</span> <span class="o">=</span> <span class="n">tokens</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="n">tokens</span> <span class="k">else</span> <span class="n">before_text</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">last_token</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">True</span>
-    <span class="n">last_char</span> <span class="o">=</span> <span class="n">last_token</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-    <span class="k">if</span> <span class="n">last_char</span><span class="o">.</span><span class="n">islower</span><span class="p">()</span> <span class="ow">or</span> <span class="n">last_char</span> <span class="o">==</span> <span class="s1">&#39;}&#39;</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">last_token</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">_KEEP_ARTICLE_AFTER</span>
-    <span class="k">return</span> <span class="kc">True</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_title_dirs</span><span class="p">(</span>
@@ -207,68 +178,8 @@
     <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="n">max_depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Expand a title template into a concrete string.&quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">depth</span> <span class="o">&gt;=</span> <span class="n">max_depth</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">pattern</span>
-
-    <span class="n">result</span> <span class="o">=</span> <span class="n">pattern</span>
-
-    <span class="c1"># Sort keys so place is expanded before sufs (article stripping depends on it)</span>
-    <span class="n">ordered_slots</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
-        <span class="n">grammar</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span>
-        <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">k</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">_SUF_LAST</span> <span class="k">else</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">_PLACE_FIRST</span> <span class="k">else</span> <span class="mi">1</span><span class="p">),</span>
-    <span class="p">)</span>
-
-    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-        <span class="n">replaced</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="k">for</span> <span class="n">slot</span> <span class="ow">in</span> <span class="n">ordered_slots</span><span class="p">:</span>
-            <span class="n">placeholder</span> <span class="o">=</span> <span class="s2">&quot;{&quot;</span> <span class="o">+</span> <span class="n">slot</span> <span class="o">+</span> <span class="s2">&quot;}&quot;</span>
-            <span class="k">while</span> <span class="n">placeholder</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
-                <span class="n">entries</span> <span class="o">=</span> <span class="n">grammar</span><span class="p">[</span><span class="n">slot</span><span class="p">]</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="n">entries</span><span class="p">:</span>
-                    <span class="k">break</span>
-                <span class="n">entry</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">entries</span><span class="p">)</span>
-                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot;patterns&quot;</span> <span class="ow">in</span> <span class="n">entry</span><span class="p">:</span>
-                    <span class="n">sub_pattern</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">entry</span><span class="p">[</span><span class="s2">&quot;patterns&quot;</span><span class="p">])</span>
-                    <span class="n">replacement</span> <span class="o">=</span> <span class="n">expand</span><span class="p">(</span><span class="n">sub_pattern</span><span class="p">,</span> <span class="n">grammar</span><span class="p">,</span> <span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">)</span>
-                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot;value&quot;</span> <span class="ow">in</span> <span class="n">entry</span><span class="p">:</span>
-                    <span class="n">value</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">]</span>
-                    <span class="n">article</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;article&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-                    <span class="n">noun_form</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;noun_form&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="n">article</span> <span class="ow">and</span> <span class="n">slot</span> <span class="ow">in</span> <span class="n">_ARTICLE_SLOTS</span> <span class="ow">and</span> <span class="n">value</span><span class="p">:</span>
-                        <span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^(the|an?)\s+&#39;</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span>
-                        <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
-                            <span class="n">article</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-                            <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="n">m</span><span class="o">.</span><span class="n">end</span><span class="p">():]</span>
-                    <span class="k">if</span> <span class="n">article</span> <span class="ow">and</span> <span class="n">slot</span> <span class="ow">in</span> <span class="n">_ARTICLE_SLOTS</span><span class="p">:</span>
-                        <span class="n">placeholder_pos</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">placeholder</span><span class="p">)</span>
-                        <span class="k">if</span> <span class="ow">not</span> <span class="n">_should_keep_article</span><span class="p">(</span><span class="n">result</span><span class="p">[:</span><span class="n">placeholder_pos</span><span class="p">]):</span>
-                            <span class="n">skip_article</span> <span class="o">=</span> <span class="kc">True</span>
-                        <span class="k">else</span><span class="p">:</span>
-                            <span class="n">skip_article</span> <span class="o">=</span> <span class="kc">False</span>
-                            <span class="n">after_pos</span> <span class="o">=</span> <span class="n">placeholder_pos</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">placeholder</span><span class="p">)</span>
-                            <span class="k">if</span> <span class="n">after_pos</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="ow">and</span> <span class="n">result</span><span class="p">[</span><span class="n">after_pos</span><span class="p">:]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;{suf&quot;</span><span class="p">):</span>
-                                <span class="n">skip_article</span> <span class="o">=</span> <span class="kc">True</span>
-                        <span class="k">if</span> <span class="ow">not</span> <span class="n">skip_article</span><span class="p">:</span>
-                            <span class="n">value</span> <span class="o">=</span> <span class="n">article</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">value</span>
-                    <span class="k">elif</span> <span class="n">noun_form</span><span class="p">:</span>
-                        <span class="n">placeholder_pos</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">placeholder</span><span class="p">)</span>
-                        <span class="n">after_pos</span> <span class="o">=</span> <span class="n">placeholder_pos</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">placeholder</span><span class="p">)</span>
-                        <span class="k">if</span> <span class="n">after_pos</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="ow">and</span> <span class="n">result</span><span class="p">[</span><span class="n">after_pos</span><span class="p">:]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot; of&quot;</span><span class="p">):</span>
-                            <span class="n">value</span> <span class="o">=</span> <span class="n">noun_form</span>
-                    <span class="n">replacement</span> <span class="o">=</span> <span class="n">value</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">replacement</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
-                <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">placeholder</span><span class="p">,</span> <span class="n">replacement</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-                <span class="n">replaced</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">replaced</span><span class="p">:</span>
-            <span class="k">break</span>
-
-    <span class="n">stripped</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^([Tt]he)\s(\S+)$&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;\2&#39;</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">stripped</span> <span class="o">!=</span> <span class="n">result</span><span class="p">:</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">stripped</span>
-
-    <span class="k">return</span> <span class="n">result</span></div>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Expand a title template into a concrete, title-cased string.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_expand</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">grammar</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">)</span></div>
 
 
 
@@ -281,86 +192,8 @@
     <span class="n">max_depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
     <span class="n">_parent</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Like :func:`expand` but returns ``(text, trace)`` where *trace* is a</span>
-<span class="sd">    list of ``{&quot;slot&quot;: str, &quot;value&quot;: str, &quot;source&quot;: str, &quot;parent&quot;: str}`` dicts.</span>
-<span class="sd">    *parent* is set when the slot was resolved via a pattern in a parent slot</span>
-<span class="sd">    (e.g. ``place -&gt; nato_name``).</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">depth</span> <span class="o">&gt;=</span> <span class="n">max_depth</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">pattern</span><span class="p">,</span> <span class="p">[]</span>
-
-    <span class="n">trace</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-
-    <span class="n">result</span> <span class="o">=</span> <span class="n">pattern</span>
-
-    <span class="n">ordered_slots</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
-        <span class="n">grammar</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span>
-        <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">k</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">_SUF_LAST</span> <span class="k">else</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">_PLACE_FIRST</span> <span class="k">else</span> <span class="mi">1</span><span class="p">),</span>
-    <span class="p">)</span>
-
-    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-        <span class="n">replaced</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="k">for</span> <span class="n">slot</span> <span class="ow">in</span> <span class="n">ordered_slots</span><span class="p">:</span>
-            <span class="n">placeholder</span> <span class="o">=</span> <span class="s2">&quot;{&quot;</span> <span class="o">+</span> <span class="n">slot</span> <span class="o">+</span> <span class="s2">&quot;}&quot;</span>
-            <span class="k">while</span> <span class="n">placeholder</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
-                <span class="n">entries</span> <span class="o">=</span> <span class="n">grammar</span><span class="p">[</span><span class="n">slot</span><span class="p">]</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="n">entries</span><span class="p">:</span>
-                    <span class="k">break</span>
-                <span class="n">entry</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">entries</span><span class="p">)</span>
-                <span class="n">src</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;_source&quot;</span><span class="p">,</span> <span class="s2">&quot;?&quot;</span><span class="p">)</span>
-                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot;patterns&quot;</span> <span class="ow">in</span> <span class="n">entry</span><span class="p">:</span>
-                    <span class="n">sub_pattern</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">entry</span><span class="p">[</span><span class="s2">&quot;patterns&quot;</span><span class="p">])</span>
-                    <span class="n">replacement</span><span class="p">,</span> <span class="n">sub_trace</span> <span class="o">=</span> <span class="n">expand_traced</span><span class="p">(</span>
-                        <span class="n">sub_pattern</span><span class="p">,</span> <span class="n">grammar</span><span class="p">,</span> <span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">,</span>
-                        <span class="n">_parent</span><span class="o">=</span><span class="n">slot</span><span class="p">,</span>
-                    <span class="p">)</span>
-                    <span class="n">trace</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">sub_trace</span><span class="p">)</span>
-                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot;value&quot;</span> <span class="ow">in</span> <span class="n">entry</span><span class="p">:</span>
-                    <span class="n">value</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">]</span>
-                    <span class="n">article</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;article&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-                    <span class="n">noun_form</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;noun_form&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="n">article</span> <span class="ow">and</span> <span class="n">slot</span> <span class="ow">in</span> <span class="n">_ARTICLE_SLOTS</span> <span class="ow">and</span> <span class="n">value</span><span class="p">:</span>
-                        <span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^(the|an?)\s+&#39;</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span>
-                        <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
-                            <span class="n">article</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-                            <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="n">m</span><span class="o">.</span><span class="n">end</span><span class="p">():]</span>
-                    <span class="k">if</span> <span class="n">article</span> <span class="ow">and</span> <span class="n">slot</span> <span class="ow">in</span> <span class="n">_ARTICLE_SLOTS</span><span class="p">:</span>
-                        <span class="n">placeholder_pos</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">placeholder</span><span class="p">)</span>
-                        <span class="k">if</span> <span class="ow">not</span> <span class="n">_should_keep_article</span><span class="p">(</span><span class="n">result</span><span class="p">[:</span><span class="n">placeholder_pos</span><span class="p">]):</span>
-                            <span class="n">skip_article</span> <span class="o">=</span> <span class="kc">True</span>
-                        <span class="k">else</span><span class="p">:</span>
-                            <span class="n">skip_article</span> <span class="o">=</span> <span class="kc">False</span>
-                            <span class="n">after_pos</span> <span class="o">=</span> <span class="n">placeholder_pos</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">placeholder</span><span class="p">)</span>
-                            <span class="k">if</span> <span class="n">after_pos</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="ow">and</span> <span class="n">result</span><span class="p">[</span><span class="n">after_pos</span><span class="p">:]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;{suf&quot;</span><span class="p">):</span>
-                                <span class="n">skip_article</span> <span class="o">=</span> <span class="kc">True</span>
-                        <span class="k">if</span> <span class="ow">not</span> <span class="n">skip_article</span><span class="p">:</span>
-                            <span class="n">value</span> <span class="o">=</span> <span class="n">article</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">value</span>
-                    <span class="k">elif</span> <span class="n">noun_form</span><span class="p">:</span>
-                        <span class="n">placeholder_pos</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">placeholder</span><span class="p">)</span>
-                        <span class="n">after_pos</span> <span class="o">=</span> <span class="n">placeholder_pos</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">placeholder</span><span class="p">)</span>
-                        <span class="k">if</span> <span class="n">after_pos</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="ow">and</span> <span class="n">result</span><span class="p">[</span><span class="n">after_pos</span><span class="p">:]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot; of&quot;</span><span class="p">):</span>
-                            <span class="n">value</span> <span class="o">=</span> <span class="n">noun_form</span>
-                    <span class="n">replacement</span> <span class="o">=</span> <span class="n">value</span>
-                    <span class="n">tr</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;slot&quot;</span><span class="p">:</span> <span class="n">slot</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">value</span><span class="p">,</span> <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="n">src</span><span class="p">}</span>
-                    <span class="k">if</span> <span class="n">_parent</span><span class="p">:</span>
-                        <span class="n">tr</span><span class="p">[</span><span class="s2">&quot;parent&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_parent</span>
-                    <span class="n">trace</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tr</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">replacement</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
-                    <span class="n">tr</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;slot&quot;</span><span class="p">:</span> <span class="n">slot</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">replacement</span><span class="p">,</span> <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="n">src</span><span class="p">}</span>
-                    <span class="k">if</span> <span class="n">_parent</span><span class="p">:</span>
-                        <span class="n">tr</span><span class="p">[</span><span class="s2">&quot;parent&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_parent</span>
-                    <span class="n">trace</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tr</span><span class="p">)</span>
-                <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">placeholder</span><span class="p">,</span> <span class="n">replacement</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-                <span class="n">replaced</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">replaced</span><span class="p">:</span>
-            <span class="k">break</span>
-
-    <span class="n">stripped</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^([Tt]he)\s(\S+)$&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;\2&#39;</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">stripped</span> <span class="o">!=</span> <span class="n">result</span><span class="p">:</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">stripped</span>
-
-    <span class="k">return</span> <span class="n">result</span><span class="p">,</span> <span class="n">trace</span></div>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Expand a title template into a concrete string with provenance trace.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_expand_traced</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">grammar</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">,</span> <span class="n">_parent</span><span class="p">)</span></div>
 
 
 
@@ -373,63 +206,7 @@
     <span class="n">max_depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Enumerate every expansion of a template.&quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">depth</span> <span class="o">&gt;=</span> <span class="n">max_depth</span><span class="p">:</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">pattern</span><span class="p">]</span>
-
-    <span class="n">ordered_slots</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
-        <span class="n">grammar</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span>
-        <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">k</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">_SUF_LAST</span> <span class="k">else</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">_PLACE_FIRST</span> <span class="k">else</span> <span class="mi">1</span><span class="p">),</span>
-    <span class="p">)</span>
-    <span class="k">for</span> <span class="n">slot</span> <span class="ow">in</span> <span class="n">ordered_slots</span><span class="p">:</span>
-        <span class="n">placeholder</span> <span class="o">=</span> <span class="s2">&quot;{&quot;</span> <span class="o">+</span> <span class="n">slot</span> <span class="o">+</span> <span class="s2">&quot;}&quot;</span>
-        <span class="k">if</span> <span class="n">placeholder</span> <span class="ow">in</span> <span class="n">pattern</span><span class="p">:</span>
-            <span class="n">entries</span> <span class="o">=</span> <span class="n">grammar</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">slot</span><span class="p">,</span> <span class="p">[])</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">entries</span><span class="p">:</span>
-                <span class="k">return</span> <span class="p">[</span><span class="n">pattern</span><span class="p">]</span>
-            <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">entries</span><span class="p">:</span>
-                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot;patterns&quot;</span> <span class="ow">in</span> <span class="n">entry</span><span class="p">:</span>
-                    <span class="k">for</span> <span class="n">sub_pattern</span> <span class="ow">in</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;patterns&quot;</span><span class="p">]:</span>
-                        <span class="k">for</span> <span class="n">replacement</span> <span class="ow">in</span> <span class="n">expand_all</span><span class="p">(</span>
-                            <span class="n">sub_pattern</span><span class="p">,</span> <span class="n">grammar</span><span class="p">,</span> <span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">max_depth</span>
-                        <span class="p">):</span>
-                            <span class="n">new_pattern</span> <span class="o">=</span> <span class="n">pattern</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">placeholder</span><span class="p">,</span> <span class="n">replacement</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-                            <span class="n">results</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
-                                <span class="n">expand_all</span><span class="p">(</span><span class="n">new_pattern</span><span class="p">,</span> <span class="n">grammar</span><span class="p">,</span> <span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">)</span>
-                            <span class="p">)</span>
-                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot;value&quot;</span> <span class="ow">in</span> <span class="n">entry</span><span class="p">:</span>
-                    <span class="n">value</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">]</span>
-                    <span class="n">article</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;article&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-                    <span class="n">noun_form</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;noun_form&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="n">article</span> <span class="ow">and</span> <span class="n">slot</span> <span class="ow">in</span> <span class="n">_ARTICLE_SLOTS</span> <span class="ow">and</span> <span class="n">value</span><span class="p">:</span>
-                        <span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^(the|an?)\s+&#39;</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span>
-                        <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
-                            <span class="n">article</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-                            <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="n">m</span><span class="o">.</span><span class="n">end</span><span class="p">():]</span>
-                    <span class="k">if</span> <span class="n">article</span> <span class="ow">and</span> <span class="n">slot</span> <span class="ow">in</span> <span class="n">_ARTICLE_SLOTS</span><span class="p">:</span>
-                        <span class="n">placeholder_pos</span> <span class="o">=</span> <span class="n">pattern</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">placeholder</span><span class="p">)</span>
-                        <span class="k">if</span> <span class="ow">not</span> <span class="n">_should_keep_article</span><span class="p">(</span><span class="n">pattern</span><span class="p">[:</span><span class="n">placeholder_pos</span><span class="p">]):</span>
-                            <span class="n">skip_article</span> <span class="o">=</span> <span class="kc">True</span>
-                        <span class="k">else</span><span class="p">:</span>
-                            <span class="n">skip_article</span> <span class="o">=</span> <span class="kc">False</span>
-                            <span class="n">after_pos</span> <span class="o">=</span> <span class="n">placeholder_pos</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">placeholder</span><span class="p">)</span>
-                            <span class="k">if</span> <span class="n">after_pos</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">pattern</span><span class="p">)</span> <span class="ow">and</span> <span class="n">pattern</span><span class="p">[</span><span class="n">after_pos</span><span class="p">:]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;{suf&quot;</span><span class="p">):</span>
-                                <span class="n">skip_article</span> <span class="o">=</span> <span class="kc">True</span>
-                        <span class="k">if</span> <span class="ow">not</span> <span class="n">skip_article</span><span class="p">:</span>
-                            <span class="n">value</span> <span class="o">=</span> <span class="n">article</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">value</span>
-                    <span class="k">elif</span> <span class="n">noun_form</span><span class="p">:</span>
-                        <span class="n">placeholder_pos</span> <span class="o">=</span> <span class="n">pattern</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">placeholder</span><span class="p">)</span>
-                        <span class="n">after_pos</span> <span class="o">=</span> <span class="n">placeholder_pos</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">placeholder</span><span class="p">)</span>
-                        <span class="k">if</span> <span class="n">after_pos</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">pattern</span><span class="p">)</span> <span class="ow">and</span> <span class="n">pattern</span><span class="p">[</span><span class="n">after_pos</span><span class="p">:]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot; of&quot;</span><span class="p">):</span>
-                            <span class="n">value</span> <span class="o">=</span> <span class="n">noun_form</span>
-                    <span class="n">new_pattern</span> <span class="o">=</span> <span class="n">pattern</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">placeholder</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-                    <span class="n">results</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">expand_all</span><span class="p">(</span><span class="n">new_pattern</span><span class="p">,</span> <span class="n">grammar</span><span class="p">,</span> <span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">))</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">new_pattern</span> <span class="o">=</span> <span class="n">pattern</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">placeholder</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">entry</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
-                    <span class="n">results</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">expand_all</span><span class="p">(</span><span class="n">new_pattern</span><span class="p">,</span> <span class="n">grammar</span><span class="p">,</span> <span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">))</span>
-            <span class="k">return</span> <span class="n">results</span>
-
-    <span class="k">return</span> <span class="p">[</span><span class="n">pattern</span><span class="p">]</span></div>
+    <span class="k">return</span> <span class="n">_expand_all</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">grammar</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">)</span></div>
 
 
 
@@ -443,78 +220,7 @@
     <span class="n">_parent</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Enumerate every expansion of a template with provenance traces.&quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">depth</span> <span class="o">&gt;=</span> <span class="n">max_depth</span><span class="p">:</span>
-        <span class="k">return</span> <span class="p">[(</span><span class="n">pattern</span><span class="p">,</span> <span class="p">[])]</span>
-
-    <span class="n">ordered_slots</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
-        <span class="n">grammar</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span>
-        <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">k</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">_SUF_LAST</span> <span class="k">else</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">_PLACE_FIRST</span> <span class="k">else</span> <span class="mi">1</span><span class="p">),</span>
-    <span class="p">)</span>
-    <span class="k">for</span> <span class="n">slot</span> <span class="ow">in</span> <span class="n">ordered_slots</span><span class="p">:</span>
-        <span class="n">placeholder</span> <span class="o">=</span> <span class="s2">&quot;{&quot;</span> <span class="o">+</span> <span class="n">slot</span> <span class="o">+</span> <span class="s2">&quot;}&quot;</span>
-        <span class="k">if</span> <span class="n">placeholder</span> <span class="ow">in</span> <span class="n">pattern</span><span class="p">:</span>
-            <span class="n">entries</span> <span class="o">=</span> <span class="n">grammar</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">slot</span><span class="p">,</span> <span class="p">[])</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">entries</span><span class="p">:</span>
-                <span class="k">return</span> <span class="p">[(</span><span class="n">pattern</span><span class="p">,</span> <span class="p">[])]</span>
-            <span class="n">results</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">entries</span><span class="p">:</span>
-                <span class="n">src</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;_source&quot;</span><span class="p">,</span> <span class="s2">&quot;?&quot;</span><span class="p">)</span>
-                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot;patterns&quot;</span> <span class="ow">in</span> <span class="n">entry</span><span class="p">:</span>
-                    <span class="k">for</span> <span class="n">sub_pattern</span> <span class="ow">in</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;patterns&quot;</span><span class="p">]:</span>
-                        <span class="k">for</span> <span class="n">repl_text</span><span class="p">,</span> <span class="n">sub_trace</span> <span class="ow">in</span> <span class="n">expand_all_traced</span><span class="p">(</span>
-                            <span class="n">sub_pattern</span><span class="p">,</span> <span class="n">grammar</span><span class="p">,</span> <span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">,</span>
-                            <span class="n">_parent</span><span class="o">=</span><span class="n">slot</span><span class="p">,</span>
-                        <span class="p">):</span>
-                            <span class="n">new_pattern</span> <span class="o">=</span> <span class="n">pattern</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">placeholder</span><span class="p">,</span> <span class="n">repl_text</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-                            <span class="k">for</span> <span class="n">result_str</span><span class="p">,</span> <span class="n">deeper</span> <span class="ow">in</span> <span class="n">expand_all_traced</span><span class="p">(</span>
-                                <span class="n">new_pattern</span><span class="p">,</span> <span class="n">grammar</span><span class="p">,</span> <span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">,</span>
-                            <span class="p">):</span>
-                                <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">result_str</span><span class="p">,</span> <span class="n">sub_trace</span> <span class="o">+</span> <span class="n">deeper</span><span class="p">))</span>
-                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot;value&quot;</span> <span class="ow">in</span> <span class="n">entry</span><span class="p">:</span>
-                    <span class="n">value</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">]</span>
-                    <span class="n">article</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;article&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-                    <span class="n">noun_form</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;noun_form&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="n">article</span> <span class="ow">and</span> <span class="n">slot</span> <span class="ow">in</span> <span class="n">_ARTICLE_SLOTS</span> <span class="ow">and</span> <span class="n">value</span><span class="p">:</span>
-                        <span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^(the|an?)\s+&#39;</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span>
-                        <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
-                            <span class="n">article</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-                            <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="n">m</span><span class="o">.</span><span class="n">end</span><span class="p">():]</span>
-                    <span class="k">if</span> <span class="n">article</span> <span class="ow">and</span> <span class="n">slot</span> <span class="ow">in</span> <span class="n">_ARTICLE_SLOTS</span><span class="p">:</span>
-                        <span class="n">placeholder_pos</span> <span class="o">=</span> <span class="n">pattern</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">placeholder</span><span class="p">)</span>
-                        <span class="k">if</span> <span class="ow">not</span> <span class="n">_should_keep_article</span><span class="p">(</span><span class="n">pattern</span><span class="p">[:</span><span class="n">placeholder_pos</span><span class="p">]):</span>
-                            <span class="n">skip_article</span> <span class="o">=</span> <span class="kc">True</span>
-                        <span class="k">else</span><span class="p">:</span>
-                            <span class="n">skip_article</span> <span class="o">=</span> <span class="kc">False</span>
-                            <span class="n">after_pos</span> <span class="o">=</span> <span class="n">placeholder_pos</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">placeholder</span><span class="p">)</span>
-                            <span class="k">if</span> <span class="n">after_pos</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">pattern</span><span class="p">)</span> <span class="ow">and</span> <span class="n">pattern</span><span class="p">[</span><span class="n">after_pos</span><span class="p">:]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;{suf&quot;</span><span class="p">):</span>
-                                <span class="n">skip_article</span> <span class="o">=</span> <span class="kc">True</span>
-                        <span class="k">if</span> <span class="ow">not</span> <span class="n">skip_article</span><span class="p">:</span>
-                            <span class="n">value</span> <span class="o">=</span> <span class="n">article</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">value</span>
-                    <span class="k">elif</span> <span class="n">noun_form</span><span class="p">:</span>
-                        <span class="n">placeholder_pos</span> <span class="o">=</span> <span class="n">pattern</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">placeholder</span><span class="p">)</span>
-                        <span class="n">after_pos</span> <span class="o">=</span> <span class="n">placeholder_pos</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">placeholder</span><span class="p">)</span>
-                        <span class="k">if</span> <span class="n">after_pos</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">pattern</span><span class="p">)</span> <span class="ow">and</span> <span class="n">pattern</span><span class="p">[</span><span class="n">after_pos</span><span class="p">:]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot; of&quot;</span><span class="p">):</span>
-                            <span class="n">value</span> <span class="o">=</span> <span class="n">noun_form</span>
-                    <span class="n">tr</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;slot&quot;</span><span class="p">:</span> <span class="n">slot</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">value</span><span class="p">,</span> <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="n">src</span><span class="p">}</span>
-                    <span class="k">if</span> <span class="n">_parent</span><span class="p">:</span>
-                        <span class="n">tr</span><span class="p">[</span><span class="s2">&quot;parent&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_parent</span>
-                    <span class="n">new_pattern</span> <span class="o">=</span> <span class="n">pattern</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">placeholder</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-                    <span class="k">for</span> <span class="n">result_str</span><span class="p">,</span> <span class="n">deeper</span> <span class="ow">in</span> <span class="n">expand_all_traced</span><span class="p">(</span>
-                        <span class="n">new_pattern</span><span class="p">,</span> <span class="n">grammar</span><span class="p">,</span> <span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">,</span>
-                    <span class="p">):</span>
-                        <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">result_str</span><span class="p">,</span> <span class="p">[</span><span class="n">tr</span><span class="p">]</span> <span class="o">+</span> <span class="n">deeper</span><span class="p">))</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">tr</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;slot&quot;</span><span class="p">:</span> <span class="n">slot</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">entry</span><span class="p">),</span> <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="n">src</span><span class="p">}</span>
-                    <span class="k">if</span> <span class="n">_parent</span><span class="p">:</span>
-                        <span class="n">tr</span><span class="p">[</span><span class="s2">&quot;parent&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_parent</span>
-                    <span class="n">new_pattern</span> <span class="o">=</span> <span class="n">pattern</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">placeholder</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">entry</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
-                    <span class="k">for</span> <span class="n">result_str</span><span class="p">,</span> <span class="n">deeper</span> <span class="ow">in</span> <span class="n">expand_all_traced</span><span class="p">(</span>
-                        <span class="n">new_pattern</span><span class="p">,</span> <span class="n">grammar</span><span class="p">,</span> <span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">,</span>
-                    <span class="p">):</span>
-                        <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">result_str</span><span class="p">,</span> <span class="p">[</span><span class="n">tr</span><span class="p">]</span> <span class="o">+</span> <span class="n">deeper</span><span class="p">))</span>
-            <span class="k">return</span> <span class="n">results</span>
-
-    <span class="k">return</span> <span class="p">[(</span><span class="n">pattern</span><span class="p">,</span> <span class="p">[])]</span></div>
+    <span class="k">return</span> <span class="n">_expand_all_traced</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">grammar</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">,</span> <span class="n">_parent</span><span class="p">)</span></div>
 
 
 
@@ -522,61 +228,7 @@
 <a class="viewcode-back" href="../../../api/ara.world.html#ara.world.title.title_case">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">title_case</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Title-case a generated title, preserving known acronyms and small words.&quot;&quot;&quot;</span>
-    <span class="n">small</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;of&quot;</span><span class="p">,</span> <span class="s2">&quot;the&quot;</span><span class="p">,</span> <span class="s2">&quot;in&quot;</span><span class="p">,</span> <span class="s2">&quot;and&quot;</span><span class="p">,</span> <span class="s2">&quot;for&quot;</span><span class="p">,</span> <span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;an&quot;</span><span class="p">,</span> <span class="s2">&quot;from&quot;</span><span class="p">,</span> <span class="s2">&quot;over&quot;</span><span class="p">,</span> <span class="s2">&quot;upon&quot;</span><span class="p">,</span> <span class="s2">&quot;against&quot;</span><span class="p">,</span> <span class="s2">&quot;beyond&quot;</span><span class="p">,</span> <span class="s2">&quot;yet&quot;</span><span class="p">,</span> <span class="s2">&quot;or&quot;</span><span class="p">,</span> <span class="s2">&quot;without&quot;</span><span class="p">,</span> <span class="s2">&quot;near&quot;</span><span class="p">,</span> <span class="s2">&quot;under&quot;</span><span class="p">,</span> <span class="s2">&quot;within&quot;</span><span class="p">,</span> <span class="s2">&quot;through&quot;</span><span class="p">,</span> <span class="s2">&quot;after&quot;</span><span class="p">,</span> <span class="s2">&quot;before&quot;</span><span class="p">,</span> <span class="s2">&quot;between&quot;</span><span class="p">,</span> <span class="s2">&quot;among&quot;</span><span class="p">,</span> <span class="s2">&quot;versus&quot;</span><span class="p">,</span> <span class="s2">&quot;by&quot;</span><span class="p">}</span>
-    <span class="n">preserve</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="c1"># SI unit symbols</span>
-        <span class="s2">&quot;m&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;g&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;s&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;A&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;K&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;mol&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;cd&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;N&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;J&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;W&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;Pa&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;Hz&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;V&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;C&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;Ω&quot;</span><span class="p">,</span>
-        <span class="c1"># Group theory symbols</span>
-        <span class="s2">&quot;Z&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;S&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;D&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;A&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;GL&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;SL&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;O&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;SO&quot;</span><span class="p">,</span>
-        <span class="c1"># Corporate acronyms</span>
-        <span class="s2">&quot;CEO&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;CFO&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;CTO&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;COO&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;VP&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;KPIs&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;OKRs&quot;</span><span class="p">,</span>
-        <span class="c1"># Tech/buzzword acronyms</span>
-        <span class="s2">&quot;AI&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;NFT&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;ROI&quot;</span><span class="p">,</span>
-    <span class="p">}</span>
-
-    <span class="n">words</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">words</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">text</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">word</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">words</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">preserve</span><span class="p">:</span>
-            <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">word</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">word</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="ow">in</span> <span class="n">preserve</span><span class="p">:</span>
-            <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">word</span><span class="o">.</span><span class="n">upper</span><span class="p">())</span>
-        <span class="k">elif</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">word</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">small</span><span class="p">:</span>
-            <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">word</span><span class="p">[:</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">+</span> <span class="n">word</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">word</span><span class="p">)</span>
-    <span class="k">return</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">result</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">_title_case</span><span class="p">(</span><span class="n">text</span><span class="p">)</span></div>
 
 
 
@@ -857,7 +509,7 @@
         <span class="n">tmpl</span> <span class="o">=</span> <span class="n">template</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">tmpl</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">templates</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">title_case</span><span class="p">(</span><span class="n">expand</span><span class="p">(</span><span class="n">tmpl</span><span class="p">,</span> <span class="n">grammar</span><span class="p">))</span></div>
+    <span class="k">return</span> <span class="n">expand</span><span class="p">(</span><span class="n">tmpl</span><span class="p">,</span> <span class="n">grammar</span><span class="p">)</span></div>
 
 </pre></div>
 

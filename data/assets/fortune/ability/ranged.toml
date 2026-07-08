@@ -1,7 +1,7 @@
 category = "delivery"
 # Generic ranged delivery ability entries.
 
-ranged_ranged_values = [
+_ranged_ranged_values = [
     { value = "shot", prefixable = false, suffixible = false },
     { value = "volley", prefixable = false, suffixible = false },
     { value = "barrage", prefixable = false, suffixible = false },
@@ -13,18 +13,13 @@ ranged_ranged_values = [
     { value = "payload", prefixable = false, suffixible = false },
 ]
 
-suf_values = []
-
-verb_values = [
-    { value = "shoot", prefixable = false, suffixible = false },
-    { value = "fire", prefixable = false, suffixible = false },
-    { value = "launch", prefixable = false, suffixible = false },
-    { value = "bombard", prefixable = false, suffixible = false, noun_form = "bombardment" },
-    { value = "snipe", prefixable = false, suffixible = false },
-    { value = "pepper", prefixable = false, suffixible = false },
+_suffix_values = [
+    { value = "shot", prefixable = true, suffixible = false },
+    { value = "bolt", prefixable = true, suffixible = false },
+    { value = "volley", prefixable = true, suffixible = false },
 ]
 
-noun_values = [
+_noun_values = [
     { value = "arrow", prefixable = false, suffixible = false },
     { value = "bullet", prefixable = false, suffixible = false },
     { value = "shell", prefixable = false, suffixible = false },
@@ -33,34 +28,41 @@ noun_values = [
     { value = "lead", prefixable = false, suffixible = false },
 ]
 
-adj_values = [
+_adj_values = [
     { value = "long-range", prefixable = false, suffixible = false },
     { value = "precision", prefixable = false, suffixible = false },
     { value = "suppressing", prefixable = false, suffixible = false },
     { value = "homing", prefixable = false, suffixible = false },
 ]
 
-ranged_movement_values = []
+_ranged_movement_values = []
 
 [["ranged"]]
-patterns = ["{ranged_ranged_values}"]
+patterns = ["{_ranged_ranged_values}"]
 
 [[expose]]
-slot = "suf"
-from = ["suf_values"]
-
-[[expose]]
-slot = "technique"
-from = ["ranged", "movement"]
-
-[[expose]]
-slot = "verb"
-from = ["verb_values"]
-
-[[expose]]
-slot = "noun"
-from = ["noun_values"]
+slot = "suffix"
+from = ["_suffix_values"]
 
 [[expose]]
 slot = "adj"
-from = ["adj_values"]
+from = ["_adj_values"]
+
+[[expose]]
+slot = "verb"
+from = [
+    "melee",
+    "area",
+    "ranged",
+    "status",
+    "defence",
+    "movement",
+    "other",
+]
+
+[[expose]]
+slot = "noun"
+from = [
+    "_domain_values",
+    "_noun_values",
+]

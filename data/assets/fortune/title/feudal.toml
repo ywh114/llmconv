@@ -14,7 +14,7 @@ rank = [
     { value = "lady", prefixable = true, suffixible = true },
     { value = "liege", prefixable = true, suffixible = true },
 ]
-class_root = [
+_class_root = [
     { value = "knight", prefixable = true, suffixible = true },
     { value = "lord", prefixable = true, suffixible = true },
     { value = "vassal", prefixable = true, suffixible = true },
@@ -24,14 +24,8 @@ class_root = [
     { value = "banneret", prefixable = true, suffixible = true },
 ]
 prefix = [
-    { value = "knight", prefixable = true, suffixible = true },
-    { value = "liege", prefixable = true, suffixible = true },
-    { value = "mesne", prefixable = true, suffixible = true },
-    { value = "over", prefixable = true, suffixible = true },
-    { value = "tenant", prefixable = true, suffixible = true },
     { value = "grand", prefixable = true, suffixible = true },
     { value = "high", prefixable = true, suffixible = true },
-    { value = "elder", prefixable = true, suffixible = true },
     { value = "holy", prefixable = true, suffixible = true },
 ]
 adj = [
@@ -60,7 +54,7 @@ noun = [
     { value = "castellan", prefixable = true, suffixible = true },
     { value = "crusader", prefixable = true, suffixible = true },
 ]
-class_values = [
+_class_values = [
     { value = "seneschal", prefixable = true, suffixible = true },
     { value = "chamberlain", prefixable = true, suffixible = true },
     { value = "steward", prefixable = true, suffixible = true },
@@ -71,27 +65,20 @@ class_values = [
     { value = "scribe", prefixable = true, suffixible = true },
     { value = "falconer", prefixable = true, suffixible = true },
 ]
-
-suf = [
-    { value = 'king', prefixable = true, suffixible = true },
-    { value = 'lord', prefixable = true, suffixible = true },
-    { value = 'knight', prefixable = true, suffixible = true },
-    { value = 'thane', prefixable = true, suffixible = true },
-    { value = 'born', prefixable = true, suffixible = true },
-    { value = 'kin', prefixable = true, suffixible = true },
-    { value = 'folk', prefixable = true, suffixible = true },
-    { value = 'child', prefixable = true, suffixible = true },
-    { value = 'seed', prefixable = true, suffixible = true },
-    { value = 'guard', prefixable = true, suffixible = true },
-    { value = 'sword', prefixable = true, suffixible = true },
-    { value = 'shield', prefixable = true, suffixible = true },
-    { value = 'crown', prefixable = true, suffixible = true },
+suffix = [
+    { value = "folk", prefixable = true, suffixible = true },
+    { value = "wick", prefixable = true, suffixible = true },
+    { value = "ham", prefixable = true, suffixible = true },
+    { value = "by", prefixable = true, suffixible = true },
+    { value = "ford", prefixable = true, suffixible = true },
+    { value = "ton", prefixable = true, suffixible = true },
+    { value = "shire", prefixable = true, suffixible = true },
 ]
 
 [[class]]
 patterns = [
-    "{prefix}{class_root}",
-    "{class_root}",
+    "{prefix}{_class_root}",
+    "{_class_root}",
 ]
 
 [[place]]
@@ -113,64 +100,64 @@ prefixable = true
 suffixible = true
 
 [[place]]
-value = "the holy land"
+value = "holy land"
 takes_of = true
 takes_in = false
-article = ""
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
 
 [[place]]
-value = "the manor"
+value = "manor"
 takes_of = true
 takes_in = false
-article = ""
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
 
 [[place]]
-value = "the fief"
+value = "fief"
 takes_of = true
 takes_in = false
-article = ""
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
 
 [[place]]
-value = "the castle"
+value = "castle"
 takes_of = true
 takes_in = false
-article = ""
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
 
 [[place]]
-value = "the realm"
+value = "realm"
 takes_of = true
 takes_in = false
-article = ""
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
 
 [[place]]
-value = "the kingdom"
+value = "kingdom"
 takes_of = true
 takes_in = false
-article = ""
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
 
 [[place]]
-value = "the land"
+value = "land"
 takes_of = true
 takes_in = false
-article = ""
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
@@ -185,7 +172,7 @@ from = [
 slot = "class"
 from = [
     "class",
-    "class_values",
+    "_class_values",
 ]
 
 [[expose]]
@@ -212,14 +199,14 @@ from = [
     "noun",
 ]
 
-
 [[expose]]
 slot = "place"
 from = [
     "place",
 ]
+
 [[expose]]
-slot = "suf"
+slot = "suffix"
 from = [
-    "suf",
+    "suffix",
 ]

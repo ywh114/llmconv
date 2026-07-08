@@ -1,17 +1,20 @@
 category = "elemental"
 # Void-elemental ability entries.
 
-prefix_values = [
+_prefix_values = [
     { value = "void", prefixable = false, suffixible = true },
     { value = "oblivio", prefixable = false, suffixible = true },
     { value = "nihil", prefixable = false, suffixible = true },
 ]
 
-suf_values = [
-    { value = "", prefixable = true, suffixible = false},
+_suffix_values = [
+    { value = "", prefixable = true, suffixible = false },
+    { value = "void", prefixable = true, suffixible = false },
+    { value = "null", prefixable = true, suffixible = false },
+    { value = "dark", prefixable = true, suffixible = false },
 ]
 
-domain_values = [
+_domain_values = [
     { value = "oblivion", prefixable = false, suffixible = false },
     { value = "vacuum", prefixable = false, suffixible = false },
     { value = "the abyss", prefixable = false, suffixible = false },
@@ -20,98 +23,101 @@ domain_values = [
     { value = "the void", prefixable = false, suffixible = false },
 ]
 
-void_melee_values = [
+_void_melee_values = [
     { value = "annihilation", prefixable = false, suffixible = false },
     { value = "erasure", prefixable = false, suffixible = false },
 ]
 
-void_area_values = [
+_void_area_values = [
     { value = "collapse", prefixable = false, suffixible = false },
     { value = "annihilation", prefixable = false, suffixible = false },
 ]
 
-void_ranged_values = [
+_void_ranged_values = [
     { value = "siphon", prefixable = false, suffixible = false },
-    { value = "unmaking", prefixable = false, suffixible = false },
+    { value = "unmake", prefixable = false, suffixible = false, pos = "verb" },
 ]
 
-void_status_values = [
+_void_status_values = [
     { value = "siphon", prefixable = false, suffixible = false },
     { value = "erasure", prefixable = false, suffixible = false },
-    { value = "unmaking", prefixable = false, suffixible = false },
+    { value = "unmake", prefixable = false, suffixible = false, pos = "verb" },
 ]
 
-void_defence_values = [
-    { value = "negate", prefixable = false, suffixible = false },
-    { value = "nullify", prefixable = false, suffixible = false },
-    { value = "deny", prefixable = false, suffixible = false },
+_void_defence_values = [
+    { value = "negate", prefixable = false, suffixible = false, noun_form = "negation" },
+    { value = "nullify", prefixable = false, suffixible = false, noun_form = "nullification" },
+    { value = "deny", prefixable = false, suffixible = false, noun_form = "denial" },
 ]
 
-void_movement_values = [
+_void_movement_values = [
 ]
 
-verb_values = [
+other = [
     { value = "annihilation", prefixable = false, suffixible = false },
-    { value = "erase", prefixable = false, suffixible = false },
+    { value = "erase", prefixable = false, suffixible = false, noun_form = "erasure" },
     { value = "unmake", prefixable = false, suffixible = false },
-    { value = "consume", prefixable = false, suffixible = false },
+    { value = "consume", prefixable = false, suffixible = false, noun_form = "consumption" },
     { value = "negation", prefixable = false, suffixible = false },
 ]
 
-noun_values = [
+_noun_values = [
     { value = "void", prefixable = false, suffixible = false },
     { value = "abyss", prefixable = false, suffixible = false },
     { value = "oblivion", prefixable = false, suffixible = false },
-    { value = "nothing", prefixable = false, suffixible = false },
+    { value = "noth", prefixable = false, suffixible = false, pos = "verb" },
 ]
 
-adj_values = [
+_adj_values = [
     { value = "empty", prefixable = false, suffixible = false },
     { value = "hollow", prefixable = false, suffixible = false },
-    { value = "crushing", prefixable = false, suffixible = false },
+    { value = "crush", prefixable = false, suffixible = false, pos = "verb" },
     { value = "absolute", prefixable = false, suffixible = false },
 ]
 
 
 [["melee"]]
-patterns = ["{void_melee_values}"]
+patterns = ["{_void_melee_values}"]
 
 [["area"]]
-patterns = ["{void_area_values}"]
+patterns = ["{_void_area_values}"]
 
 [["ranged"]]
-patterns = ["{void_ranged_values}"]
+patterns = ["{_void_ranged_values}"]
 
 [["status"]]
-patterns = ["{void_status_values}"]
+patterns = ["{_void_status_values}"]
 
 [["defence"]]
-patterns = ["{void_defence_values}"]
+patterns = ["{_void_defence_values}"]
 
 [[expose]]
-slot = "suf"
-from = ["suf_values"]
+slot = "suffix"
+from = ["_suffix_values"]
 
 [[expose]]
 slot = "prefix"
-from = ["prefix_values"]
-
-[[expose]]
-slot = "domain"
-from = ["domain_values"]
-
-[[expose]]
-slot = "technique"
-from = ["melee", "area", "ranged", "status", "defence", "movement"]
-
-[[expose]]
-slot = "verb"
-from = ["verb_values"]
-
-[[expose]]
-slot = "noun"
-from = ["noun_values"]
+from = ["_prefix_values"]
 
 [[expose]]
 slot = "adj"
-from = ["adj_values"]
+from = ["_adj_values"]
+
+[[expose]]
+slot = "verb"
+from = [
+    "melee",
+    "area",
+    "ranged",
+    "status",
+    "defence",
+    "movement",
+    "other",
+]
+
+[[expose]]
+slot = "noun"
+from = [
+    "_domain_values",
+    "_noun_values",
+]

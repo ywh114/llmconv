@@ -8,14 +8,14 @@ prefix = [
     { value = "nano", prefixable = true, suffixible = true },
     { value = "pico", prefixable = true, suffixible = true },
 ]
-base_unit = [
+_base_unit = [
     { value = "m", prefixable = true, suffixible = true },
     { value = "g", prefixable = true, suffixible = true },
     { value = "s", prefixable = true, suffixible = true },
     { value = "A", prefixable = true, suffixible = true },
     { value = "K", prefixable = true, suffixible = true },
 ]
-derived_unit = [
+_derived_unit = [
     { value = "N", prefixable = true, suffixible = true },
     { value = "J", prefixable = true, suffixible = true },
     { value = "W", prefixable = true, suffixible = true },
@@ -29,6 +29,7 @@ adj = [
     { value = "normalized", prefixable = true, suffixible = true },
 ]
 adj_sup = [
+    { value = "natural", prefixable = true, suffixible = true },
     { value = "absolute", prefixable = true, suffixible = true },
     { value = "fundamental", prefixable = true, suffixible = true },
     { value = "exact", prefixable = true, suffixible = true },
@@ -39,49 +40,49 @@ quantity = [
     { value = "scalar", prefixable = true, suffixible = true },
     { value = "tensor", prefixable = true, suffixible = true },
 ]
-thing = [
+suffix = [
+    { value = "meter", prefixable = true, suffixible = true },
+    { value = "gram", prefixable = true, suffixible = true },
+    { value = "second", prefixable = true, suffixible = true },
+    { value = "liter", prefixable = true, suffixible = true },
+    { value = "volt", prefixable = true, suffixible = true },
+    { value = "amp", prefixable = true, suffixible = true },
+]
+noun = [
     { value = "force", prefixable = true, suffixible = true },
     { value = "energy", prefixable = true, suffixible = true },
+    { value = "time", prefixable = true, suffixible = true },
+    { value = "mass", prefixable = true, suffixible = true },
+    { value = "distance", prefixable = true, suffixible = true },
     { value = "power", prefixable = true, suffixible = true },
     { value = "pressure", prefixable = true, suffixible = true },
-]
-
-suf = [
-    { value = 'kind', prefixable = true, suffixible = true },
-    { value = 'scale', prefixable = true, suffixible = true },
+    { value = "density", prefixable = true, suffixible = true },
+    { value = "ħ", prefixable = true, suffixible = true },
+    { value = "π", prefixable = true, suffixible = true },
 ]
 
 [[place]]
-value = "the lab"
+value = "lab"
 takes_of = true
 takes_in = false
-article = ""
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
 
 [[place]]
-value = "the field"
+value = "scale"
 takes_of = true
 takes_in = false
-article = ""
-proper_noun = false
-prefixable = false
-suffixible = false
-
-[[place]]
-value = "the vacuum"
-takes_of = true
-takes_in = false
-article = ""
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
 
 [[unit]]
 patterns = [
-    "{base_unit}",
-    "{derived_unit}",
+    "{_base_unit}",
+    "{_derived_unit}",
 ]
 
 [[expose]]
@@ -116,12 +117,7 @@ from = [
 ]
 
 [[expose]]
-slot = "thing"
+slot = "suffix"
 from = [
-    "thing",
-]
-[[expose]]
-slot = "suf"
-from = [
-    "suf",
+    "suffix",
 ]

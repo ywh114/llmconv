@@ -1,6 +1,6 @@
-# Generic/fallback ability entries.
+# Generic/fallback ability entries (prefixes and suffixes only).
 
-prefix_values = [
+_prefix_values = [
     { value = "hyper", prefixable = false, suffixible = true },
     { value = "mega", prefixable = false, suffixible = true },
     { value = "ultra", prefixable = false, suffixible = true },
@@ -13,7 +13,7 @@ prefix_values = [
     { value = "nano", prefixable = false, suffixible = true },
 ]
 
-suf_values = [
+_suffix_values = [
     { value = "thermia", prefixable = true, suffixible = false },
     { value = "kinesis", prefixable = true, suffixible = false },
     { value = "mancy", prefixable = true, suffixible = false },
@@ -28,146 +28,10 @@ suf_values = [
     { value = "+", prefixable = true, suffixible = false },
 ]
 
-domain_values = [
-    { value = "frost", prefixable = false, suffixible = false },
-    { value = "flame", prefixable = false, suffixible = false },
-    { value = "void", prefixable = false, suffixible = false },
-    { value = "steel", prefixable = false, suffixible = false },
-    { value = "light", prefixable = false, suffixible = false },
-    { value = "shadow", prefixable = false, suffixible = false },
-    { value = "storm", prefixable = false, suffixible = false },
-    { value = "crystal", prefixable = false, suffixible = false },
-]
-
-generic_melee_values = [
-    { value = "strike", prefixable = false, suffixible = false },
-    { value = "rend", prefixable = false, suffixible = false },
-    { value = "cleave", prefixable = false, suffixible = false },
-    { value = "lance", prefixable = false, suffixible = false },
-    { value = "pierce", prefixable = false, suffixible = false },
-    { value = "shatter", prefixable = false, suffixible = false },
-]
-
-generic_area_values = [
-    { value = "surge", prefixable = false, suffixible = false },
-    { value = "wave", prefixable = false, suffixible = false },
-    { value = "burst", prefixable = false, suffixible = false },
-    { value = "shroud", prefixable = false, suffixible = false },
-]
-
-generic_ranged_values = [
-    { value = "lance", prefixable = false, suffixible = false },
-    { value = "pierce", prefixable = false, suffixible = false },
-]
-
-generic_defence_values = [
-    { value = "endure", prefixable = false, suffixible = false },
-    { value = "guard", prefixable = false, suffixible = false },
-    { value = "fortify", prefixable = false, suffixible = false },
-]
-
-verb_values = [
-    { value = "smite", prefixable = false, suffixible = false },
-    { value = "sear", prefixable = false, suffixible = false },
-    { value = "rend", prefixable = false, suffixible = false },
-    { value = "bind", prefixable = false, suffixible = false },
-    { value = "shatter", prefixable = false, suffixible = false },
-    { value = "crush", prefixable = false, suffixible = false },
-    { value = "consume", prefixable = false, suffixible = false },
-    { value = "sunder", prefixable = false, suffixible = false },
-]
-
-noun_values = [
-    { value = "flame", prefixable = false, suffixible = false },
-    { value = "frost", prefixable = false, suffixible = false },
-    { value = "blood", prefixable = false, suffixible = false },
-    { value = "void", prefixable = false, suffixible = false },
-    { value = "steel", prefixable = false, suffixible = false },
-    { value = "doom", prefixable = false, suffixible = false },
-    { value = "abyss", prefixable = false, suffixible = false },
-    { value = "entropy", prefixable = false, suffixible = false },
-]
-
-adj_values = [
-    { value = "mighty", prefixable = false, suffixible = false },
-    { value = "fell", prefixable = false, suffixible = false },
-    { value = "dark", prefixable = false, suffixible = false },
-    { value = "bright", prefixable = false, suffixible = false },
-    { value = "swift", prefixable = false, suffixible = false },
-    { value = "deep", prefixable = false, suffixible = false },
-    { value = "grim", prefixable = false, suffixible = false },
-    { value = "dread", prefixable = false, suffixible = false },
-]
-
-adj_sup_values = [
-    { value = "improved", prefixable = false, suffixible = false },
-    { value = "greater", prefixable = false, suffixible = false },
-    { value = "superior", prefixable = false, suffixible = false },
-    { value = "enhanced", prefixable = false, suffixible = false },
-    { value = "fortified", prefixable = false, suffixible = false },
-    { value = "over", prefixable = false, suffixible = false },
-    { value = "dual", prefixable = false, suffixible = false },
-    { value = "triple", prefixable = false, suffixible = false },
-    { value = "mass", prefixable = false, suffixible = false },
-    { value = "mega", prefixable = false, suffixible = false },
-    { value = "ultra", prefixable = false, suffixible = false },
-    { value = "hyper", prefixable = false, suffixible = false },
-    { value = "omega", prefixable = false, suffixible = false },
-    { value = "ultimate", prefixable = false, suffixible = false },
-    { value = "true", prefixable = false, suffixible = false },
-    { value = "giga", prefixable = false, suffixible = false },
-    { value = "super", prefixable = false, suffixible = false },
-]
-
-generic_movement_values = []
-
-[["melee"]]
-patterns = ["{generic_melee_values}"]
-
-[["area"]]
-patterns = ["{generic_area_values}"]
-
-[["ranged"]]
-patterns = ["{generic_ranged_values}"]
-
-[["defence"]]
-patterns = ["{generic_defence_values}"]
-
-[["prefix+"]]
-patterns = [
-    "{prefix}",
-    "{prefix}{prefix}",
-    "{prefix}{prefix}{prefix}",
-]
-
 [[expose]]
 slot = "prefix"
-from = ["prefix_values"]
+from = ["_prefix_values"]
 
 [[expose]]
-slot = "suf"
-from = ["suf_values"]
-
-[[expose]]
-slot = "domain"
-from = ["domain_values"]
-
-[[expose]]
-slot = "technique"
-from = ["melee", "area", "ranged", "defence", "movement"]
-
-[[expose]]
-slot = "verb"
-from = ["verb_values"]
-
-[[expose]]
-slot = "noun"
-from = ["noun_values"]
-
-[[expose]]
-slot = "adj"
-from = ["adj_values"]
-
-[[expose]]
-slot = "adj_sup"
-from = ["adj_sup_values"]
+slot = "suffix"
+from = ["_suffix_values"]

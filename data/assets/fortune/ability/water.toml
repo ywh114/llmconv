@@ -1,16 +1,19 @@
 category = "elemental"
 # Water-elemental ability entries.
 
-prefix_values = [
+_prefix_values = [
     { value = "hydro", prefixable = false, suffixible = true },
     { value = "aqua", prefixable = false, suffixible = true },
 ]
 
-suf_values = [
-    { value = "", prefixable = true, suffixible = false},
+_suffix_values = [
+    { value = "", prefixable = true, suffixible = false },
+    { value = "tide", prefixable = true, suffixible = false },
+    { value = "wave", prefixable = true, suffixible = false },
+    { value = "splash", prefixable = true, suffixible = false },
 ]
 
-domain_values = [
+_domain_values = [
     { value = "tsunami", prefixable = false, suffixible = false },
     { value = "riptide", prefixable = false, suffixible = true },
     { value = "undertow", prefixable = false, suffixible = false },
@@ -24,12 +27,12 @@ domain_values = [
     { value = "sea cucumber", prefixable = false, suffixible = false },
 ]
 
-water_melee_values = [
+_water_melee_values = [
     { value = "crash", prefixable = false, suffixible = false },
     { value = "jet", prefixable = false, suffixible = true },
 ]
 
-water_area_values = [
+_water_area_values = [
     { value = "tide", prefixable = false, suffixible = true },
     { value = "wave", prefixable = false, suffixible = true },
     { value = "storm", prefixable = false, suffixible = true },
@@ -38,7 +41,7 @@ water_area_values = [
     { value = "flood", prefixable = false, suffixible = false },
 ]
 
-water_ranged_values = [
+_water_ranged_values = [
     { value = "spout", prefixable = false, suffixible = false },
     { value = "torrent", prefixable = false, suffixible = true },
     { value = "jet", prefixable = false, suffixible = true },
@@ -46,7 +49,7 @@ water_ranged_values = [
     { value = "siphon", prefixable = false, suffixible = false },
 ]
 
-water_status_values = [
+_water_status_values = [
     { value = "drown", prefixable = false, suffixible = false },
     { value = "submerge", prefixable = false, suffixible = false },
     { value = "brine", prefixable = false, suffixible = true },
@@ -54,20 +57,20 @@ water_status_values = [
     { value = "siphon", prefixable = false, suffixible = false },
 ]
 
-water_defence_values = [
+_water_defence_values = [
     { value = "dam", prefixable = false, suffixible = false },
     { value = "wave", prefixable = false, suffixible = false },
 ]
 
-water_movement_values = [
+_water_movement_values = [
     { value = "surge", prefixable = false, suffixible = false },
     { value = "flow", prefixable = false, suffixible = false },
 ]
 
-verb_values = [
+other = [
 ]
 
-noun_values = [
+_noun_values = [
     { value = "tide", prefixable = false, suffixible = false },
     { value = "wave", prefixable = false, suffixible = false },
     { value = "flood", prefixable = false, suffixible = false },
@@ -79,7 +82,7 @@ noun_values = [
     { value = "sea cucumber", prefixable = false, suffixible = false },
 ]
 
-adj_values = [
+_adj_values = [
     { value = "tidal", prefixable = false, suffixible = false },
     { value = "abyssal", prefixable = false, suffixible = false },
     { value = "torrential", prefixable = false, suffixible = false },
@@ -92,44 +95,47 @@ adj_values = [
 
 
 [["melee"]]
-patterns = ["{water_melee_values}"]
+patterns = ["{_water_melee_values}"]
 
 [["area"]]
-patterns = ["{water_area_values}"]
+patterns = ["{_water_area_values}"]
 
 [["ranged"]]
-patterns = ["{water_ranged_values}"]
+patterns = ["{_water_ranged_values}"]
 
 [["status"]]
-patterns = ["{water_status_values}"]
+patterns = ["{_water_status_values}"]
 
 [["defence"]]
-patterns = ["{water_defence_values}"]
+patterns = ["{_water_defence_values}"]
 
 [[expose]]
-slot = "suf"
-from = ["suf_values"]
+slot = "suffix"
+from = ["_suffix_values"]
 
 [[expose]]
 slot = "prefix"
-from = ["prefix_values"]
-
-[[expose]]
-slot = "domain"
-from = ["domain_values"]
-
-[[expose]]
-slot = "technique"
-from = ["melee", "area", "ranged", "status", "defence", "movement"]
-
-[[expose]]
-slot = "verb"
-from = ["verb_values"]
-
-[[expose]]
-slot = "noun"
-from = ["noun_values"]
+from = ["_prefix_values"]
 
 [[expose]]
 slot = "adj"
-from = ["adj_values"]
+from = ["_adj_values"]
+
+[[expose]]
+slot = "verb"
+from = [
+    "melee",
+    "area",
+    "ranged",
+    "status",
+    "defence",
+    "movement",
+    "other",
+]
+
+[[expose]]
+slot = "noun"
+from = [
+    "_domain_values",
+    "_noun_values",
+]

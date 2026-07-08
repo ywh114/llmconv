@@ -3,14 +3,14 @@ rank = [
     { value = "governor", prefixable = true, suffixible = true },
     { value = "senator", prefixable = true, suffixible = true },
     { value = "commissioner", prefixable = true, suffixible = true },
-    { value = "sheriff", prefixable = true, suffixible = true },
 ]
 noun = [
     { value = "mayor", prefixable = true, suffixible = true },
     { value = "governor", prefixable = true, suffixible = true },
     { value = "commissioner", prefixable = true, suffixible = true },
+    { value = "sheriff", prefixable = true, suffixible = true },
 ]
-class_values = [
+_class_values = [
     { value = "postmaster", prefixable = true, suffixible = true },
     { value = "tax collector", prefixable = false, suffixible = false },
     { value = "clerk", prefixable = true, suffixible = true },
@@ -24,9 +24,6 @@ adj = [
 adj_sup = [
     { value = "chief", prefixable = true, suffixible = true },
     { value = "head", prefixable = true, suffixible = true },
-    { value = "assistant", prefixable = true, suffixible = true },
-    { value = "acting", prefixable = true, suffixible = true },
-    { value = "junior", prefixable = true, suffixible = true },
 ]
 
 [[place]]
@@ -98,7 +95,7 @@ from = [
 [[expose]]
 slot = "class"
 from = [
-    "class_values",
+    "_class_values",
 ]
 
 [[expose]]

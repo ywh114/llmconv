@@ -1,53 +1,49 @@
 category = "silly"
 # Office-theme silly ability entries.
 
-office_melee_values = [
+_office_melee_values = [
     { value = "papercut", prefixable = false, suffixible = false },
     { value = "staple", prefixable = false, suffixible = false },
     { value = "three-hole-punch", prefixable = false, suffixible = false },
 ]
 
-office_area_values = [
+_office_area_values = [
     { value = "shred", prefixable = false, suffixible = false },
     { value = "print", prefixable = false, suffixible = false },
 ]
 
-office_ranged_values = [
+_office_ranged_values = [
     { value = "fax", prefixable = false, suffixible = false },
     { value = "carbon-copy", prefixable = false, suffixible = false },
 ]
 
-office_status_values = [
+_office_status_values = [
     { value = "memo", prefixable = false, suffixible = false },
     { value = "carbon-copy", prefixable = false, suffixible = false },
 ]
 
-office_defence_values = [
-    { value = "encrypt", prefixable = false, suffixible = false },
+_office_defence_values = [
+    { value = "encrypt", prefixable = false, suffixible = false, noun_form = "encryption" },
     { value = "shred", prefixable = false, suffixible = false },
 ]
 
-suf_values = []
-
-domain_values = [
-    { value = "toner", prefixable = false, suffixible = false },
-    { value = "fax", prefixable = false, suffixible = false },
-    { value = "memo", prefixable = false, suffixible = false },
-    { value = "copier", prefixable = false, suffixible = false },
-    { value = "water cooler", prefixable = false, suffixible = false },
-    { value = "reply all", prefixable = false, suffixible = false },
+_suffix_values = [
+    { value = "work", prefixable = true, suffixible = false },
+    { value = "flow", prefixable = true, suffixible = false },
+    { value = "doc", prefixable = true, suffixible = false },
+    { value = "memo", prefixable = true, suffixible = false },
 ]
 
-verb_values = [
+other = [
     { value = "papercut", prefixable = false, suffixible = false },
-    { value = "fax", prefixable = false, suffixible = false, noun_form = "faxing" },
+    { value = "fax", prefixable = false, suffixible = false },
     { value = "staple", prefixable = false, suffixible = false },
     { value = "shred", prefixable = false, suffixible = false },
     { value = "file", prefixable = false, suffixible = false },
-    { value = "cc", prefixable = false, suffixible = false },
+    { value = "cc", prefixable = false, suffixible = false, noun_form = "cc'ing" },
 ]
 
-noun_values = [
+_noun_values = [
     { value = "paper", prefixable = false, suffixible = false },
     { value = "toner", prefixable = false, suffixible = false },
     { value = "memo", prefixable = false, suffixible = false },
@@ -56,39 +52,42 @@ noun_values = [
     { value = "stapler", prefixable = false, suffixible = false },
 ]
 
-office_movement_values = []
+_office_movement_values = []
 
 [["melee"]]
-patterns = ["{office_melee_values}"]
+patterns = ["{_office_melee_values}"]
 
 [["area"]]
-patterns = ["{office_area_values}"]
+patterns = ["{_office_area_values}"]
 
 [["ranged"]]
-patterns = ["{office_ranged_values}"]
+patterns = ["{_office_ranged_values}"]
 
 [["status"]]
-patterns = ["{office_status_values}"]
+patterns = ["{_office_status_values}"]
 
 [["defence"]]
-patterns = ["{office_defence_values}"]
+patterns = ["{_office_defence_values}"]
 
 [[expose]]
-slot = "suf"
-from = ["suf_values"]
-
-[[expose]]
-slot = "technique"
-from = ["melee", "area", "ranged", "status", "defence", "movement"]
-
-[[expose]]
-slot = "domain"
-from = ["domain_values"]
+slot = "suffix"
+from = ["_suffix_values"]
 
 [[expose]]
 slot = "verb"
-from = ["verb_values"]
+from = [
+    "melee",
+    "area",
+    "ranged",
+    "status",
+    "defence",
+    "movement",
+    "other",
+]
 
 [[expose]]
 slot = "noun"
-from = ["noun_values"]
+from = [
+    "_domain_values",
+    "_noun_values",
+]

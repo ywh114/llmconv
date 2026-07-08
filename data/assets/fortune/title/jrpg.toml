@@ -1,86 +1,39 @@
-class_root = [
+class = [
+    { value = "adventurer", prefixable = true, suffixible = true },
+    { value = "monster", prefixable = true, suffixible = true },
+    { value = "boss", prefixable = true, suffixible = true },
     { value = "mage", prefixable = true, suffixible = true },
     { value = "knight", prefixable = true, suffixible = true },
-    { value = "dragoon", prefixable = true, suffixible = true },
+    { value = "swordsman", prefixable = true, suffixible = true },
     { value = "summoner", prefixable = true, suffixible = true },
     { value = "bard", prefixable = true, suffixible = true },
     { value = "monk", prefixable = true, suffixible = true },
     { value = "ranger", prefixable = true, suffixible = true },
     { value = "paladin", prefixable = true, suffixible = true },
     { value = "necromancer", prefixable = true, suffixible = true },
-    { value = "samurai", prefixable = true, suffixible = true },
-    { value = "ninja", prefixable = true, suffixible = true },
-    { value = "dancer", prefixable = true, suffixible = true },
-    { value = "geomancer", prefixable = true, suffixible = true },
     { value = "chemist", prefixable = true, suffixible = true },
-    { value = "freelancer", prefixable = true, suffixible = true },
-    { value = "gunbreaker", prefixable = true, suffixible = true },
-    { value = "arcanist", prefixable = true, suffixible = true },
-    { value = "scholar", prefixable = true, suffixible = true },
-    { value = "astrologian", prefixable = true, suffixible = true },
+    { value = "astrologist", prefixable = true, suffixible = true },
     { value = "sage", prefixable = true, suffixible = true },
-    { value = "reaper", prefixable = true, suffixible = true },
-    { value = "pictomancer", prefixable = true, suffixible = true },
-    { value = "psychic", prefixable = true, suffixible = true },
-    { value = "beastmaster", prefixable = true, suffixible = true },
-    { value = "gambler", prefixable = true, suffixible = true },
     { value = "machinist", prefixable = true, suffixible = true },
-    { value = "cannoneer", prefixable = true, suffixible = true },
     { value = "pirate", prefixable = true, suffixible = true },
-    { value = "viking", prefixable = true, suffixible = true },
     { value = "gladiator", prefixable = true, suffixible = true },
     { value = "oracle", prefixable = true, suffixible = true },
     { value = "bishop", prefixable = true, suffixible = true },
     { value = "priest", prefixable = true, suffixible = true },
     { value = "priestess", prefixable = true, suffixible = true },
-    { value = "evoker", prefixable = true, suffixible = true },
-    { value = "illusionist", prefixable = true, suffixible = true },
-    { value = "lancer", prefixable = true, suffixible = true },
-]
-class_suffix = [
-    { value = "blade", prefixable = true, suffixible = true },
-    { value = "caller", prefixable = true, suffixible = true },
-    { value = "walker", prefixable = true, suffixible = true },
-    { value = "master", prefixable = true, suffixible = true },
     { value = "saint", prefixable = true, suffixible = true },
-    { value = "knight", prefixable = true, suffixible = true },
-    { value = "mage", prefixable = true, suffixible = true },
-    { value = "breaker", prefixable = true, suffixible = true },
-    { value = "keeper", prefixable = true, suffixible = true },
-]
-prefix = [
-    { value = "white", prefixable = true, suffixible = true },
-    { value = "black", prefixable = true, suffixible = true },
-    { value = "red", prefixable = true, suffixible = true },
-    { value = "blue", prefixable = true, suffixible = true },
-    { value = "dark", prefixable = true, suffixible = true },
-    { value = "holy", prefixable = true, suffixible = true },
-    { value = "azure", prefixable = true, suffixible = true },
-    { value = "crimson", prefixable = true, suffixible = true },
-    { value = "emerald", prefixable = true, suffixible = true },
-    { value = "violet", prefixable = true, suffixible = true },
-    { value = "radiant", prefixable = true, suffixible = true },
-    { value = "shadow", prefixable = true, suffixible = true },
-    { value = "lunar", prefixable = true, suffixible = true },
-    { value = "solar", prefixable = true, suffixible = true },
-    { value = "astral", prefixable = true, suffixible = true },
-    { value = "chaos", prefixable = true, suffixible = true },
-    { value = "divine", prefixable = true, suffixible = true },
-    { value = "royal", prefixable = true, suffixible = true },
-    { value = "iron", prefixable = true, suffixible = true },
-    { value = "mythic", prefixable = true, suffixible = true },
+    { value = "saintess", prefixable = true, suffixible = true },
 ]
 adj = [
     { value = "legendary", prefixable = true, suffixible = true },
-    { value = "jobless", prefixable = true, suffixible = true },
-    { value = "dual", prefixable = true, suffixible = true },
     { value = "heroic", prefixable = true, suffixible = true },
     { value = "ancient", prefixable = true, suffixible = true },
-    { value = "swift", prefixable = true, suffixible = true },
     { value = "cursed", prefixable = true, suffixible = true },
     { value = "awakened", prefixable = true, suffixible = true },
-    { value = "transcendent", prefixable = true, suffixible = true },
-    { value = "ultimate", prefixable = true, suffixible = true },
+    { value = "saint", prefixable = true, suffixible = true },
+    { value = "royal", prefixable = true, suffixible = true },
+    { value = "iron", prefixable = true, suffixible = true },
+    { value = "mythic", prefixable = true, suffixible = true },
 ]
 adj_sup = [
     { value = "ultimate", prefixable = true, suffixible = true },
@@ -93,195 +46,88 @@ adj_sup = [
     { value = "lowest-level", prefixable = false, suffixible = false },
     { value = "least", prefixable = true, suffixible = true },
 ]
-spell = [
-    { value = "fire", prefixable = true, suffixible = true },
-    { value = "blizzard", prefixable = true, suffixible = true },
-    { value = "thunder", prefixable = true, suffixible = true },
-    { value = "cure", prefixable = true, suffixible = true },
-    { value = "esuna", prefixable = true, suffixible = true },
-    { value = "flare", prefixable = true, suffixible = true },
-    { value = "meteor", prefixable = true, suffixible = true },
-    { value = "holy", prefixable = true, suffixible = true },
-    { value = "raise", prefixable = true, suffixible = true },
-    { value = "protect", prefixable = true, suffixible = true },
-    { value = "shell", prefixable = true, suffixible = true },
-    { value = "haste", prefixable = true, suffixible = true },
-    { value = "slow", prefixable = true, suffixible = true },
-    { value = "stop", prefixable = true, suffixible = true },
-    { value = "break", prefixable = true, suffixible = true },
-    { value = "gravity", prefixable = true, suffixible = true },
-    { value = "comet", prefixable = true, suffixible = true },
-    { value = "bio", prefixable = true, suffixible = true },
-    { value = "quake", prefixable = true, suffixible = true },
-    { value = "flood", prefixable = true, suffixible = true },
-    { value = "tornado", prefixable = true, suffixible = true },
-    { value = "quasar", prefixable = true, suffixible = true },
-    { value = "omega", prefixable = true, suffixible = true },
-    { value = "drain", prefixable = true, suffixible = true },
-    { value = "osmose", prefixable = true, suffixible = true },
-    { value = "reflect", prefixable = true, suffixible = true },
-    { value = "berserk", prefixable = true, suffixible = true },
-    { value = "float", prefixable = true, suffixible = true },
-    { value = "regen", prefixable = true, suffixible = true },
-    { value = "revive", prefixable = true, suffixible = true },
-    { value = "full cure", prefixable = false, suffixible = false },
-    { value = "scan", prefixable = true, suffixible = true },
-    { value = "teleport", prefixable = true, suffixible = true },
-    { value = "warp", prefixable = true, suffixible = true },
-    { value = "doublecast", prefixable = true, suffixible = true },
-    { value = "triplecast", prefixable = true, suffixible = true },
+suffix = [
+    { value = "blade", prefixable = true, suffixible = true },
+    { value = "rider", prefixable = true, suffixible = true },
+    { value = "smith", prefixable = true, suffixible = true },
+    { value = "forged", prefixable = true, suffixible = true },
+    { value = "guard", prefixable = true, suffixible = true },
+    { value = "seed", prefixable = true, suffixible = true },
+    { value = "master", prefixable = true, suffixible = true },
+    { value = "shard", prefixable = true, suffixible = true },
+    { value = "heart", prefixable = true, suffixible = true },
 ]
-item = [
-    { value = "limit break", prefixable = false, suffixible = false },
-    { value = "overdrive", prefixable = true, suffixible = true },
-    { value = "trance", prefixable = true, suffixible = true },
-    { value = "summon", prefixable = true, suffixible = true },
-    { value = "gambit", prefixable = true, suffixible = true },
+noun = [
     { value = "ether", prefixable = true, suffixible = true },
     { value = "elixir", prefixable = true, suffixible = true },
-    { value = "tent", prefixable = true, suffixible = true },
-    { value = "save point", prefixable = false, suffixible = false },
+    { value = "mana", prefixable = true, suffixible = true },
+    { value = "energy", prefixable = true, suffixible = true },
     { value = "crystal", prefixable = true, suffixible = true },
     { value = "orb", prefixable = true, suffixible = true },
-    { value = "key item", prefixable = false, suffixible = false },
-    { value = "ultimate weapon", prefixable = false, suffixible = false },
-]
-thing = [
     { value = "destruction", prefixable = true, suffixible = true },
-    { value = "healing", prefixable = true, suffixible = true },
-    { value = "summons", prefixable = true, suffixible = true },
-    { value = "job", prefixable = true, suffixible = true },
-    { value = "class", prefixable = true, suffixible = true },
-    { value = "ability", prefixable = true, suffixible = true },
-    { value = "skill", prefixable = true, suffixible = true },
-]
-
-suf = [
-    { value = 'blade', prefixable = true, suffixible = true },
-    { value = 'born', prefixable = true, suffixible = true },
-    { value = 'spawn', prefixable = true, suffixible = true },
-    { value = 'lord', prefixable = true, suffixible = true },
-    { value = 'king', prefixable = true, suffixible = true },
-    { value = 'kin', prefixable = true, suffixible = true },
-    { value = 'kind', prefixable = true, suffixible = true },
-    { value = 'ling', prefixable = true, suffixible = true },
-    { value = 'bane', prefixable = true, suffixible = true },
-    { value = 'seeker', prefixable = true, suffixible = true },
-    { value = 'hunter', prefixable = true, suffixible = true },
-    { value = 'slayer', prefixable = true, suffixible = true },
-    { value = 'walker', prefixable = true, suffixible = true },
-    { value = 'weaver', prefixable = true, suffixible = true },
-    { value = 'keeper', prefixable = true, suffixible = true },
-    { value = 'breaker', prefixable = true, suffixible = true },
-    { value = 'bearer', prefixable = true, suffixible = true },
-    { value = 'caller', prefixable = true, suffixible = true },
-    { value = 'dancer', prefixable = true, suffixible = true },
-    { value = 'singer', prefixable = true, suffixible = true },
-    { value = 'rider', prefixable = true, suffixible = true },
-    { value = 'smith', prefixable = true, suffixible = true },
-    { value = 'forged', prefixable = true, suffixible = true },
-    { value = 'mage', prefixable = true, suffixible = true },
-    { value = 'knight', prefixable = true, suffixible = true },
-    { value = 'priest', prefixable = true, suffixible = true },
-    { value = 'witch', prefixable = true, suffixible = true },
-    { value = 'guard', prefixable = true, suffixible = true },
-    { value = 'warden', prefixable = true, suffixible = true },
-    { value = 'child', prefixable = true, suffixible = true },
-    { value = 'seed', prefixable = true, suffixible = true },
-    { value = 'master', prefixable = true, suffixible = true },
-    { value = 'saint', prefixable = true, suffixible = true },
-    { value = 'fiend', prefixable = true, suffixible = true },
-    { value = 'beast', prefixable = true, suffixible = true },
-    { value = 'rune', prefixable = true, suffixible = true },
-    { value = 'shard', prefixable = true, suffixible = true },
-    { value = 'flame', prefixable = true, suffixible = true },
-    { value = 'frost', prefixable = true, suffixible = true },
-    { value = 'storm', prefixable = true, suffixible = true },
-    { value = 'shadow', prefixable = true, suffixible = true },
-    { value = 'light', prefixable = true, suffixible = true },
-    { value = 'dream', prefixable = true, suffixible = true },
-    { value = 'doom', prefixable = true, suffixible = true },
-    { value = 'sword', prefixable = true, suffixible = true },
-    { value = 'shield', prefixable = true, suffixible = true },
-    { value = 'crystal', prefixable = true, suffixible = true },
-    { value = 'orb', prefixable = true, suffixible = true },
-]
-
-[[class]]
-patterns = [
-    "{prefix}{class_root}",
-    "{class_root}",
-    "{class_root}{class_suffix}",
+    { value = "health", prefixable = true, suffixible = true },
 ]
 
 [[place]]
-value = "the party"
-takes_of = false
-takes_in = true
-article = ""
+value = "party"
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
 
 [[place]]
-value = "the airship"
-takes_of = false
-takes_in = true
-article = ""
+value = "airship"
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
 
 [[place]]
-value = "the world map"
-takes_of = false
-takes_in = true
-article = ""
+value = "kingdom"
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
 
 [[place]]
-value = "the inn"
-takes_of = false
-takes_in = true
-article = ""
+value = "empire"
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
 
 [[place]]
-value = "the item shop"
+value = "tavern"
 takes_of = false
 takes_in = true
-article = ""
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
 
 [[place]]
-value = "the dungeon"
+value = "shop"
 takes_of = false
 takes_in = true
-article = ""
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
 
 [[place]]
-value = "the final dungeon"
+value = "dungeon"
 takes_of = false
 takes_in = true
-article = ""
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
 
 [[place]]
-value = "the hidden ending"
+value = "final dungeon"
 takes_of = false
 takes_in = true
-article = ""
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
@@ -311,19 +157,19 @@ from = [
 ]
 
 [[expose]]
-slot = "thing"
-from = [
-    "thing",
-    "item",
-]
-
-[[expose]]
 slot = "place"
 from = [
     "place",
 ]
+
 [[expose]]
-slot = "suf"
+slot = "suffix"
 from = [
-    "suf",
+    "suffix",
+]
+
+[[expose]]
+slot = "noun"
+from = [
+    "noun",
 ]

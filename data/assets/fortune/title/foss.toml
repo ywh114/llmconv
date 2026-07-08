@@ -1,173 +1,150 @@
 prefix = [
-    { value = "arch", prefixable = true, suffixible = true },
-    { value = "gnu", prefixable = true, suffixible = true },
-    { value = "libre", prefixable = true, suffixible = true },
-    { value = "open", prefixable = true, suffixible = true },
-    { value = "free", prefixable = true, suffixible = true },
+    { value = "GNU+" },
+    { value = "GNU/" },
+    { value = "libre" },
+    { value = "open" },
+    { value = "free" },
 ]
-foss_rank_values = [
-    { value = "maintainer", prefixable = true, suffixible = true },
-    { value = "contributor", prefixable = true, suffixible = true },
-    { value = "committer", prefixable = true, suffixible = true },
-    { value = "reviewer", prefixable = true, suffixible = true },
-    { value = "BDFL", prefixable = true, suffixible = true },
+rank = [
+    { value = "maintainer" },
+    { value = "contributor" },
+    { value = "committer" },
+    { value = "reviewer" },
+    { value = "BDFL" },
 ]
-foss_class_root_values = [
-    { value = "contributor", prefixable = true, suffixible = true },
-    { value = "maintainer", prefixable = true, suffixible = true },
-    { value = "packager", prefixable = true, suffixible = true },
-    { value = "hacker", prefixable = true, suffixible = true },
-    { value = "user", prefixable = true, suffixible = true },
-    { value = "ricer", prefixable = true, suffixible = true },
-    { value = "wizard", prefixable = true, suffixible = true },
-    { value = "coder", prefixable = true, suffixible = true },
+adj = [
+    { value = "open-source" },
+    { value = "free" },
+    { value = "libre" },
+    { value = "copyleft" },
+    { value = "permissive" },
+    { value = "proprietary" },
+    { value = "minimal" },
 ]
-foss_class_suffix_values = [
-    { value = "ling", prefixable = true, suffixible = true },
-    { value = "kind", prefixable = true, suffixible = true },
-    { value = "bot", prefixable = true, suffixible = true },
-]
-foss_adj_values = [
-    { value = "open-source", prefixable = true, suffixible = true },
-    { value = "free", prefixable = true, suffixible = true },
-    { value = "libre", prefixable = true, suffixible = true },
-    { value = "copyleft", prefixable = true, suffixible = true },
-    { value = "permissive", prefixable = true, suffixible = true },
-    { value = "viral", prefixable = true, suffixible = true },
-    { value = "proprietary", prefixable = true, suffixible = true },
-    { value = "minimal", prefixable = true, suffixible = true },
-]
-foss_adj_sup_values = [
+adj_sup = [
     { value = "most free", prefixable = false, suffixible = false },
     { value = "most open", prefixable = false, suffixible = false },
-    { value = "ultimate", prefixable = true, suffixible = true },
-    { value = "greatest", prefixable = true, suffixible = true },
+    { value = "ultimate" },
+    { value = "greatest" },
+    { value = "Yet another" },
+    { value = "FSF-approved" },
+    { value = "free as in freedom" },
+    { value = "free as in free beer" },
+    { value = "free and open source" },
 ]
-foss_head_values = [
-    { value = "contributor", prefixable = true, suffixible = true },
-    { value = "maintainer", prefixable = true, suffixible = true },
-    { value = "packager", prefixable = true, suffixible = true },
-    { value = "hacker", prefixable = true, suffixible = true },
-    { value = "user", prefixable = true, suffixible = true },
-    { value = "ricer", prefixable = true, suffixible = true },
-    { value = "wizard", prefixable = true, suffixible = true },
-    { value = "coder", prefixable = true, suffixible = true },
-    { value = "kernel", prefixable = true, suffixible = true },
-    { value = "repo", prefixable = true, suffixible = true },
-    { value = "commit", prefixable = true, suffixible = true },
-    { value = "patch", prefixable = true, suffixible = true },
-    { value = "fork", prefixable = true, suffixible = true },
-    { value = "distro", prefixable = true, suffixible = true },
-    { value = "purist", prefixable = true, suffixible = true },
+_foss_role_values = [
+    { value = "contributor" },
+    { value = "maintainer" },
+    { value = "packager" },
+    { value = "hacker" },
+    { value = "user" },
+    { value = "hacker" },
+    { value = "ricer" },
+    { value = "wizard" },
+    { value = "coder" },
+    { value = "kernel" },
+    { value = "repo" },
+    { value = "commit" },
+    { value = "patch" },
+    { value = "fork" },
+    { value = "distro" },
+    { value = "purist" },
 ]
-foss_class_values = [
-    { value = "maintainer", prefixable = true, suffixible = true },
-    { value = "contributor", prefixable = true, suffixible = true },
-    { value = "committer", prefixable = true, suffixible = true },
-    { value = "packager", prefixable = true, suffixible = true },
+class = [
+    { value = "maintainer" },
+    { value = "contributor" },
+    { value = "committer" },
+    { value = "packager" },
     { value = "distro hopper", prefixable = false, suffixible = false },
     { value = "kernel hacker", prefixable = false, suffixible = false },
-    { value = "terminal wizard", prefixable = false, suffixible = false },
     { value = "arch user", prefixable = false, suffixible = false },
     { value = "bug triager", prefixable = false, suffixible = false },
 ]
-foss_thing_values = [
-    { value = "linux", prefixable = true, suffixible = true },
-    { value = "kernel", prefixable = true, suffixible = true },
-    { value = "source", prefixable = true, suffixible = true },
-    { value = "repo", prefixable = true, suffixible = true },
-    { value = "PR", prefixable = true, suffixible = true },
+noun = [
+    { value = "linux" },
+    { value = "GNU/Linux" },
+    { value = "GNU+Linux" },
+    { value = "kernel" },
+    { value = "source" },
+    { value = "repo" },
+    { value = "PR" },
     { value = "merge conflict", prefixable = false, suffixible = false },
-    { value = "dependency", prefixable = true, suffixible = true },
-    { value = "package", prefixable = true, suffixible = true },
-    { value = "FSF", prefixable = true, suffixible = true },
-    { value = "AUR", prefixable = true, suffixible = true },
-    { value = "GPL", prefixable = true, suffixible = true },
-    { value = "MIT", prefixable = false, suffixible = false },
-    { value = "BSD", prefixable = false, suffixible = false },
-    { value = "copyleft", prefixable = true, suffixible = true },
-    { value = "README", prefixable = true, suffixible = true },
-    { value = "dotfiles", prefixable = true, suffixible = true },
-    { value = "systemd", prefixable = true, suffixible = true },
-    { value = "init", prefixable = true, suffixible = true },
-    { value = "tarball", prefixable = true, suffixible = true },
+    { value = "dependency" },
+    { value = "package" },
+    { value = "copyleft" },
+    { value = "dotfile" },
+    { value = "systemd" },
+    { value = "sysVinit" },
+    { value = "init" },
+    { value = "tarball" },
+    { value = "sudo", lowercase = "true" },
+    { value = "root" },
+    { value = "shebang" },
 ]
-foss_license_values = [
-    { value = "GPL", prefixable = true, suffixible = true },
-    { value = "GPLv2-only", prefixable = true, suffixible = true },
-    { value = "GPLv3-only", prefixable = true, suffixible = true },
-    { value = "MIT", prefixable = true, suffixible = true },
-    { value = "BSD", prefixable = true, suffixible = true },
-    { value = "copyleft", prefixable = true, suffixible = true },
+entity = [
+    { value = "Stallman" },
+    { value = "Torvalds" },
+    { value = "Poettering" },
+    { value = "Richard M. Stallman" },
+    { value = "Linus Torvalds" },
+    { value = "Lennart Poettering" },
+    { value = "the AUR" },
+    { value = "the ArchWiki" },
+    { value = "the Gentoo Wiki" },
+    { value = "the EPEL" },
+    { value = "GNU" },
+    { value = "the FSF" },
 ]
-
-foss_suf_values = [
-    { value = 'born', prefixable = true, suffixible = true },
-    { value = 'kin', prefixable = true, suffixible = true },
-    { value = 'kind', prefixable = true, suffixible = true },
-    { value = 'kernel', prefixable = true, suffixible = true },
-    { value = 'user', prefixable = true, suffixible = true },
-    { value = 'coder', prefixable = true, suffixible = true },
-    { value = 'hacker', prefixable = true, suffixible = true },
+_foss_distro_values = [
+    { value = "Debian" },
+    { value = "Ubuntu" },
+    { value = "Arch Linux" },
+    { value = "Parabola GNU/Linux-libre" },
+    { value = "Hyperbola GNU/Linux-libre" },
+    { value = "CentOS" },
+    { value = "Almalinux" },
+    { value = "Rocky Linux" },
+    { value = "OpenEuler" },
+    { value = "Fedora" },
+    { value = "OpenSUSE" },
+    { value = "Slackware" },
+    { value = "Gentoo" },
+    { value = "Void Linux" },
+    { value = "Alpine Linux" },
+    { value = "NixOS" },
+    { value = "Guix" },
+    { value = "*BSD" },
 ]
-
-[[foss_suf]]
-patterns = [
-    "{foss_suf_values}",
+_foss_license_values = [
+    { value = "Apache" },
+    { value = "GPL" },
+    { value = "GPLv2" },
+    { value = "GPLv3" },
+    { value = "MIT" },
+    { value = "BSD" },
+    { value = "copyleft" },
 ]
-
-[[class]]
-patterns = [
-    "{prefix}{class_root}",
-    "{class_root}",
-    "{class_root}{class_suffix}",
+suffix = [
+    { value = "-only", suffixible = false },
+    { value = "-release", suffixible = false },
+    { value = ".conf.d", suffixible = false },
+    { value = ".sh", suffixible = false },
+    { value = ".tar.gz", suffixible = false },
 ]
 
 [[license_role]]
 patterns = [
-    "{license} {head}",
+    "{_foss_role_values}",
+    "{license} {_foss_role_values}",
 ]
 
 [[place]]
-value = "GitHub"
-takes_of = true
-takes_in = false
-article = ""
-proper_noun = true
-prefixable = true
-suffixible = true
-
-[[place]]
 value = "GitLab"
-takes_of = true
-takes_in = false
 article = ""
 proper_noun = true
-prefixable = true
-suffixible = true
-
-[[place]]
-value = "SourceHut"
-takes_of = true
-takes_in = false
-article = ""
-proper_noun = true
-prefixable = true
-suffixible = true
-
-[[place]]
-value = "AUR"
-takes_of = true
-takes_in = false
-article = "the"
-proper_noun = false
-prefixable = false
-suffixible = false
 
 [[place]]
 value = "mailing list"
-takes_of = true
-takes_in = false
 article = "the"
 proper_noun = false
 prefixable = false
@@ -175,51 +152,37 @@ suffixible = false
 
 [[place]]
 value = "issue tracker"
-takes_of = true
-takes_in = false
 article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
 
 [[place]]
-value = "terminal"
-takes_of = true
-takes_in = false
-article = "the"
+value = "tty{digit}"
+article = ""
 proper_noun = false
-prefixable = true
-suffixible = true
+lowercase = true
 
 [[place]]
 value = "/dev/null"
-takes_of = true
-takes_in = false
 article = ""
 proper_noun = false
-prefixable = true
-suffixible = true
 
 [[place]]
-value = "IRC channel"
-takes_of = true
-takes_in = false
-article = "the"
+value = "userland"
+article = ""
 proper_noun = false
-prefixable = false
-suffixible = false
 
 [[expose]]
 slot = "rank"
 from = [
-    "foss_rank",
+    "rank",
 ]
 
 [[expose]]
 slot = "class"
 from = [
     "class",
-    "foss_class",
     "license_role",
 ]
 
@@ -232,27 +195,28 @@ from = [
 [[expose]]
 slot = "adj"
 from = [
-    "foss_adj",
+    "adj",
 ]
 
 [[expose]]
 slot = "adj_sup"
 from = [
-    "foss_adj_sup",
+    "adj_sup",
 ]
 
 [[expose]]
 slot = "noun"
 from = [
-    "head",
+    "role",
     "license",
+    "distro",
+    "noun",
 ]
 
-
 [[expose]]
-slot = "thing"
+slot = "entity"
 from = [
-    "foss_thing",
+    "entity",
 ]
 
 [[expose]]
@@ -261,52 +225,23 @@ from = [
     "place",
 ]
 
-[[foss_rank]]
-patterns = [
-    "{foss_rank_values}",
-]
-
-[[class_root]]
-patterns = [
-    "{foss_class_root_values}",
-]
-
-[[class_suffix]]
-patterns = [
-    "{foss_class_suffix_values}",
-]
-
-[[foss_adj]]
-patterns = [
-    "{foss_adj_values}",
-]
-
-[[foss_adj_sup]]
-patterns = [
-    "{foss_adj_sup_values}",
+[[expose]]
+slot = "suffix"
+from = [
+    "suffix",
 ]
 
 [[head]]
 patterns = [
-    "{foss_head_values}",
-]
-
-[[foss_class]]
-patterns = [
-    "{foss_class_values}",
-]
-
-[[foss_thing]]
-patterns = [
-    "{foss_thing_values}",
+    "{_foss_head_values}",
 ]
 
 [[license]]
 patterns = [
-    "{foss_license_values}",
+    "{_foss_license_values}",
 ]
-[[expose]]
-slot = "suf"
-from = [
-    "foss_suf",
+
+[[distro]]
+patterns = [
+    "{_foss_distro_values}",
 ]

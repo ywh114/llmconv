@@ -11,57 +11,44 @@ lepton = [
     { value = "lepton", prefixable = true, suffixible = true },
 ]
 prefix = [
-    { value = "higgs", prefixable = true, suffixible = true },
-    { value = "gluon", prefixable = true, suffixible = true },
-    { value = "photon", prefixable = true, suffixible = true },
-    { value = "muon", prefixable = true, suffixible = true },
-    { value = "tau", prefixable = true, suffixible = true },
+    { value = "quasi", prefixable = true, suffixible = true },
+    { value = "pseudo", prefixable = true, suffixible = true },
 ]
 adj = [
     { value = "charged", prefixable = true, suffixible = true },
     { value = "neutral", prefixable = true, suffixible = true },
     { value = "virtual", prefixable = true, suffixible = true },
+    { value = "composite", prefixable = true, suffixible = true },
 ]
 adj_sup = [
-    { value = "fundamental", prefixable = true, suffixible = true },
-    { value = "elementary", prefixable = true, suffixible = true },
-    { value = "composite", prefixable = true, suffixible = true },
-    { value = "derivative", prefixable = true, suffixible = true },
+    { value = "most fundamental", prefixable = true, suffixible = true },
+    { value = "most elementary", prefixable = true, suffixible = true },
     { value = "least fundamental", prefixable = false, suffixible = false },
 ]
-thing = [
+suffix = [
+    { value = "on", prefixable = true, suffixible = true },
+    { value = "ino", prefixable = true, suffixible = true },
+]
+noun = [
     { value = "mass", prefixable = true, suffixible = true },
     { value = "charge", prefixable = true, suffixible = true },
     { value = "spin", prefixable = true, suffixible = true },
 ]
 
-suf = [
-    { value = 'kind', prefixable = true, suffixible = true },
-    { value = 'born', prefixable = true, suffixible = true },
-]
-
-[[particle]]
-patterns = [
-    "{fermion}",
-    "{boson}",
-    "{quark}",
-    "{lepton}",
-]
-
 [[place]]
-value = "the vacuum"
+value = "vacuum"
 takes_of = false
 takes_in = true
-article = ""
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
 
 [[place]]
-value = "the collider"
+value = "collider"
 takes_of = false
 takes_in = true
-article = ""
+article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
@@ -69,7 +56,10 @@ suffixible = false
 [[expose]]
 slot = "noun"
 from = [
-    "particle",
+    "fermion",
+    "boson",
+    "quark",
+    "lepton",
 ]
 
 [[expose]]
@@ -91,18 +81,13 @@ from = [
 ]
 
 [[expose]]
-slot = "thing"
-from = [
-    "thing",
-]
-
-[[expose]]
 slot = "place"
 from = [
     "place",
 ]
+
 [[expose]]
-slot = "suf"
+slot = "suffix"
 from = [
-    "suf",
+    "suffix",
 ]

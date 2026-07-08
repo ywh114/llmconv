@@ -24,7 +24,7 @@ from ara.world.title import (
 )
 
 _ALWAYS_LOAD = {"generic", "numbers", "templates"}
-_SLOTS = {"domain", "technique", "verb", "noun", "prefix", "suf", "adj", "adj_sup"}
+_SLOTS = {"verb", "noun", "prefix", "suffix", "adj", "adj_sup"}
 
 
 def _ability_dirs(
@@ -160,8 +160,4 @@ def generate_ability(
         tmpl = template
     else:
         tmpl = random.choice(templates)
-    return title_case(
-        expand(
-            tmpl, grammar,
-        )
-    )
+    return expand(tmpl, grammar)

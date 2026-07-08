@@ -1,51 +1,65 @@
 # Ability grammar templates.
 #
 # Complexity levels:
-#   simple    — compound suffix (Pyrothermia), prefix-noun, adj-suffix
-#   moderate  — domain-technique combos (Miasma Surge), modifiers, numbered
-#   complex   — technique-of-noun (Audit of Entropy), stacked modifiers, ordinals
-#   insane    — absurd combos (Sauce's Flush), cascading mods
+#   simple    — short names, 1-2 slots, basic modifiers
+#   moderate  — prepositional phrases, ordinals, simple stacks
+#   complex   — multi-slot phrases, superlatives, plural/past modifiers
+#   insane    — maximal stacks, cascading modifiers, multiple clauses
 
 simple = [
-    "{prefix}{suf}",
+    "{verb:noun}",
+    "{verb} {noun}",
+    "{noun} {verb}",
+    "{noun} {noun}",
+    "{adj} {noun}",
+    "{adj} {verb:noun}",
     "{prefix}{noun}",
-    "{adj}{suf}",
-    "{adj_sup} {technique}",
-    "{adj_sup} {domain}",
+    "{prefix}{verb:noun}",
+    "{noun}{suffix}",
+    "{verb:noun}{suffix}",
+    "{adj_sup} {verb}",
+    "{adj_sup} {noun}",
+    "{verb:gerund} {noun}",
 ]
 
 moderate = [
-    "{domain} {technique}",
-    "{adj} {technique}",
-    "{domain} {noun}",
-    "{adj_sup} {technique}",
-    "{adj_sup} {domain} {technique}",
-    "{technique} {roman_numeral}",
-    "{ordinal} {technique}",
-    "{technique}{suf}",
+    "{noun:possessive} {verb}",
+    "{noun:possessive} {verb:noun}",
+    "{noun} of {verb:noun}",
+    "{adj} {verb:gerund} {noun}",
+    "{ordinal} {verb:noun}",
+    "{verb} {roman_numeral}",
+    "{noun} {verb:noun}",
+    "{verb:noun} {noun}",
+    "{adj_sup} {verb:noun}",
+    "{prefix+}{verb:noun}",
+    "{adj} {verb:noun} of {noun:plural}",
 ]
 
 complex = [
-    "{technique} of {noun}",
-    "The {adj} {noun}",
-    "{noun}'s {technique}",
-    "{ordinal} {domain} {technique}",
-    "{adj} {noun} {roman_numeral}",
-    "{adj_sup} {technique} of {noun}",
-    "{adj_sup} {domain} {technique}",
-    "{prefix}{technique}",
-    "{domain} {technique}",
+    "{adj_sup} {verb:noun} of {noun:plural}",
+    "{ordinal:>1,<6} {verb:noun}",
+    "{verb:past} {noun}",
+    "{verb:past} {verb}",
+    "{noun:possessive} {verb:noun}",
+    "{adj} {verb:noun} of {noun:plural}",
+    "{adj_sup} {noun} {verb:noun}",
+    "{prefix}{verb:noun} of {noun:plural}",
+    "{verb:noun} of {noun:plural}",
+    "{adj_sup} {verb:gerund} {noun}",
+    "{verb} {verb:noun}",
+    "{verb} {verb:gerund}",
 ]
 
 insane = [
-    "{noun}'s {noun}",
-    "{domain} {domain} {technique}",
-    "The {domain} of {domain} and {domain}",
-    "{technique} of {technique}s",
-    "{prefix}{suf} Mk.{number}",
-    "The {ordinal} {noun}",
-    "Level {number} {technique}",
-    "{adj_sup} {prefix}{suf}",
-    "{adj_sup} {adj_sup} {technique}",
-    "{technique}{suf} {roman_numeral}",
+    "{adj_sup} {adj_sup} {verb:noun}",
+    "{verb:gerund} {verb:gerund} {noun}",
+    "{verb} of {verb:noun}",
+    "{ordinal:>1,<6} {adj_sup} {verb:noun}",
+    "{adj} {adj} {verb:noun} of {noun}",
+    "{prefix+}{prefix+}{verb:noun}",
+    "{noun:possessive} {verb:noun} of {noun:plural}",
+    "{adj_sup} {adj_sup} {verb:noun} of {noun:plural}",
+    "{verb:past} {noun} {noun}",
+    "{adj_sup} {verb:noun} of {verb:noun}",
 ]

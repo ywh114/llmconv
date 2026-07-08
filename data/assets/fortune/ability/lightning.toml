@@ -1,16 +1,20 @@
 category = "elemental"
 # Lightning-elemental ability entries.
 
-prefix_values = [
+_prefix_values = [
     { value = "electro", prefixable = false, suffixible = true },
     { value = "volt", prefixable = false, suffixible = true },
 ]
 
-suf_values = [
-    { value = "", prefixable = true, suffixible = false},
+_suffix_values = [
+    { value = "", prefixable = true, suffixible = false },
+    { value = "shock", prefixable = true, suffixible = false },
+    { value = "jolt", prefixable = true, suffixible = false },
+    { value = "spark", prefixable = true, suffixible = false },
+    { value = "bolt", prefixable = true, suffixible = false },
 ]
 
-domain_values = [
+_domain_values = [
     { value = "tempest", prefixable = false, suffixible = false },
     { value = "discharge", prefixable = false, suffixible = false },
     { value = "thunder", prefixable = false, suffixible = false },
@@ -19,19 +23,19 @@ domain_values = [
     { value = "plasma", prefixable = false, suffixible = false },
 ]
 
-lightning_melee_values = [
+_lightning_melee_values = [
     { value = "jolt", prefixable = false, suffixible = false },
     { value = "shock", prefixable = false, suffixible = false },
     { value = "fry", prefixable = false, suffixible = false },
 ]
 
-lightning_area_values = [
+_lightning_area_values = [
     { value = "discharge", prefixable = false, suffixible = false },
     { value = "overload", prefixable = false, suffixible = false },
     { value = "tempest", prefixable = false, suffixible = false },
 ]
 
-lightning_ranged_values = [
+_lightning_ranged_values = [
     { value = "arc", prefixable = false, suffixible = false },
     { value = "bolt", prefixable = false, suffixible = true },
     { value = "spark", prefixable = false, suffixible = true },
@@ -39,33 +43,33 @@ lightning_ranged_values = [
     { value = "overload", prefixable = false, suffixible = false },
 ]
 
-lightning_defence_values = [
+_lightning_defence_values = [
     { value = "ground", prefixable = false, suffixible = false },
-    { value = "repel", prefixable = false, suffixible = false },
+    { value = "repel", prefixable = false, suffixible = false, noun_form = "repulsion" },
 ]
 
-lightning_status_values = [
+_lightning_status_values = [
     { value = "charge", prefixable = false, suffixible = false },
     { value = "overload", prefixable = false, suffixible = false },
     { value = "electrification", prefixable = false, suffixible = false },
 ]
 
-lightning_movement_values = [
+_lightning_movement_values = [
     { value = "surge", prefixable = false, suffixible = false },
-    { value = "levitate", prefixable = false, suffixible = false },
+    { value = "levitate", prefixable = false, suffixible = false, noun_form = "levitation" },
 ]
 
-verb_values = [
+other = [
 ]
 
-noun_values = [
+_noun_values = [
     { value = "storm", prefixable = false, suffixible = false },
     { value = "bolt", prefixable = false, suffixible = false },
     { value = "thunder", prefixable = false, suffixible = false },
     { value = "plasma", prefixable = false, suffixible = false },
 ]
 
-adj_values = [
+_adj_values = [
     { value = "crackling", prefixable = false, suffixible = false },
     { value = "thundering", prefixable = false, suffixible = false },
     { value = "arcing", prefixable = false, suffixible = false },
@@ -73,47 +77,50 @@ adj_values = [
 ]
 
 [["melee"]]
-patterns = ["{lightning_melee_values}"]
+patterns = ["{_lightning_melee_values}"]
 
 [["area"]]
-patterns = ["{lightning_area_values}"]
+patterns = ["{_lightning_area_values}"]
 
 [["ranged"]]
-patterns = ["{lightning_ranged_values}"]
+patterns = ["{_lightning_ranged_values}"]
 
 [["defence"]]
-patterns = ["{lightning_defence_values}"]
+patterns = ["{_lightning_defence_values}"]
 
 [["status"]]
-patterns = ["{lightning_status_values}"]
+patterns = ["{_lightning_status_values}"]
 
 [["movement"]]
-patterns = ["{lightning_movement_values}"]
+patterns = ["{_lightning_movement_values}"]
 
 [[expose]]
-slot = "suf"
-from = ["suf_values"]
+slot = "suffix"
+from = ["_suffix_values"]
 
 [[expose]]
 slot = "prefix"
-from = ["prefix_values"]
-
-[[expose]]
-slot = "domain"
-from = ["domain_values"]
-
-[[expose]]
-slot = "technique"
-from = ["melee", "area", "ranged", "defence", "status", "movement"]
-
-[[expose]]
-slot = "verb"
-from = ["verb_values"]
-
-[[expose]]
-slot = "noun"
-from = ["noun_values"]
+from = ["_prefix_values"]
 
 [[expose]]
 slot = "adj"
-from = ["adj_values"]
+from = ["_adj_values"]
+
+[[expose]]
+slot = "verb"
+from = [
+    "melee",
+    "area",
+    "ranged",
+    "status",
+    "defence",
+    "movement",
+    "other",
+]
+
+[[expose]]
+slot = "noun"
+from = [
+    "_domain_values",
+    "_noun_values",
+]

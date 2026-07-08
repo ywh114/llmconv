@@ -1,4 +1,4 @@
-country_name = [
+_country_name = [
     { value = "Afghanistan", prefixable = true, suffixible = true },
     { value = "Albania", prefixable = true, suffixible = true },
     { value = "Algeria", prefixable = true, suffixible = true },
@@ -193,14 +193,14 @@ country_name = [
     { value = "Zambia", prefixable = true, suffixible = true },
     { value = "Zimbabwe", prefixable = true, suffixible = true },
 ]
-permanent_security_council_name = [
+_permanent_security_council_name = [
     { value = "China", prefixable = true, suffixible = true },
     { value = "France", prefixable = true, suffixible = true },
     { value = "Russia", prefixable = true, suffixible = true },
     { value = "the United Kingdom", prefixable = false, suffixible = false },
     { value = "the United States", prefixable = false, suffixible = false },
 ]
-africa_name = [
+_africa_name = [
     { value = "Algeria", prefixable = true, suffixible = true },
     { value = "Angola", prefixable = true, suffixible = true },
     { value = "Benin", prefixable = true, suffixible = true },
@@ -256,7 +256,7 @@ africa_name = [
     { value = "Zambia", prefixable = true, suffixible = true },
     { value = "Zimbabwe", prefixable = true, suffixible = true },
 ]
-asia_name = [
+_asia_name = [
     { value = "Afghanistan", prefixable = true, suffixible = true },
     { value = "Armenia", prefixable = true, suffixible = true },
     { value = "Azerbaijan", prefixable = true, suffixible = true },
@@ -288,7 +288,7 @@ asia_name = [
     { value = "North Korea", prefixable = false, suffixible = false },
     { value = "Oman", prefixable = true, suffixible = true },
     { value = "Pakistan", prefixable = true, suffixible = true },
-    { value = "Philippines", prefixable = true, suffixible = true },
+    { value = "the Philippines", prefixable = true, suffixible = true },
     { value = "Qatar", prefixable = true, suffixible = true },
     { value = "Saudi Arabia", prefixable = false, suffixible = false },
     { value = "Singapore", prefixable = true, suffixible = true },
@@ -305,7 +305,7 @@ asia_name = [
     { value = "Vietnam", prefixable = true, suffixible = true },
     { value = "Yemen", prefixable = true, suffixible = true },
 ]
-europe_name = [
+_europe_name = [
     { value = "Albania", prefixable = true, suffixible = true },
     { value = "Andorra", prefixable = true, suffixible = true },
     { value = "Austria", prefixable = true, suffixible = true },
@@ -351,7 +351,7 @@ europe_name = [
     { value = "Türkiye", prefixable = true, suffixible = true },
     { value = "Ukraine", prefixable = true, suffixible = true },
 ]
-north_america_name = [
+_north_america_name = [
     { value = "Antigua and Barbuda", prefixable = false, suffixible = false },
     { value = "Barbados", prefixable = true, suffixible = true },
     { value = "Belize", prefixable = true, suffixible = true },
@@ -376,7 +376,7 @@ north_america_name = [
     { value = "the United States", prefixable = false, suffixible = false },
     { value = "Trinidad and Tobago", prefixable = false, suffixible = false },
 ]
-south_america_name = [
+_south_america_name = [
     { value = "Argentina", prefixable = true, suffixible = true },
     { value = "Bolivia", prefixable = true, suffixible = true },
     { value = "Brazil", prefixable = true, suffixible = true },
@@ -390,7 +390,7 @@ south_america_name = [
     { value = "Uruguay", prefixable = true, suffixible = true },
     { value = "Venezuela", prefixable = true, suffixible = true },
 ]
-oceania_name = [
+_oceania_name = [
     { value = "Australia", prefixable = true, suffixible = true },
     { value = "Fiji", prefixable = true, suffixible = true },
     { value = "Kiribati", prefixable = true, suffixible = true },
@@ -406,7 +406,7 @@ oceania_name = [
     { value = "Tuvalu", prefixable = true, suffixible = true },
     { value = "Vanuatu", prefixable = true, suffixible = true },
 ]
-middle_east_name = [
+_middle_east_name = [
     { value = "Bahrain", prefixable = true, suffixible = true },
     { value = "Cyprus", prefixable = true, suffixible = true },
     { value = "Iran", prefixable = true, suffixible = true },
@@ -422,7 +422,7 @@ middle_east_name = [
     { value = "United Arab Emirates", prefixable = false, suffixible = false },
     { value = "Yemen", prefixable = true, suffixible = true },
 ]
-southeast_asia_name = [
+_southeast_asia_name = [
     { value = "Brunei", prefixable = true, suffixible = true },
     { value = "Cambodia", prefixable = true, suffixible = true },
     { value = "Indonesia", prefixable = true, suffixible = true },
@@ -435,7 +435,7 @@ southeast_asia_name = [
     { value = "Timor-Leste", prefixable = true, suffixible = true },
     { value = "Vietnam", prefixable = true, suffixible = true },
 ]
-nato_name = [
+_nato_name = [
     { value = "Albania", prefixable = true, suffixible = true },
     { value = "Belgium", prefixable = true, suffixible = true },
     { value = "Bulgaria", prefixable = true, suffixible = true },
@@ -469,7 +469,7 @@ nato_name = [
     { value = "the United Kingdom", prefixable = false, suffixible = false },
     { value = "the United States", prefixable = false, suffixible = false },
 ]
-opec_name = [
+_opec_name = [
     { value = "Algeria", prefixable = true, suffixible = true },
     { value = "Equatorial Guinea", prefixable = false, suffixible = false },
     { value = "Gabon", prefixable = true, suffixible = true },
@@ -482,7 +482,7 @@ opec_name = [
     { value = "Saudi Arabia", prefixable = false, suffixible = false },
     { value = "Venezuela", prefixable = true, suffixible = true },
 ]
-european_union_name = [
+_european_union_name = [
     { value = "Austria", prefixable = true, suffixible = true },
     { value = "Belgium", prefixable = true, suffixible = true },
     { value = "Bulgaria", prefixable = true, suffixible = true },
@@ -511,7 +511,7 @@ european_union_name = [
     { value = "Spain", prefixable = true, suffixible = true },
     { value = "Sweden", prefixable = true, suffixible = true },
 ]
-asean_name = [
+_asean_name = [
     { value = "Brunei", prefixable = true, suffixible = true },
     { value = "Cambodia", prefixable = true, suffixible = true },
     { value = "Indonesia", prefixable = true, suffixible = true },
@@ -524,7 +524,7 @@ asean_name = [
     { value = "Timor-Leste", prefixable = true, suffixible = true },
     { value = "Vietnam", prefixable = true, suffixible = true },
 ]
-african_union_name = [
+_african_union_name = [
     { value = "Algeria", prefixable = true, suffixible = true },
     { value = "Angola", prefixable = true, suffixible = true },
     { value = "Benin", prefixable = true, suffixible = true },
@@ -580,7 +580,7 @@ african_union_name = [
     { value = "Zambia", prefixable = true, suffixible = true },
     { value = "Zimbabwe", prefixable = true, suffixible = true },
 ]
-arab_league_name = [
+_arab_league_name = [
     { value = "Algeria", prefixable = true, suffixible = true },
     { value = "Bahrain", prefixable = true, suffixible = true },
     { value = "Comoros", prefixable = true, suffixible = true },
@@ -603,7 +603,7 @@ arab_league_name = [
     { value = "United Arab Emirates", prefixable = false, suffixible = false },
     { value = "Yemen", prefixable = true, suffixible = true },
 ]
-g7_name = [
+_g7_name = [
     { value = "Canada", prefixable = true, suffixible = true },
     { value = "France", prefixable = true, suffixible = true },
     { value = "Germany", prefixable = true, suffixible = true },
@@ -612,7 +612,7 @@ g7_name = [
     { value = "the United Kingdom", prefixable = false, suffixible = false },
     { value = "the United States", prefixable = false, suffixible = false },
 ]
-g20_name = [
+_g20_name = [
     { value = "Argentina", prefixable = true, suffixible = true },
     { value = "Australia", prefixable = true, suffixible = true },
     { value = "Brazil", prefixable = true, suffixible = true },
@@ -633,7 +633,7 @@ g20_name = [
     { value = "the United Kingdom", prefixable = false, suffixible = false },
     { value = "the United States", prefixable = false, suffixible = false },
 ]
-brics_name = [
+_brics_name = [
     { value = "Brazil", prefixable = true, suffixible = true },
     { value = "Russia", prefixable = true, suffixible = true },
     { value = "India", prefixable = true, suffixible = true },
@@ -646,7 +646,7 @@ brics_name = [
     { value = "Saudi Arabia", prefixable = false, suffixible = false },
     { value = "Indonesia", prefixable = true, suffixible = true },
 ]
-commonwealth_of_nations_name = [
+_commonwealth_of_nations_name = [
     { value = "Antigua and Barbuda", prefixable = false, suffixible = false },
     { value = "Australia", prefixable = true, suffixible = true },
     { value = "the Bahamas", prefixable = false, suffixible = false },
@@ -704,106 +704,509 @@ commonwealth_of_nations_name = [
     { value = "Vanuatu", prefixable = true, suffixible = true },
     { value = "Zambia", prefixable = true, suffixible = true },
     { value = "Zimbabwe", prefixable = true, suffixible = true },
+]
+
+
+_africa_adj = [
+    { value = "Algerian", prefixable = true, suffixible = true },
+    { value = "Angolan", prefixable = true, suffixible = true },
+    { value = "Beninese", prefixable = true, suffixible = true },
+    { value = "Motswana", prefixable = true, suffixible = true },
+    { value = "Burkinabe", prefixable = true, suffixible = true },
+    { value = "Burundian", prefixable = true, suffixible = true },
+    { value = "Cape Verdian", prefixable = false, suffixible = false },
+    { value = "Cameroonian", prefixable = true, suffixible = true },
+    { value = "Central African", prefixable = false, suffixible = false },
+    { value = "Chadian", prefixable = true, suffixible = true },
+    { value = "Comoran", prefixable = true, suffixible = true },
+    { value = "Congolese", prefixable = true, suffixible = true },
+    { value = "Ivorian", prefixable = true, suffixible = true },
+    { value = "Djibouti", prefixable = true, suffixible = true },
+    { value = "Egyptian", prefixable = true, suffixible = true },
+    { value = "Equatorial Guinean", prefixable = false, suffixible = false },
+    { value = "Eritrean", prefixable = true, suffixible = true },
+    { value = "Swazi", prefixable = true, suffixible = true },
+    { value = "Ethiopian", prefixable = true, suffixible = true },
+    { value = "Gabonese", prefixable = true, suffixible = true },
+    { value = "Ghanaian", prefixable = true, suffixible = true },
+    { value = "Guinean", prefixable = true, suffixible = true },
+    { value = "Guinea-Bissauan", prefixable = true, suffixible = true },
+    { value = "Kenyan", prefixable = true, suffixible = true },
+    { value = "Mosotho", prefixable = true, suffixible = true },
+    { value = "Liberian", prefixable = true, suffixible = true },
+    { value = "Libyan", prefixable = true, suffixible = true },
+    { value = "Malagasy", prefixable = true, suffixible = true },
+    { value = "Malawian", prefixable = true, suffixible = true },
+    { value = "Malian", prefixable = true, suffixible = true },
+    { value = "Mauritanian", prefixable = true, suffixible = true },
+    { value = "Mauritian", prefixable = true, suffixible = true },
+    { value = "Moroccan", prefixable = true, suffixible = true },
+    { value = "Mozambican", prefixable = true, suffixible = true },
+    { value = "Namibian", prefixable = true, suffixible = true },
+    { value = "Nigerien", prefixable = true, suffixible = true },
+    { value = "Nigerian", prefixable = true, suffixible = true },
+    { value = "Rwandan", prefixable = true, suffixible = true },
+    { value = "Sao Tomean", prefixable = false, suffixible = false },
+    { value = "Senegalese", prefixable = true, suffixible = true },
+    { value = "Seychellois", prefixable = true, suffixible = true },
+    { value = "Sierra Leonean", prefixable = false, suffixible = false },
+    { value = "Somali", prefixable = true, suffixible = true },
+    { value = "South African", prefixable = false, suffixible = false },
+    { value = "South Sudanese", prefixable = false, suffixible = false },
+    { value = "Sudanese", prefixable = true, suffixible = true },
+    { value = "Tanzanian", prefixable = true, suffixible = true },
+    { value = "Gambian", prefixable = true, suffixible = true },
+    { value = "Togolese", prefixable = true, suffixible = true },
+    { value = "Tunisian", prefixable = true, suffixible = true },
+    { value = "Ugandan", prefixable = true, suffixible = true },
+    { value = "Zambian", prefixable = true, suffixible = true },
+    { value = "Zimbabwean", prefixable = true, suffixible = true },
+]
+
+_asia_adj = [
+    { value = "Afghan", prefixable = true, suffixible = true },
+    { value = "Armenian", prefixable = true, suffixible = true },
+    { value = "Azerbaijani", prefixable = true, suffixible = true },
+    { value = "Bahraini", prefixable = true, suffixible = true },
+    { value = "Bangladeshi", prefixable = true, suffixible = true },
+    { value = "Bhutanese", prefixable = true, suffixible = true },
+    { value = "Bruneian", prefixable = true, suffixible = true },
+    { value = "Cambodian", prefixable = true, suffixible = true },
+    { value = "Chinese", prefixable = true, suffixible = true },
+    { value = "Cypriot", prefixable = true, suffixible = true },
+    { value = "Georgian", prefixable = true, suffixible = true },
+    { value = "Indian", prefixable = true, suffixible = true },
+    { value = "Indonesian", prefixable = true, suffixible = true },
+    { value = "Iranian", prefixable = true, suffixible = true },
+    { value = "Iraqi", prefixable = true, suffixible = true },
+    { value = "Israeli", prefixable = true, suffixible = true },
+    { value = "Japanese", prefixable = true, suffixible = true },
+    { value = "Jordanian", prefixable = true, suffixible = true },
+    { value = "Kazakhstani", prefixable = true, suffixible = true },
+    { value = "Kuwaiti", prefixable = true, suffixible = true },
+    { value = "Kirghiz", prefixable = true, suffixible = true },
+    { value = "Laotian", prefixable = true, suffixible = true },
+    { value = "Lebanese", prefixable = true, suffixible = true },
+    { value = "Malaysian", prefixable = true, suffixible = true },
+    { value = "Maldivan", prefixable = true, suffixible = true },
+    { value = "Mongolian", prefixable = true, suffixible = true },
+    { value = "Burmese", prefixable = true, suffixible = true },
+    { value = "Nepalese", prefixable = true, suffixible = true },
+    { value = "North Korean", prefixable = false, suffixible = false },
+    { value = "Omani", prefixable = true, suffixible = true },
+    { value = "Pakistani", prefixable = true, suffixible = true },
+    { value = "Filipino", prefixable = true, suffixible = true },
+    { value = "Qatari", prefixable = true, suffixible = true },
+    { value = "Saudi Arabian", prefixable = false, suffixible = false },
+    { value = "Singaporean", prefixable = true, suffixible = true },
+    { value = "South Korean", prefixable = false, suffixible = false },
+    { value = "Sri Lankan", prefixable = false, suffixible = false },
+    { value = "Syrian", prefixable = true, suffixible = true },
+    { value = "Tadzhik", prefixable = true, suffixible = true },
+    { value = "Thai", prefixable = true, suffixible = true },
+    { value = "East Timorese", prefixable = false, suffixible = false },
+    { value = "Turkmen", prefixable = true, suffixible = true },
+    { value = "Turkish", prefixable = true, suffixible = true },
+    { value = "Emirati", prefixable = true, suffixible = true },
+    { value = "Uzbekistani", prefixable = true, suffixible = true },
+    { value = "Vietnamese", prefixable = true, suffixible = true },
+    { value = "Yemeni", prefixable = true, suffixible = true },
+]
+
+_europe_adj = [
+    { value = "Albanian", prefixable = true, suffixible = true },
+    { value = "Andorran", prefixable = true, suffixible = true },
+    { value = "Austrian", prefixable = true, suffixible = true },
+    { value = "Belarusian", prefixable = true, suffixible = true },
+    { value = "Belgian", prefixable = true, suffixible = true },
+    { value = "Bosnian", prefixable = true, suffixible = true },
+    { value = "Herzegovinian", prefixable = true, suffixible = true },
+    { value = "Bulgarian", prefixable = true, suffixible = true },
+    { value = "Croatian", prefixable = true, suffixible = true },
+    { value = "Czech", prefixable = true, suffixible = true },
+    { value = "Danish", prefixable = true, suffixible = true },
+    { value = "Estonian", prefixable = true, suffixible = true },
+    { value = "Finnish", prefixable = true, suffixible = true },
+    { value = "French", prefixable = true, suffixible = true },
+    { value = "German", prefixable = true, suffixible = true },
+    { value = "Greek", prefixable = true, suffixible = true },
+    { value = "Hungarian", prefixable = true, suffixible = true },
+    { value = "Icelander", prefixable = true, suffixible = true },
+    { value = "Irish", prefixable = true, suffixible = true },
+    { value = "Italian", prefixable = true, suffixible = true },
+    { value = "Latvian", prefixable = true, suffixible = true },
+    { value = "Liechtensteiner", prefixable = true, suffixible = true },
+    { value = "Lithuanian", prefixable = true, suffixible = true },
+    { value = "Luxembourger", prefixable = true, suffixible = true },
+    { value = "Maltese", prefixable = true, suffixible = true },
+    { value = "Monegasque", prefixable = true, suffixible = true },
+    { value = "Montenegrin", prefixable = true, suffixible = true },
+    { value = "Dutch", prefixable = true, suffixible = true },
+    { value = "Macedonian", prefixable = true, suffixible = true },
+    { value = "Norwegian", prefixable = true, suffixible = true },
+    { value = "Polish", prefixable = true, suffixible = true },
+    { value = "Portuguese", prefixable = true, suffixible = true },
+    { value = "Moldovan", prefixable = true, suffixible = true },
+    { value = "Romanian", prefixable = true, suffixible = true },
+    { value = "Russian", prefixable = true, suffixible = true },
+    { value = "Sammarinese", prefixable = true, suffixible = true },
+    { value = "Serbian", prefixable = true, suffixible = true },
+    { value = "Slovak", prefixable = true, suffixible = true },
+    { value = "Slovene", prefixable = true, suffixible = true },
+    { value = "Spanish", prefixable = true, suffixible = true },
+    { value = "Swedish", prefixable = true, suffixible = true },
+    { value = "Swiss", prefixable = true, suffixible = true },
+    { value = "British", prefixable = true, suffixible = true },
+    { value = "Turkish", prefixable = true, suffixible = true },
+    { value = "Ukrainian", prefixable = true, suffixible = true },
+]
+
+_north_america_adj = [
+    { value = "Antiguan", prefixable = true, suffixible = true },
+    { value = "Barbudan", prefixable = true, suffixible = true },
+    { value = "Barbadian", prefixable = true, suffixible = true },
+    { value = "Belizean", prefixable = true, suffixible = true },
+    { value = "Canadian", prefixable = true, suffixible = true },
+    { value = "Costa Rican", prefixable = false, suffixible = false },
+    { value = "Cuban", prefixable = true, suffixible = true },
+    { value = "Dominican", prefixable = true, suffixible = true },
+    { value = "Salvadoran", prefixable = true, suffixible = true },
+    { value = "Grenadian", prefixable = true, suffixible = true },
+    { value = "Guatemalan", prefixable = true, suffixible = true },
+    { value = "Haitian", prefixable = true, suffixible = true },
+    { value = "Honduran", prefixable = true, suffixible = true },
+    { value = "Jamaican", prefixable = true, suffixible = true },
+    { value = "Mexican", prefixable = true, suffixible = true },
+    { value = "Nicaraguan", prefixable = true, suffixible = true },
+    { value = "Panamanian", prefixable = true, suffixible = true },
+    { value = "Kittian and Nevisian", prefixable = false, suffixible = false },
+    { value = "Saint Lucian", prefixable = false, suffixible = false },
+    { value = "Saint Vincentian", prefixable = false, suffixible = false },
+    { value = "Bahamian", prefixable = true, suffixible = true },
+    { value = "American", prefixable = true, suffixible = true },
+    { value = "Trinidadian", prefixable = true, suffixible = true },
+]
+
+_south_america_adj = [
+    { value = "Argentinean", prefixable = true, suffixible = true },
+    { value = "Bolivian", prefixable = true, suffixible = true },
+    { value = "Brazilian", prefixable = true, suffixible = true },
+    { value = "Chilean", prefixable = true, suffixible = true },
+    { value = "Colombian", prefixable = true, suffixible = true },
+    { value = "Ecuadorean", prefixable = true, suffixible = true },
+    { value = "Guyanese", prefixable = true, suffixible = true },
+    { value = "Paraguayan", prefixable = true, suffixible = true },
+    { value = "Peruvian", prefixable = true, suffixible = true },
+    { value = "Surinamer", prefixable = true, suffixible = true },
+    { value = "Uruguayan", prefixable = true, suffixible = true },
+    { value = "Venezuelan", prefixable = true, suffixible = true },
+]
+
+_oceania_adj = [
+    { value = "Australian", prefixable = true, suffixible = true },
+    { value = "Fijian", prefixable = true, suffixible = true },
+    { value = "I-Kiribati", prefixable = true, suffixible = true },
+    { value = "Marshallese", prefixable = true, suffixible = true },
+    { value = "Micronesian", prefixable = true, suffixible = true },
+    { value = "Nauruan", prefixable = true, suffixible = true },
+    { value = "New Zealander", prefixable = false, suffixible = false },
+    { value = "Palauan", prefixable = true, suffixible = true },
+    { value = "Papua New Guinean", prefixable = false, suffixible = false },
+    { value = "Samoan", prefixable = true, suffixible = true },
+    { value = "Solomon Islander", prefixable = false, suffixible = false },
+    { value = "Tongan", prefixable = true, suffixible = true },
+    { value = "Tuvaluan", prefixable = true, suffixible = true },
+    { value = "Ni-Vanuatu", prefixable = true, suffixible = true },
+]
+
+_middle_east_adj = [
+    { value = "Bahraini", prefixable = true, suffixible = true },
+    { value = "Cypriot", prefixable = true, suffixible = true },
+    { value = "Iranian", prefixable = true, suffixible = true },
+    { value = "Iraqi", prefixable = true, suffixible = true },
+    { value = "Israeli", prefixable = true, suffixible = true },
+    { value = "Jordanian", prefixable = true, suffixible = true },
+    { value = "Kuwaiti", prefixable = true, suffixible = true },
+    { value = "Lebanese", prefixable = true, suffixible = true },
+    { value = "Omani", prefixable = true, suffixible = true },
+    { value = "Qatari", prefixable = true, suffixible = true },
+    { value = "Saudi Arabian", prefixable = false, suffixible = false },
+    { value = "Syrian", prefixable = true, suffixible = true },
+    { value = "Emirati", prefixable = true, suffixible = true },
+    { value = "Yemeni", prefixable = true, suffixible = true },
+]
+
+_southeast_asia_adj = [
+    { value = "Bruneian", prefixable = true, suffixible = true },
+    { value = "Cambodian", prefixable = true, suffixible = true },
+    { value = "Indonesian", prefixable = true, suffixible = true },
+    { value = "Laotian", prefixable = true, suffixible = true },
+    { value = "Malaysian", prefixable = true, suffixible = true },
+    { value = "Burmese", prefixable = true, suffixible = true },
+    { value = "Filipino", prefixable = true, suffixible = true },
+    { value = "Singaporean", prefixable = true, suffixible = true },
+    { value = "Thai", prefixable = true, suffixible = true },
+    { value = "East Timorese", prefixable = false, suffixible = false },
+    { value = "Vietnamese", prefixable = true, suffixible = true },
+]
+
+_nato_adj = [
+    { value = "NATO", prefixable = true, suffixible = true },
+]
+
+_opec_adj = [
+    { value = "OPEC", prefixable = true, suffixible = true },
+]
+
+_european_union_adj = [
+    { value = "European", prefixable = true, suffixible = true },
+    { value = "EU", prefixable = true, suffixible = true },
+]
+
+_asean_adj = [
+    { value = "ASEAN", prefixable = true, suffixible = true },
+]
+
+_african_union_adj = [
+    { value = "African Union", prefixable = false, suffixible = false },
+    { value = "AU", prefixable = true, suffixible = true },
+]
+
+_arab_league_adj = [
+    { value = "Arab League", prefixable = false, suffixible = false },
+    { value = "Arab", prefixable = true, suffixible = true },
+]
+
+_g7_adj = [
+    { value = "G7", prefixable = true, suffixible = true },
+]
+
+_g20_adj = [
+    { value = "G20", prefixable = true, suffixible = true },
+]
+
+_brics_adj = [
+    { value = "BRICS", prefixable = true, suffixible = true },
+]
+
+_commonwealth_of_nations_adj = [
+    { value = "Commonwealth", prefixable = true, suffixible = true },
+    { value = "Commonwealth of Nations", prefixable = false, suffixible = false },
 ]
 
 [[country]]
 patterns = [
-    "{country_name}",
+    "{_country_name}",
 ]
 
 [[permanent_security_council]]
 patterns = [
-    "{permanent_security_council_name}",
+    "{_permanent_security_council_name}",
 ]
 
 [[africa]]
 patterns = [
-    "{africa_name}",
+    "{_africa_name}",
 ]
 
 [[asia]]
 patterns = [
-    "{asia_name}",
+    "{_asia_name}",
 ]
 
 [[europe]]
 patterns = [
-    "{europe_name}",
+    "{_europe_name}",
 ]
 
 [[north_america]]
 patterns = [
-    "{north_america_name}",
+    "{_north_america_name}",
 ]
 
 [[south_america]]
 patterns = [
-    "{south_america_name}",
+    "{_south_america_name}",
 ]
 
 [[oceania]]
 patterns = [
-    "{oceania_name}",
+    "{_oceania_name}",
 ]
 
 [[middle_east]]
 patterns = [
-    "{middle_east_name}",
+    "{_middle_east_name}",
 ]
 
 [[southeast_asia]]
 patterns = [
-    "{southeast_asia_name}",
+    "{_southeast_asia_name}",
 ]
 
 [[nato]]
 patterns = [
-    "{nato_name}",
+    "{_nato_name}",
 ]
 
 [[opec]]
 patterns = [
-    "{opec_name}",
+    "{_opec_name}",
 ]
 
 [[european_union]]
 patterns = [
-    "{european_union_name}",
+    "{_european_union_name}",
 ]
 
 [[asean]]
 patterns = [
-    "{asean_name}",
+    "{_asean_name}",
 ]
 
 [[african_union]]
 patterns = [
-    "{african_union_name}",
+    "{_african_union_name}",
 ]
 
 [[arab_league]]
 patterns = [
-    "{arab_league_name}",
+    "{_arab_league_name}",
 ]
 
 [[g7]]
 patterns = [
-    "{g7_name}",
+    "{_g7_name}",
 ]
 
 [[g20]]
 patterns = [
-    "{g20_name}",
+    "{_g20_name}",
 ]
 
 [[brics]]
 patterns = [
-    "{brics_name}",
+    "{_brics_name}",
 ]
 
 [[commonwealth_of_nations]]
 patterns = [
-    "{commonwealth_of_nations_name}",
+    "{_commonwealth_of_nations_name}",
+]
+
+
+
+[[africa_adj]]
+patterns = [
+    "{_africa_adj}",
+]
+
+[[asia_adj]]
+patterns = [
+    "{_asia_adj}",
+]
+
+[[europe_adj]]
+patterns = [
+    "{_europe_adj}",
+]
+
+[[north_america_adj]]
+patterns = [
+    "{_north_america_adj}",
+]
+
+[[south_america_adj]]
+patterns = [
+    "{_south_america_adj}",
+]
+
+[[oceania_adj]]
+patterns = [
+    "{_oceania_adj}",
+]
+
+[[middle_east_adj]]
+patterns = [
+    "{_middle_east_adj}",
+]
+
+[[southeast_asia_adj]]
+patterns = [
+    "{_southeast_asia_adj}",
+]
+
+[[nato_adj]]
+patterns = [
+    "{_nato_adj}",
+]
+
+[[opec_adj]]
+patterns = [
+    "{_opec_adj}",
+]
+
+[[european_union_adj]]
+patterns = [
+    "{_european_union_adj}",
+]
+
+[[asean_adj]]
+patterns = [
+    "{_asean_adj}",
+]
+
+[[african_union_adj]]
+patterns = [
+    "{_african_union_adj}",
+]
+
+[[arab_league_adj]]
+patterns = [
+    "{_arab_league_adj}",
+]
+
+[[g7_adj]]
+patterns = [
+    "{_g7_adj}",
+]
+
+[[g20_adj]]
+patterns = [
+    "{_g20_adj}",
+]
+
+[[brics_adj]]
+patterns = [
+    "{_brics_adj}",
+]
+
+[[commonwealth_of_nations_adj]]
+patterns = [
+    "{_commonwealth_of_nations_adj}",
+]
+
+[[expose]]
+slot = "adj"
+from = [
+    "africa_adj",
+    "asia_adj",
+    "europe_adj",
+    "north_america_adj",
+    "south_america_adj",
+    "oceania_adj",
+    "middle_east_adj",
+    "southeast_asia_adj",
+    "nato_adj",
+    "opec_adj",
+    "european_union_adj",
+    "asean_adj",
+    "african_union_adj",
+    "arab_league_adj",
+    "g7_adj",
+    "g20_adj",
+    "brics_adj",
+    "commonwealth_of_nations_adj",
 ]
 
 [[expose]]

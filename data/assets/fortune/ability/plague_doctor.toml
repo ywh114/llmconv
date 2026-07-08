@@ -1,51 +1,46 @@
 category = "tonal"
 # Plague-doctor-toned ability entries.
 
-plague_doctor_melee_values = [
+_plague_doctor_melee_values = [
     { value = "bloodlet", prefixable = false, suffixible = false },
-    { value = "trepan", prefixable = false, suffixible = false },
+    { value = "trepan", prefixable = false, suffixible = false, noun_form = "trepanation" },
 ]
 
-plague_doctor_area_values = [
+_plague_doctor_area_values = [
     { value = "quarantine", prefixable = false, suffixible = false },
     { value = "contagion", prefixable = false, suffixible = false },
     { value = "purge", prefixable = false, suffixible = false },
 ]
 
-plague_doctor_status_values = [
-    { value = "diagnose", prefixable = false, suffixible = false },
-    { value = "inoculate", prefixable = false, suffixible = false },
+_plague_doctor_status_values = [
+    { value = "diagnose", prefixable = false, suffixible = false, noun_form = "diagnosis" },
+    { value = "inoculate", prefixable = false, suffixible = false, noun_form = "inoculation" },
     { value = "purge", prefixable = false, suffixible = false },
     { value = "contagion", prefixable = false, suffixible = false },
 ]
 
-plague_doctor_defence_values = [
+_plague_doctor_defence_values = [
     { value = "quarantine", prefixable = false, suffixible = false },
-    { value = "fumigate", prefixable = false, suffixible = false },
+    { value = "fumigate", prefixable = false, suffixible = false, noun_form = "fumigation" },
 ]
 
-suf_values = []
-
-domain_values = [
-    { value = "miasma", prefixable = false, suffixible = false },
-    { value = "bubo", prefixable = false, suffixible = false },
-    { value = "consumption", prefixable = false, suffixible = false },
-    { value = "ague", prefixable = false, suffixible = false },
-    { value = "pestilence", prefixable = false, suffixible = false },
-    { value = "leech", prefixable = false, suffixible = false },
-    { value = "cholera", prefixable = false, suffixible = false },
+_suffix_values = [
+    { value = "pox", prefixable = true, suffixible = false },
+    { value = "fever", prefixable = true, suffixible = false },
+    { value = "blight", prefixable = true, suffixible = false },
+    { value = "miasma", prefixable = true, suffixible = false },
 ]
 
-verb_values = [
+other = [
     { value = "leech", prefixable = false, suffixible = false },
-    { value = "diagnose", prefixable = false, suffixible = false },
+    { value = "diagnose", prefixable = false, suffixible = false, noun_form = "diagnosis" },
     { value = "quarantine", prefixable = false, suffixible = false },
     { value = "cauterization", prefixable = false, suffixible = false },
     { value = "inoculation", prefixable = false, suffixible = false },
     { value = "depopulation", prefixable = false, suffixible = false },
 ]
 
-noun_values = [
+_noun_values = [
     { value = "bubo", prefixable = false, suffixible = false },
     { value = "plague", prefixable = false, suffixible = false },
     { value = "miasma", prefixable = false, suffixible = false },
@@ -54,47 +49,50 @@ noun_values = [
     { value = "gangrene", prefixable = false, suffixible = false },
 ]
 
-adj_values = [
+_adj_values = [
     { value = "miasmic", prefixable = false, suffixible = false },
     { value = "septic", prefixable = false, suffixible = false },
     { value = "bubonic", prefixable = false, suffixible = false },
     { value = "necrotic", prefixable = false, suffixible = false },
 ]
 
-plague_doctor_movement_values = []
+_plague_doctor_movement_values = []
 
 [["melee"]]
-patterns = ["{plague_doctor_melee_values}"]
+patterns = ["{_plague_doctor_melee_values}"]
 
 [["area"]]
-patterns = ["{plague_doctor_area_values}"]
+patterns = ["{_plague_doctor_area_values}"]
 
 [["status"]]
-patterns = ["{plague_doctor_status_values}"]
+patterns = ["{_plague_doctor_status_values}"]
 
 [["defence"]]
-patterns = ["{plague_doctor_defence_values}"]
+patterns = ["{_plague_doctor_defence_values}"]
 
 [[expose]]
-slot = "suf"
-from = ["suf_values"]
-
-[[expose]]
-slot = "technique"
-from = ["melee", "area", "status", "defence", "movement"]
-
-[[expose]]
-slot = "domain"
-from = ["domain_values"]
-
-[[expose]]
-slot = "verb"
-from = ["verb_values"]
-
-[[expose]]
-slot = "noun"
-from = ["noun_values"]
+slot = "suffix"
+from = ["_suffix_values"]
 
 [[expose]]
 slot = "adj"
-from = ["adj_values"]
+from = ["_adj_values"]
+
+[[expose]]
+slot = "verb"
+from = [
+    "melee",
+    "area",
+    "ranged",
+    "status",
+    "defence",
+    "movement",
+    "other",
+]
+
+[[expose]]
+slot = "noun"
+from = [
+    "_domain_values",
+    "_noun_values",
+]
