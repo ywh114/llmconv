@@ -2,8 +2,8 @@ category = "elemental"
 # Lightning-elemental ability entries.
 
 _prefix_values = [
-    { value = "electro", prefixable = false, suffixible = true },
-    { value = "volt", prefixable = false, suffixible = true },
+    { value = "electro", suffixible = true },
+    { value = "volt", suffixible = true },
 ]
 
 _suffix_values = [
@@ -15,65 +15,65 @@ _suffix_values = [
 ]
 
 _domain_values = [
-    { value = "tempest", prefixable = false, suffixible = false },
-    { value = "discharge", prefixable = false, suffixible = false },
-    { value = "thunder", prefixable = false, suffixible = false },
-    { value = "lightning", prefixable = false, suffixible = false },
-    { value = "current", prefixable = false, suffixible = false },
-    { value = "plasma", prefixable = false, suffixible = false },
+    { value = "tempest", suffixible = false },
+    { value = "discharge", suffixible = false },
+    { value = "thunder", suffixible = false },
+    { value = "lightning", suffixible = false },
+    { value = "current", suffixible = false },
+    { value = "plasma", suffixible = false },
 ]
 
 _lightning_melee_values = [
-    { value = "jolt", prefixable = false, suffixible = false },
-    { value = "shock", prefixable = false, suffixible = false },
-    { value = "fry", prefixable = false, suffixible = false },
+    { value = "jolt", suffixible = false },
+    { value = "shock", suffixible = false },
+    { value = "fry", suffixible = false },
 ]
 
 _lightning_area_values = [
-    { value = "discharge", prefixable = false, suffixible = false },
-    { value = "overload", prefixable = false, suffixible = false },
-    { value = "tempest", prefixable = false, suffixible = false },
+    { value = "discharge", suffixible = false },
+    { value = "overload", suffixible = false },
+    { value = "tempest", suffixible = false },
 ]
 
 _lightning_ranged_values = [
-    { value = "arc", prefixable = false, suffixible = false },
-    { value = "bolt", prefixable = false, suffixible = true },
-    { value = "spark", prefixable = false, suffixible = true },
-    { value = "discharge", prefixable = false, suffixible = false },
-    { value = "overload", prefixable = false, suffixible = false },
+    { value = "arc", suffixible = false },
+    { value = "bolt", suffixible = true },
+    { value = "spark", suffixible = true },
+    { value = "discharge", suffixible = false },
+    { value = "overload", suffixible = false },
 ]
 
 _lightning_defence_values = [
-    { value = "ground", prefixable = false, suffixible = false },
-    { value = "repel", prefixable = false, suffixible = false, noun_form = "repulsion" },
+    { value = "ground", suffixible = false },
+    { value = "repel", suffixible = false, noun_form = "repulsion" },
 ]
 
 _lightning_status_values = [
-    { value = "charge", prefixable = false, suffixible = false },
-    { value = "overload", prefixable = false, suffixible = false },
-    { value = "electrification", prefixable = false, suffixible = false },
+    { value = "charge", suffixible = false },
+    { value = "overload", suffixible = false },
+    { value = "electrification", suffixible = false },
 ]
 
 _lightning_movement_values = [
-    { value = "surge", prefixable = false, suffixible = false },
-    { value = "levitate", prefixable = false, suffixible = false, noun_form = "levitation" },
+    { value = "surge", suffixible = false },
+    { value = "levitate", suffixible = false, noun_form = "levitation" },
 ]
 
 other = [
 ]
 
 _noun_values = [
-    { value = "storm", prefixable = false, suffixible = false },
-    { value = "bolt", prefixable = false, suffixible = false },
-    { value = "thunder", prefixable = false, suffixible = false },
-    { value = "plasma", prefixable = false, suffixible = false },
+    { value = "storm", suffixible = false },
+    { value = "bolt", suffixible = false },
+    { value = "thunder", suffixible = false },
+    { value = "plasma", suffixible = false },
 ]
 
 _adj_values = [
-    { value = "crackling", prefixable = false, suffixible = false },
-    { value = "thundering", prefixable = false, suffixible = false },
-    { value = "arcing", prefixable = false, suffixible = false },
-    { value = "ionized", prefixable = false, suffixible = false },
+    { value = "crackling", suffixible = false },
+    { value = "thundering", suffixible = false },
+    { value = "arcing", suffixible = false },
+    { value = "ionized", suffixible = false },
 ]
 
 [["melee"]]

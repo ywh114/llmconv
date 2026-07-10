@@ -1,21 +1,21 @@
 prefix = [
-    { value = "nano", prefixable = true, suffixible = true },
-    { value = "micro", prefixable = true, suffixible = true },
-    { value = "milli", prefixable = true, suffixible = true },
-    { value = "kilo", prefixable = true, suffixible = true },
-    { value = "mega", prefixable = true, suffixible = true },
-    { value = "giga", prefixable = true, suffixible = true },
-    { value = "tera", prefixable = true, suffixible = true },
-    { value = "peta", prefixable = true, suffixible = true },
-    { value = "exa", prefixable = true, suffixible = true },
+    { value = "nano" },
+    { value = "micro" },
+    { value = "milli" },
+    { value = "kilo" },
+    { value = "mega" },
+    { value = "giga" },
+    { value = "tera" },
+    { value = "peta" },
+    { value = "exa" },
 ]
 suffix = [
-    { value = "meter", prefixable = true, suffixible = true },
-    { value = "gram", prefixable = true, suffixible = true },
-    { value = "level", prefixable = true, suffixible = true },
-    { value = "index", prefixable = true, suffixible = true },
-    { value = "point", prefixable = true, suffixible = true },
-    { value = "scale", prefixable = true, suffixible = true },
+    { value = "meter" },
+    { value = "gram" },
+    { value = "level" },
+    { value = "index" },
+    { value = "point" },
+    { value = "scale" },
 ]
 
 [[expose]]

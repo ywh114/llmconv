@@ -2,14 +2,14 @@ category = "elemental"
 # Wind-elemental ability entries.
 
 _prefix_values = [
-    { value = "aero", prefixable = false, suffixible = true },
-    { value = "vento", prefixable = false, suffixible = true },
-    { value = "gale", prefixable = false, suffixible = true },
-    { value = "zephyr", prefixable = false, suffixible = true },
-    { value = "cyclo", prefixable = false, suffixible = true },
-    { value = "tempest", prefixable = false, suffixible = true },
-    { value = "gust", prefixable = false, suffixible = true },
-    { value = "vortex", prefixable = false, suffixible = true },
+    { value = "aero", suffixible = true },
+    { value = "vento", suffixible = true },
+    { value = "gale", suffixible = true },
+    { value = "zephyr", suffixible = true },
+    { value = "cyclo", suffixible = true },
+    { value = "tempest", suffixible = true },
+    { value = "gust", suffixible = true },
+    { value = "vortex", suffixible = true },
 ]
 
 _suffix_values = [
@@ -20,72 +20,72 @@ _suffix_values = [
 ]
 
   _domain_values = [
-    { value = "hurricane", prefixable = false, suffixible = false },
-    { value = "tornado", prefixable = false, suffixible = false },
-    { value = "squall", prefixable = false, suffixible = false },
-    { value = "cyclone", prefixable = false, suffixible = false },
-    { value = "jetstream", prefixable = false, suffixible = false },
-    { value = "updraft", prefixable = false, suffixible = false },
-    { value = "downdraft", prefixable = false, suffixible = false },
+    { value = "hurricane", suffixible = false },
+    { value = "tornado", suffixible = false },
+    { value = "squall", suffixible = false },
+    { value = "cyclone", suffixible = false },
+    { value = "jetstream", suffixible = false },
+    { value = "updraft", suffixible = false },
+    { value = "downdraft", suffixible = false },
     { value = "the high pressure", prefixable = false, suffixible = false },
 ]
 
 _wind_melee_values = [
-    { value = "scythe", prefixable = false, suffixible = false },
-    { value = "shear", prefixable = false, suffixible = false },
+    { value = "scythe", suffixible = false },
+    { value = "shear", suffixible = false },
 ]
 
 _wind_area_values = [
-    { value = "cyclone", prefixable = false, suffixible = false },
-    { value = "buffet", prefixable = false, suffixible = false },
-    { value = "asphyxiate", prefixable = false, suffixible = false, noun_form = "asphyxiation" },
+    { value = "cyclone", suffixible = false },
+    { value = "buffet", suffixible = false },
+    { value = "asphyxiate", suffixible = false, noun_form = "asphyxiation" },
 ]
 
 _wind_ranged_values = [
-    { value = "gust", prefixable = false, suffixible = false },
-    { value = "drift", prefixable = false, suffixible = false },
-    { value = "updraft", prefixable = false, suffixible = false },
+    { value = "gust", suffixible = false },
+    { value = "drift", suffixible = false },
+    { value = "updraft", suffixible = false },
 ]
 
 _wind_status_values = [
-    { value = "asphyxiate", prefixable = false, suffixible = false, noun_form = "asphyxiation" },
+    { value = "asphyxiate", suffixible = false, noun_form = "asphyxiation" },
 ]
 
 _wind_defence_values = [
-    { value = "headwind", prefixable = false, suffixible = false },
-    { value = "buffer", prefixable = false, suffixible = false },
+    { value = "headwind", suffixible = false },
+    { value = "buffer", suffixible = false },
 ]
 
 _wind_movement_values = [
-    { value = "drift", prefixable = false, suffixible = false },
-    { value = "soar", prefixable = false, suffixible = false },
+    { value = "drift", suffixible = false },
+    { value = "soar", suffixible = false },
 ]
 
 other = [
-    { value = "buffet", prefixable = false, suffixible = false },
-    { value = "shear", prefixable = false, suffixible = false },
-    { value = "asphyxiation", prefixable = false, suffixible = false },
-    { value = "scythe", prefixable = false, suffixible = false },
-    { value = "gust", prefixable = false, suffixible = false },
-    { value = "drift", prefixable = false, suffixible = false },
+    { value = "buffet", suffixible = false },
+    { value = "shear", suffixible = false },
+    { value = "asphyxiation", suffixible = false },
+    { value = "scythe", suffixible = false },
+    { value = "gust", suffixible = false },
+    { value = "drift", suffixible = false },
 ]
 
 _noun_values = [
-    { value = "gale", prefixable = false, suffixible = false },
-    { value = "zephyr", prefixable = false, suffixible = false },
-    { value = "storm", prefixable = false, suffixible = false },
-    { value = "vortex", prefixable = false, suffixible = false },
-    { value = "sky", prefixable = false, suffixible = false },
-    { value = "draft", prefixable = false, suffixible = false },
+    { value = "gale", suffixible = false },
+    { value = "zephyr", suffixible = false },
+    { value = "storm", suffixible = false },
+    { value = "vortex", suffixible = false },
+    { value = "sky", suffixible = false },
+    { value = "draft", suffixible = false },
 ]
 
 _adj_values = [
-    { value = "howling", prefixable = false, suffixible = false },
-    { value = "gale-force", prefixable = false, suffixible = false },
-    { value = "cyclonic", prefixable = false, suffixible = false },
-    { value = "turbulent", prefixable = false, suffixible = false },
-    { value = "shearing", prefixable = false, suffixible = false },
-    { value = "blustering", prefixable = false, suffixible = false },
+    { value = "howling", suffixible = false },
+    { value = "gale-force", suffixible = false },
+    { value = "cyclonic", suffixible = false },
+    { value = "turbulent", suffixible = false },
+    { value = "shearing", suffixible = false },
+    { value = "blustering", suffixible = false },
 ]
 
 

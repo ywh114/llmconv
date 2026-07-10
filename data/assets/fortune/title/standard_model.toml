@@ -1,44 +1,125 @@
 fermion = [
-    { value = "fermion", prefixable = true, suffixible = true },
+    { value = "fermion" },
+    { value = "electron" },
+    { value = "muon" },
+    { value = "tau" },
+    { value = "neutrino" },
+    { value = "electron neutrino", sticky = false },
+    { value = "muon neutrino", sticky = false },
+    { value = "tau neutrino", sticky = false },
 ]
+
 boson = [
-    { value = "boson", prefixable = true, suffixible = true },
+    { value = "boson" },
+    { value = "photon" },
+    { value = "gluon" },
+    { value = "W boson", sticky = false },
+    { value = "Z boson", sticky = false },
+    { value = "Higgs boson", sticky = false },
 ]
+
 quark = [
-    { value = "quark", prefixable = true, suffixible = true },
+    { value = "quark" },
+    { value = "up quark", sticky = false },
+    { value = "down quark", sticky = false },
+    { value = "charm quark", sticky = false },
+    { value = "strange quark", sticky = false },
+    { value = "top quark", sticky = false },
+    { value = "bottom quark", sticky = false },
 ]
+
 lepton = [
-    { value = "lepton", prefixable = true, suffixible = true },
+    { value = "lepton" },
+    { value = "electron" },
+    { value = "muon" },
+    { value = "tau" },
+    { value = "electron neutrino", sticky = false },
+    { value = "muon neutrino", sticky = false },
+    { value = "tau neutrino", sticky = false },
 ]
+
+particle = [
+    { value = "fermion" },
+    { value = "boson" },
+    { value = "quark" },
+    { value = "lepton" },
+    { value = "electron" },
+    { value = "muon" },
+    { value = "tau" },
+    { value = "neutrino" },
+    { value = "electron neutrino", sticky = false },
+    { value = "muon neutrino", sticky = false },
+    { value = "tau neutrino", sticky = false },
+    { value = "photon" },
+    { value = "gluon" },
+    { value = "W boson", sticky = false },
+    { value = "Z boson", sticky = false },
+    { value = "Higgs boson", sticky = false },
+    { value = "up quark", sticky = false },
+    { value = "down quark", sticky = false },
+    { value = "charm quark", sticky = false },
+    { value = "strange quark", sticky = false },
+    { value = "top quark", sticky = false },
+    { value = "bottom quark", sticky = false },
+]
+
+entity = [
+    { value = "Max Planck", sticky = false, proper_noun = true },
+    { value = "Albert Einstein", sticky = false, proper_noun = true },
+    { value = "Niels Bohr", sticky = false, proper_noun = true },
+    { value = "Werner Heisenberg", sticky = false, proper_noun = true },
+    { value = "Erwin Schrödinger", sticky = false, proper_noun = true },
+    { value = "Paul Dirac", sticky = false, proper_noun = true },
+    { value = "Wolfgang Pauli", sticky = false, proper_noun = true },
+    { value = "Richard Feynman", sticky = false, proper_noun = true },
+    { value = "Enrico Fermi", sticky = false, proper_noun = true },
+    { value = "Murray Gell-Mann", sticky = false, proper_noun = true },
+    { value = "Sheldon Glashow", sticky = false, proper_noun = true },
+    { value = "Steven Weinberg", sticky = false, proper_noun = true },
+    { value = "Abdus Salam", sticky = false, proper_noun = true },
+    { value = "Peter Higgs", sticky = false, proper_noun = true },
+    { value = "Yoichiro Nambu", sticky = false, proper_noun = true },
+    { value = "Chen-Ning Yang", sticky = false, proper_noun = true },
+    { value = "Robert Mills", sticky = false, proper_noun = true },
+    { value = "Chien-Shiung Wu", sticky = false, proper_noun = true },
+    { value = "Makoto Kobayashi", sticky = false, proper_noun = true },
+    { value = "Toshihide Maskawa", sticky = false, proper_noun = true },
+    { value = "Gerard 't Hooft", sticky = false, proper_noun = true },
+    { value = "Martinus Veltman", sticky = false, proper_noun = true },
+    { value = "Emmy Noether", sticky = false, proper_noun = true },
+]
+
 prefix = [
-    { value = "quasi", prefixable = true, suffixible = true },
-    { value = "pseudo", prefixable = true, suffixible = true },
+    { value = "quasi" },
+    { value = "pseudo" },
 ]
+
 adj = [
-    { value = "charged", prefixable = true, suffixible = true },
-    { value = "neutral", prefixable = true, suffixible = true },
-    { value = "virtual", prefixable = true, suffixible = true },
-    { value = "composite", prefixable = true, suffixible = true },
+    { value = "charged" },
+    { value = "neutral" },
+    { value = "virtual" },
+    { value = "composite" },
 ]
+
 adj_sup = [
-    { value = "most fundamental", prefixable = true, suffixible = true },
-    { value = "most elementary", prefixable = true, suffixible = true },
+    { value = "most fundamental" },
+    { value = "most elementary" },
     { value = "least fundamental", prefixable = false, suffixible = false },
 ]
+
 suffix = [
-    { value = "on", prefixable = true, suffixible = true },
-    { value = "ino", prefixable = true, suffixible = true },
+    { value = "on" },
+    { value = "ino" },
 ]
+
 noun = [
-    { value = "mass", prefixable = true, suffixible = true },
-    { value = "charge", prefixable = true, suffixible = true },
-    { value = "spin", prefixable = true, suffixible = true },
+    { value = "mass" },
+    { value = "charge" },
+    { value = "spin" },
 ]
 
 [[place]]
 value = "vacuum"
-takes_of = false
-takes_in = true
 article = "the"
 proper_noun = false
 prefixable = false
@@ -46,8 +127,6 @@ suffixible = false
 
 [[place]]
 value = "collider"
-takes_of = false
-takes_in = true
 article = "the"
 proper_noun = false
 prefixable = false
@@ -56,10 +135,18 @@ suffixible = false
 [[expose]]
 slot = "noun"
 from = [
+    "particle",
     "fermion",
     "boson",
     "quark",
     "lepton",
+    "noun",
+]
+
+[[expose]]
+slot = "entity"
+from = [
+    "entity",
 ]
 
 [[expose]]

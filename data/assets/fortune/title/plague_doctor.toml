@@ -1,58 +1,58 @@
 _class_values = [
-    { value = "physician", prefixable = true, suffixible = true },
-    { value = "apothecary", prefixable = true, suffixible = true },
-    { value = "barber-surgeon", prefixable = true, suffixible = true },
+    { value = "physician" },
+    { value = "apothecary" },
+    { value = "barber-surgeon" },
 ]
 _class_root = [
-    { value = "doctor", prefixable = true, suffixible = true },
-    { value = "crow", prefixable = true, suffixible = true },
-    { value = "mask", prefixable = true, suffixible = true },
-    { value = "leech", prefixable = true, suffixible = true },
+    { value = "doctor" },
+    { value = "crow" },
+    { value = "mask" },
+    { value = "leech" },
 ]
 prefix = [
-    { value = "plague", prefixable = true, suffixible = true },
-    { value = "raven", prefixable = true, suffixible = true },
-    { value = "black", prefixable = true, suffixible = true },
-    { value = "bleak", prefixable = true, suffixible = true },
+    { value = "plague" },
+    { value = "raven" },
+    { value = "black" },
+    { value = "bleak" },
 ]
 adj = [
-    { value = "sickly", prefixable = true, suffixible = true },
-    { value = "pale", prefixable = true, suffixible = true },
-    { value = "bleak", prefixable = true, suffixible = true },
-    { value = "raven", prefixable = true, suffixible = true },
+    { value = "sickly" },
+    { value = "pale" },
+    { value = "bleak" },
+    { value = "raven" },
 ]
 adj_sup = [
     { value = "most sickly", prefixable = false, suffixible = false },
-    { value = "grimmest", prefixable = true, suffixible = true },
+    { value = "grimmest" },
 ]
 noun = [
-    { value = "doctor", prefixable = true, suffixible = true },
-    { value = "crow", prefixable = true, suffixible = true },
-    { value = "mask", prefixable = true, suffixible = true },
-    { value = "plague", prefixable = true, suffixible = true },
-    { value = "miasma", prefixable = true, suffixible = true },
-    { value = "pestilence", prefixable = true, suffixible = true },
-    { value = "buboes", prefixable = true, suffixible = true },
+    { value = "doctor" },
+    { value = "crow" },
+    { value = "mask" },
+    { value = "plague" },
+    { value = "miasma" },
+    { value = "pestilence" },
+    { value = "buboes" },
 ]
 disease = [
-    { value = "cancer", prefixable = true, suffixible = true },
-    { value = "pox", prefixable = true, suffixible = true },
-    { value = "fever", prefixable = true, suffixible = true },
-    { value = "ague", prefixable = true, suffixible = true },
-    { value = "gout", prefixable = true, suffixible = true },
-    { value = "dropsy", prefixable = true, suffixible = true },
-    { value = "plague", prefixable = true, suffixible = true },
-    { value = "leprosy", prefixable = true, suffixible = true },
-    { value = "cholera", prefixable = true, suffixible = true },
-    { value = "blight", prefixable = true, suffixible = true },
-    { value = "typhus", prefixable = true, suffixible = true },
-    { value = "arthritis", prefixable = true, suffixible = true },
-    { value = "osteoperosis", prefixable = true, suffixible = true },
+    { value = "cancer" },
+    { value = "pox" },
+    { value = "fever" },
+    { value = "ague" },
+    { value = "gout" },
+    { value = "dropsy" },
+    { value = "plague" },
+    { value = "leprosy" },
+    { value = "cholera" },
+    { value = "blight" },
+    { value = "typhus" },
+    { value = "arthritis" },
+    { value = "osteoperosis" },
 ]
 suffix = [
-    { value = "pox", prefixable = true, suffixible = true },
-    { value = "ague", prefixable = true, suffixible = true },
-    { value = "blight", prefixable = true, suffixible = true },
+    { value = "pox" },
+    { value = "ague" },
+    { value = "blight" },
 ]
 
 [[class]]

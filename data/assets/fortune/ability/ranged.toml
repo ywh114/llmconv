@@ -2,15 +2,15 @@ category = "delivery"
 # Generic ranged delivery ability entries.
 
 _ranged_ranged_values = [
-    { value = "shot", prefixable = false, suffixible = false },
-    { value = "volley", prefixable = false, suffixible = false },
-    { value = "barrage", prefixable = false, suffixible = false },
-    { value = "beam", prefixable = false, suffixible = false },
-    { value = "bolt", prefixable = false, suffixible = false },
-    { value = "salvo", prefixable = false, suffixible = false },
-    { value = "snipe", prefixable = false, suffixible = false },
-    { value = "spray", prefixable = false, suffixible = false },
-    { value = "payload", prefixable = false, suffixible = false },
+    { value = "shot", suffixible = false },
+    { value = "volley", suffixible = false },
+    { value = "barrage", suffixible = false },
+    { value = "beam", suffixible = false },
+    { value = "bolt", suffixible = false },
+    { value = "salvo", suffixible = false },
+    { value = "snipe", suffixible = false },
+    { value = "spray", suffixible = false },
+    { value = "payload", suffixible = false },
 ]
 
 _suffix_values = [
@@ -20,19 +20,19 @@ _suffix_values = [
 ]
 
 _noun_values = [
-    { value = "arrow", prefixable = false, suffixible = false },
-    { value = "bullet", prefixable = false, suffixible = false },
-    { value = "shell", prefixable = false, suffixible = false },
-    { value = "missile", prefixable = false, suffixible = false },
-    { value = "projectile", prefixable = false, suffixible = false },
-    { value = "lead", prefixable = false, suffixible = false },
+    { value = "arrow", suffixible = false },
+    { value = "bullet", suffixible = false },
+    { value = "shell", suffixible = false },
+    { value = "missile", suffixible = false },
+    { value = "projectile", suffixible = false },
+    { value = "lead", suffixible = false },
 ]
 
 _adj_values = [
-    { value = "long-range", prefixable = false, suffixible = false },
-    { value = "precision", prefixable = false, suffixible = false },
-    { value = "suppressing", prefixable = false, suffixible = false },
-    { value = "homing", prefixable = false, suffixible = false },
+    { value = "long-range", suffixible = false },
+    { value = "precision", suffixible = false },
+    { value = "suppressing", suffixible = false },
+    { value = "homing", suffixible = false },
 ]
 
 _ranged_movement_values = []

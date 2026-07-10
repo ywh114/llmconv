@@ -81,7 +81,7 @@ simple = [
     "{subject} {roman_numeral}",
     "{subject} {number}",
     "{subject}-{number}",
-    "{ordinal:<6} {subject}",
+    "{ordinal} {subject}",
 
     # Prefix compounds (short, natural)
     "{prefix}{noun}",
@@ -110,31 +110,22 @@ moderate = [
 
     # (adjective)
     "{subject} ({adj})",
+    "{subject} ({adj_sup})",
+
     "{adj} {rank} ({adj})",
     "{adj} {class} ({adj})",
-    "{prefix}{noun} ({adj})",
-    "{prefix}{noun} ({adj})",
-    "{prefix}{place} ({adj})",
-    "{prefix}{rank} ({adj})",
-    "{prefix}{class} ({adj})",
-    "{noun}{suffix} ({adj})",
-    "{noun}{suffix} ({adj})",
-    "{place}{suffix} ({adj})",
-    "{rank}{suffix} ({adj})",
-    "{class}{suffix} ({adj})",
-    "{subject} ({adj_sup})",
     "{adj} {rank} ({adj_sup})",
     "{adj} {class} ({adj_sup})",
+
+    "{prefix}{subject} ({adj})",
+    "{prefix}{subject} ({adj_sup})",
+    "{prefix}{noun} ({adj})",
     "{prefix}{noun} ({adj_sup})",
-    "{prefix}{noun} ({adj_sup})",
-    "{prefix}{place} ({adj_sup})",
-    "{prefix}{rank} ({adj_sup})",
-    "{prefix}{class} ({adj_sup})",
+
+    "{subject}{suffix} ({adj})",
+    "{subject}{suffix} ({adj_sup})",
+    "{noun}{suffix} ({adj})",
     "{noun}{suffix} ({adj_sup})",
-    "{noun}{suffix} ({adj_sup})",
-    "{place}{suffix} ({adj_sup})",
-    "{rank}{suffix} ({adj_sup})",
-    "{class}{suffix} ({adj_sup})",
 
     # More descriptors
     "{adj} {rank} {subject}",
@@ -181,7 +172,7 @@ moderate = [
     # Modifier-driven templates
     "{adj} {noun} of {place}",
     "{noun:possessive} {subject}",
-    "{ordinal:<100} {subject}",
+    "{ordinal} {subject}",
 ]
 
 complex = [
@@ -291,8 +282,12 @@ insane = [
     "{entity} of {place}",
 
     # Fun
+    "{adj_sup} {subject} (formerly {adj} {subject})",
+    "{entity} (formerly {adj_sup} {entity})",
     "{subject} of {place} (hates {place})",
     "{subject} of {prefix}{place} (hates {place})",
+    "{subject} (hates {entity})",
+    "{subject} (loves {entity})",
     "{entity} (hates {place})",
     "{entity} (loves {place})",
     "{entity} (hates {noun:plural})",
@@ -303,18 +298,19 @@ insane = [
     "{entity} (actually {entity} in disguise)",
 
     "Two {noun:plural}",
-    "{digit} {noun:plural}",
     "{number} {noun:plural}",
+    "{number} {noun:plural} (used to be {number})",
 
-    "Two {rank:plural}",
-    "{digit} {rank:plural}",
-    "{number} {rank:plural}",
-
-    "Two {class:plural}",
-    "{digit} {class:plural}",
-    "{number} {class:plural}",
+    "Two {subject:plural}",
+    "{number} {subject:plural}",
+    "{number} {subject:plural} (used to be {number})",
 
     "Two {entity:plural}",
-    "{digit} {entity:plural}",
     "{number} {entity:plural}",
+    "{number} {entity:plural} (used to be {number})",
+
+    "\"{subject}\"",
+    "\"{entity}\"",
+    "\"{entity}\" (in scare quotes)",
+    "\"{adj}\" (in scare quotes)",
 ]

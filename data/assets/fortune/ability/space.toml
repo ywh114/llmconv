@@ -2,47 +2,47 @@ category = "concept"
 # Spatial/teleportation ability entries.
 
 _space_melee_values = [
-    { value = "blink", prefixable = false, suffixible = false },
-    { value = "phase", prefixable = false, suffixible = false },
-    { value = "warp", prefixable = false, suffixible = false },
+    { value = "blink", suffixible = false },
+    { value = "phase", suffixible = false },
+    { value = "warp", suffixible = false },
 ]
 
 _space_area_values = [
-    { value = "warp", prefixable = false, suffixible = false },
-    { value = "fold", prefixable = false, suffixible = false },
-    { value = "rift", prefixable = false, suffixible = false },
-    { value = "portal", prefixable = false, suffixible = false },
-    { value = "stretch", prefixable = false, suffixible = false },
-    { value = "compress", prefixable = false, suffixible = false, noun_form = "compression" },
+    { value = "warp", suffixible = false },
+    { value = "fold", suffixible = false },
+    { value = "rift", suffixible = false },
+    { value = "portal", suffixible = false },
+    { value = "stretch", suffixible = false },
+    { value = "compress", suffixible = false, noun_form = "compression" },
 ]
 
 _space_ranged_values = [
-    { value = "teleport", prefixable = false, suffixible = false, noun_form = "teleportation" },
-    { value = "displace", prefixable = false, suffixible = false, noun_form = "displacement" },
-    { value = "portal", prefixable = false, suffixible = false },
-    { value = "blink", prefixable = false, suffixible = false },
+    { value = "teleport", suffixible = false, noun_form = "teleportation" },
+    { value = "displace", suffixible = false, noun_form = "displacement" },
+    { value = "portal", suffixible = false },
+    { value = "blink", suffixible = false },
 ]
 
 _space_status_values = [
-    { value = "phase", prefixable = false, suffixible = false },
-    { value = "stretch", prefixable = false, suffixible = false },
-    { value = "compress", prefixable = false, suffixible = false, noun_form = "compression" },
+    { value = "phase", suffixible = false },
+    { value = "stretch", suffixible = false },
+    { value = "compress", suffixible = false, noun_form = "compression" },
 ]
 
 _space_defence_values = [
-    { value = "isolate", prefixable = false, suffixible = false, noun_form = "isolation" },
-    { value = "shunt", prefixable = false, suffixible = false },
+    { value = "isolate", suffixible = false, noun_form = "isolation" },
+    { value = "shunt", suffixible = false },
 ]
 
 other = [
-    { value = "teleport", prefixable = false, suffixible = false, noun_form = "teleportation" },
-    { value = "blink", prefixable = false, suffixible = false },
-    { value = "warp", prefixable = false, suffixible = false },
-    { value = "fold", prefixable = false, suffixible = false },
-    { value = "displace", prefixable = false, suffixible = false, noun_form = "displacement" },
-    { value = "phase", prefixable = false, suffixible = false },
-    { value = "riftwalk", prefixable = false, suffixible = false },
-    { value = "gate", prefixable = false, suffixible = false, pos = "verb" },
+    { value = "teleport", suffixible = false, noun_form = "teleportation" },
+    { value = "blink", suffixible = false },
+    { value = "warp", suffixible = false },
+    { value = "fold", suffixible = false },
+    { value = "displace", suffixible = false, noun_form = "displacement" },
+    { value = "phase", suffixible = false },
+    { value = "riftwalk", suffixible = false },
+    { value = "gate", suffixible = false, pos = "verb" },
 ]
 
 _suffix_values = [
@@ -54,18 +54,18 @@ _suffix_values = [
 ]
 
 _noun_values = [
-    { value = "portal", prefixable = false, suffixible = false },
-    { value = "rift", prefixable = false, suffixible = false },
-    { value = "wormhole", prefixable = false, suffixible = false },
-    { value = "gate", prefixable = false, suffixible = false },
-    { value = "distance", prefixable = false, suffixible = false },
+    { value = "portal", suffixible = false },
+    { value = "rift", suffixible = false },
+    { value = "wormhole", suffixible = false },
+    { value = "gate", suffixible = false },
+    { value = "distance", suffixible = false },
 ]
 
 _adj_values = [
-    { value = "nonlocal", prefixable = false, suffixible = false },
-    { value = "folded", prefixable = false, suffixible = false },
-    { value = "warped", prefixable = false, suffixible = false },
-    { value = "displaced", prefixable = false, suffixible = false },
+    { value = "nonlocal", suffixible = false },
+    { value = "folded", suffixible = false },
+    { value = "warped", suffixible = false },
+    { value = "displaced", suffixible = false },
 ]
 
 _space_movement_values = []

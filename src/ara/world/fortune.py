@@ -271,17 +271,25 @@ def categorized_title_flavors(
     return _title.categorized_title_flavors(story, config)
 
 
+def cull_grammar(grammar: dict) -> dict:
+    """Return a source-capped copy of a title or ability grammar."""
+    return _title.cull_grammar(grammar)
+
+
 def load_title_grammar(
     story: str | None = None,
     config: AraSettings | None = None,
     flavors: list[str] | str | None = None,
     slot_sources: dict[str, list[str]] | None = None,
+    cull_sources: bool = True,
 ) -> dict:
     """Load and merge title flavor grammars.
 
     Per-story title files take priority over global files.
     """
-    return _title.load_title_grammar(story, config, flavors, slot_sources)
+    return _title.load_title_grammar(
+        story, config, flavors, slot_sources, cull_sources=cull_sources
+    )
 
 
 def generate_title(
@@ -292,10 +300,18 @@ def generate_title(
     level: str | int | None = "2",
     slot_sources: dict[str, list[str]] | None = None,
     required_slots: list[str] | set[str] | None = None,
+    cull_sources: bool = True,
 ) -> str:
     """Generate a random title from the title grammar."""
     return _title.generate_title(
-        story, config, template, flavors, level, slot_sources, required_slots
+        story,
+        config,
+        template,
+        flavors,
+        level,
+        slot_sources,
+        required_slots,
+        cull_sources=cull_sources,
     )
 
 
@@ -335,9 +351,12 @@ def load_ability_grammar(
     config: AraSettings | None = None,
     flavors: list[str] | str | None = None,
     slot_sources: dict[str, list[str]] | None = None,
+    cull_sources: bool = True,
 ) -> dict:
     """Load and merge ability flavor grammars."""
-    return _ability.load_ability_grammar(story, config, flavors, slot_sources)
+    return _ability.load_ability_grammar(
+        story, config, flavors, slot_sources, cull_sources=cull_sources
+    )
 
 
 def generate_ability(
@@ -348,10 +367,18 @@ def generate_ability(
     level: str | int | None = "2",
     slot_sources: dict[str, list[str]] | None = None,
     required_slots: list[str] | set[str] | None = None,
+    cull_sources: bool = True,
 ) -> str:
     """Generate a random ability name from the ability grammar."""
     return _ability.generate_ability(
-        story, config, template, flavors, level, slot_sources, required_slots
+        story,
+        config,
+        template,
+        flavors,
+        level,
+        slot_sources,
+        required_slots,
+        cull_sources=cull_sources,
     )
 
 

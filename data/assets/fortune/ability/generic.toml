@@ -1,16 +1,16 @@
 # Generic/fallback ability entries (prefixes and suffixes only).
 
 _prefix_values = [
-    { value = "hyper", prefixable = false, suffixible = true },
-    { value = "mega", prefixable = false, suffixible = true },
-    { value = "ultra", prefixable = false, suffixible = true },
-    { value = "proto", prefixable = false, suffixible = true },
-    { value = "neo", prefixable = false, suffixible = true },
-    { value = "quasi", prefixable = false, suffixible = true },
-    { value = "para", prefixable = false, suffixible = true },
-    { value = "meta", prefixable = false, suffixible = true },
-    { value = "micro", prefixable = false, suffixible = true },
-    { value = "nano", prefixable = false, suffixible = true },
+    { value = "hyper", suffixible = true },
+    { value = "mega", suffixible = true },
+    { value = "ultra", suffixible = true },
+    { value = "proto", suffixible = true },
+    { value = "neo", suffixible = true },
+    { value = "quasi", suffixible = true },
+    { value = "para", suffixible = true },
+    { value = "meta", suffixible = true },
+    { value = "micro", suffixible = true },
+    { value = "nano", suffixible = true },
 ]
 
 _suffix_values = [
@@ -35,3 +35,11 @@ from = ["_prefix_values"]
 [[expose]]
 slot = "suffix"
 from = ["_suffix_values"]
+
+
+[["prefix+"]]
+patterns = [
+    "{prefix}",
+    "{prefix}{prefix}",
+    "{prefix}{prefix}{prefix}",
+]

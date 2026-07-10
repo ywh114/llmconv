@@ -303,14 +303,14 @@ def _deduplicate_entries(entries: list[dict]) -> list[dict]:
 def _cap_sources(
     entries: list[dict],
     slot: str,
-    max_share: float = 0.25,
+    max_share: float = 0.4,
 ) -> list[dict]:
     """Trim any single source so it cannot dominate a generic slot.
 
     The cap defaults to ``max_share`` of the total slot size (minimum 1).
-    Sampling is deterministic, seeded on the slot name so repeated runs
-    produce the same grammar.  The process repeats until no source exceeds
-    the cap relative to the final slot size.
+    Sampling is seeded randomly so repeated runs can produce different
+    grammars.  The process repeats until no source exceeds the cap relative
+    to the final slot size.
     """
     if not entries:
         return entries
@@ -330,7 +330,7 @@ def _cap_sources(
     if all(len(indices) <= cap for indices in by_source.values()):
         return entries
     keep_indices: set[int] = set()
-    rng = random.Random(slot)
+    rng = random.Random()
     for indices in by_source.values():
         if len(indices) > cap:
             keep_indices.update(rng.sample(indices, cap))
@@ -344,6 +344,7 @@ def build_grammar(
     slot_sources: dict[str, list[str]] | dict[str, list[list[str]]],
     primary: Path,
     fallback: Path | None,
+    cull_sources: bool = True,
 ) -> dict:
     """Build a merged grammar from selected flavors with optional slot restrictions.
 
@@ -383,7 +384,7 @@ def build_grammar(
     all_slots.discard('expose')
     all_slots.discard('category')
 
-    merged: dict[str, list] = {}
+    merged: dict[str, list] = {'__generic_slots__': frozenset(generic_slots)}
     for slot in all_slots:
         entries: list[dict] = []
         if slot in generic_slots:
@@ -519,11 +520,31 @@ def build_grammar(
                     entries.extend(tagged)
         if entries:
             deduped = _deduplicate_entries(entries)
-            if slot in generic_slots:
+            if slot in generic_slots and cull_sources:
                 deduped = _cap_sources(deduped, slot)
             merged[slot] = deduped
 
     return merged
+
+
+def cull_grammar(grammar: dict) -> dict:
+    """Return a copy of *grammar* with generic slots source-capped.
+
+    This lets callers build one full grammar and cull it fresh for each
+    individual title/ability generation instead of once per batch.
+    """
+    generic_slots = grammar.get('__generic_slots__', frozenset())
+    if not generic_slots:
+        return grammar
+    culled: dict[str, list] = {}
+    for slot, entries in grammar.items():
+        if slot == '__generic_slots__':
+            culled[slot] = entries
+        elif slot in generic_slots and isinstance(entries, list):
+            culled[slot] = _cap_sources(list(entries), slot)
+        else:
+            culled[slot] = list(entries)
+    return culled
 
 
 def load_title_grammar(
@@ -531,11 +552,13 @@ def load_title_grammar(
     config: AraSettings | None = None,
     flavors: list[str] | str | None = None,
     slot_sources: dict[str, list[str]] | None = None,
+    cull_sources: bool = True,
 ) -> dict:
     """Load and merge title flavor grammars.
 
     :param flavors: Flavor name(s) to load. ``None`` loads every available flavor.
     :param slot_sources: Optional per-slot source restrictions.
+    :param cull_sources: If False, skip source-cap culling.
     """
     primary, fallback = _title_dirs(story, config)
     available = list_title_flavors(story, config)
@@ -556,6 +579,7 @@ def load_title_grammar(
         slot_sources or {},
         primary,
         fallback,
+        cull_sources=cull_sources,
     )
 
 
@@ -567,6 +591,7 @@ def generate_title(
     level: str | int | None = '2',
     slot_sources: dict[str, list[str]] | None = None,
     required_slots: list[str] | set[str] | None = None,
+    cull_sources: bool = True,
 ) -> str:
     """Generate a random title.
 
@@ -597,6 +622,7 @@ def generate_title(
         config=config,
         flavors=flavors,
         slot_sources=slot_sources,
+        cull_sources=cull_sources,
     )
 
     if template is not None:

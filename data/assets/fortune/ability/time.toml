@@ -2,48 +2,48 @@ category = "concept"
 # Time-manipulation ability entries.
 
 _prefix_values = [
-    { value = "chrono", prefixable = false, suffixible = true },
-    { value = "tempo", prefixable = false, suffixible = true },
-    { value = "aeon", prefixable = false, suffixible = true },
+    { value = "chrono", suffixible = true },
+    { value = "tempo", suffixible = true },
+    { value = "aeon", suffixible = true },
 ]
 
 _time_status_values = [
-    { value = "haste", prefixable = false, suffixible = false },
-    { value = "slow", prefixable = false, suffixible = false },
-    { value = "stop", prefixable = false, suffixible = false },
-    { value = "freeze", prefixable = false, suffixible = false },
-    { value = "lag", prefixable = false, suffixible = false },
-    { value = "accelerate", prefixable = false, suffixible = false, noun_form = "acceleration" },
-    { value = "decelerate", prefixable = false, suffixible = false, noun_form = "deceleration" },
-    { value = "delay", prefixable = false, suffixible = false, noun_form = "delay" },
-    { value = "loop", prefixable = false, suffixible = false },
+    { value = "haste", suffixible = false },
+    { value = "slow", suffixible = false },
+    { value = "stop", suffixible = false },
+    { value = "freeze", suffixible = false },
+    { value = "lag", suffixible = false },
+    { value = "accelerate", suffixible = false, noun_form = "acceleration" },
+    { value = "decelerate", suffixible = false, noun_form = "deceleration" },
+    { value = "delay", suffixible = false, noun_form = "delay" },
+    { value = "loop", suffixible = false },
 ]
 
 _time_area_values = [
-    { value = "loop", prefixable = false, suffixible = false },
-    { value = "skip", prefixable = false, suffixible = false },
-    { value = "rewind", prefixable = false, suffixible = false },
-    { value = "paradox", prefixable = false, suffixible = false },
+    { value = "loop", suffixible = false },
+    { value = "skip", suffixible = false },
+    { value = "rewind", suffixible = false },
+    { value = "paradox", suffixible = false },
 ]
 
 _time_ranged_values = [
-    { value = "paradox", prefixable = false, suffixible = false },
+    { value = "paradox", suffixible = false },
 ]
 
 _time_defence_values = [
-    { value = "halt", prefixable = false, suffixible = false },
-    { value = "suspend", prefixable = false, suffixible = false, noun_form = "suspension" },
+    { value = "halt", suffixible = false },
+    { value = "suspend", suffixible = false, noun_form = "suspension" },
 ]
 
 other = [
-    { value = "haste", prefixable = false, suffixible = false },
-    { value = "slow", prefixable = false, suffixible = false },
-    { value = "stop", prefixable = false, suffixible = false },
-    { value = "rewind", prefixable = false, suffixible = false },
-    { value = "freeze", prefixable = false, suffixible = false },
-    { value = "skip", prefixable = false, suffixible = false },
-    { value = "fast-forward", prefixable = false, suffixible = false },
-    { value = "delay", prefixable = false, suffixible = false },
+    { value = "haste", suffixible = false },
+    { value = "slow", suffixible = false },
+    { value = "stop", suffixible = false },
+    { value = "rewind", suffixible = false },
+    { value = "freeze", suffixible = false },
+    { value = "skip", suffixible = false },
+    { value = "fast-forward", suffixible = false },
+    { value = "delay", suffixible = false },
 ]
 
 _suffix_values = [
@@ -53,19 +53,19 @@ _suffix_values = [
 ]
 
 _noun_values = [
-    { value = "time", prefixable = false, suffixible = false },
+    { value = "time", suffixible = false },
     { value = "the clock", prefixable = false, suffixible = false },
-    { value = "age", prefixable = false, suffixible = false },
-    { value = "moment", prefixable = false, suffixible = false },
-    { value = "paradox", prefixable = false, suffixible = false },
+    { value = "age", suffixible = false },
+    { value = "moment", suffixible = false },
+    { value = "paradox", suffixible = false },
 ]
 
 _adj_values = [
-    { value = "temporal", prefixable = false, suffixible = false },
-    { value = "atemporal", prefixable = false, suffixible = false },
-    { value = "dilated", prefixable = false, suffixible = false },
-    { value = "looping", prefixable = false, suffixible = false },
-    { value = "frozen", prefixable = false, suffixible = false },
+    { value = "temporal", suffixible = false },
+    { value = "atemporal", suffixible = false },
+    { value = "dilated", suffixible = false },
+    { value = "looping", suffixible = false },
+    { value = "frozen", suffixible = false },
 ]
 
 _time_movement_values = []

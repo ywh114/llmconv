@@ -2,9 +2,9 @@ category = "elemental"
 # Void-elemental ability entries.
 
 _prefix_values = [
-    { value = "void", prefixable = false, suffixible = true },
-    { value = "oblivio", prefixable = false, suffixible = true },
-    { value = "nihil", prefixable = false, suffixible = true },
+    { value = "void", suffixible = true },
+    { value = "oblivio", suffixible = true },
+    { value = "nihil", suffixible = true },
 ]
 
 _suffix_values = [
@@ -15,64 +15,64 @@ _suffix_values = [
 ]
 
 _domain_values = [
-    { value = "oblivion", prefixable = false, suffixible = false },
-    { value = "vacuum", prefixable = false, suffixible = false },
+    { value = "oblivion", suffixible = false },
+    { value = "vacuum", suffixible = false },
     { value = "the abyss", prefixable = false, suffixible = false },
-    { value = "nothing", prefixable = false, suffixible = false },
+    { value = "nothing", suffixible = false },
     { value = "the hollow", prefixable = false, suffixible = false },
     { value = "the void", prefixable = false, suffixible = false },
 ]
 
 _void_melee_values = [
-    { value = "annihilation", prefixable = false, suffixible = false },
-    { value = "erasure", prefixable = false, suffixible = false },
+    { value = "annihilation", suffixible = false },
+    { value = "erasure", suffixible = false },
 ]
 
 _void_area_values = [
-    { value = "collapse", prefixable = false, suffixible = false },
-    { value = "annihilation", prefixable = false, suffixible = false },
+    { value = "collapse", suffixible = false },
+    { value = "annihilation", suffixible = false },
 ]
 
 _void_ranged_values = [
-    { value = "siphon", prefixable = false, suffixible = false },
-    { value = "unmake", prefixable = false, suffixible = false, pos = "verb" },
+    { value = "siphon", suffixible = false },
+    { value = "unmake", suffixible = false, pos = "verb" },
 ]
 
 _void_status_values = [
-    { value = "siphon", prefixable = false, suffixible = false },
-    { value = "erasure", prefixable = false, suffixible = false },
-    { value = "unmake", prefixable = false, suffixible = false, pos = "verb" },
+    { value = "siphon", suffixible = false },
+    { value = "erasure", suffixible = false },
+    { value = "unmake", suffixible = false, pos = "verb" },
 ]
 
 _void_defence_values = [
-    { value = "negate", prefixable = false, suffixible = false, noun_form = "negation" },
-    { value = "nullify", prefixable = false, suffixible = false, noun_form = "nullification" },
-    { value = "deny", prefixable = false, suffixible = false, noun_form = "denial" },
+    { value = "negate", suffixible = false, noun_form = "negation" },
+    { value = "nullify", suffixible = false, noun_form = "nullification" },
+    { value = "deny", suffixible = false, noun_form = "denial" },
 ]
 
 _void_movement_values = [
 ]
 
 other = [
-    { value = "annihilation", prefixable = false, suffixible = false },
-    { value = "erase", prefixable = false, suffixible = false, noun_form = "erasure" },
-    { value = "unmake", prefixable = false, suffixible = false },
-    { value = "consume", prefixable = false, suffixible = false, noun_form = "consumption" },
-    { value = "negation", prefixable = false, suffixible = false },
+    { value = "annihilation", suffixible = false },
+    { value = "erase", suffixible = false, noun_form = "erasure" },
+    { value = "unmake", suffixible = false },
+    { value = "consume", suffixible = false, noun_form = "consumption" },
+    { value = "negation", suffixible = false },
 ]
 
 _noun_values = [
-    { value = "void", prefixable = false, suffixible = false },
-    { value = "abyss", prefixable = false, suffixible = false },
-    { value = "oblivion", prefixable = false, suffixible = false },
-    { value = "noth", prefixable = false, suffixible = false, pos = "verb" },
+    { value = "void", suffixible = false },
+    { value = "abyss", suffixible = false },
+    { value = "oblivion", suffixible = false },
+    { value = "noth", suffixible = false, pos = "verb" },
 ]
 
 _adj_values = [
-    { value = "empty", prefixable = false, suffixible = false },
-    { value = "hollow", prefixable = false, suffixible = false },
-    { value = "crush", prefixable = false, suffixible = false, pos = "verb" },
-    { value = "absolute", prefixable = false, suffixible = false },
+    { value = "empty", suffixible = false },
+    { value = "hollow", suffixible = false },
+    { value = "crush", suffixible = false, pos = "verb" },
+    { value = "absolute", suffixible = false },
 ]
 
 

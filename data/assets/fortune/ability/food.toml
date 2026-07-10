@@ -2,31 +2,31 @@ category = "silly"
 # Food-theme silly ability entries.
 
 _food_melee_values = [
-    { value = "baste", prefixable = false, suffixible = false },
-    { value = "braise", prefixable = false, suffixible = false },
-    { value = "tenderize", prefixable = false, suffixible = false, noun_form = "tenderization" },
-    { value = "julienne", prefixable = false, suffixible = false },
+    { value = "baste", suffixible = false },
+    { value = "braise", suffixible = false },
+    { value = "tenderize", suffixible = false, noun_form = "tenderization" },
+    { value = "julienne", suffixible = false },
 ]
 
 _food_area_values = [
-    { value = "flambé", prefixable = false, suffixible = false },
-    { value = "reduce", prefixable = false, suffixible = false, noun_form = "reduction" },
-    { value = "whisk", prefixable = false, suffixible = false },
+    { value = "flambé", suffixible = false },
+    { value = "reduce", suffixible = false, noun_form = "reduction" },
+    { value = "whisk", suffixible = false },
 ]
 
 _food_ranged_values = [
-    { value = "flambé", prefixable = false, suffixible = false },
+    { value = "flambé", suffixible = false },
 ]
 
 _food_status_values = [
-    { value = "marinate", prefixable = false, suffixible = false, noun_form = "marination" },
-    { value = "glaze", prefixable = false, suffixible = false },
-    { value = "garnish", prefixable = false, suffixible = false },
+    { value = "marinate", suffixible = false, noun_form = "marination" },
+    { value = "glaze", suffixible = false },
+    { value = "garnish", suffixible = false },
 ]
 
 _food_defence_values = [
-    { value = "preserve", prefixable = false, suffixible = false, noun_form = "preservation" },
-    { value = "chill", prefixable = false, suffixible = false },
+    { value = "preserve", suffixible = false, noun_form = "preservation" },
+    { value = "chill", suffixible = false },
 ]
 
 _suffix_values = [
@@ -37,21 +37,21 @@ _suffix_values = [
 ]
 
 other = [
-    { value = "flambé", prefixable = false, suffixible = false },
-    { value = "braise", prefixable = false, suffixible = false },
-    { value = "glaze", prefixable = false, suffixible = false },
-    { value = "tenderization", prefixable = false, suffixible = false },
-    { value = "fillet", prefixable = false, suffixible = false },
-    { value = "debone", prefixable = false, suffixible = false },
+    { value = "flambé", suffixible = false },
+    { value = "braise", suffixible = false },
+    { value = "glaze", suffixible = false },
+    { value = "tenderization", suffixible = false },
+    { value = "fillet", suffixible = false },
+    { value = "debone", suffixible = false },
 ]
 
 _noun_values = [
-    { value = "sauce", prefixable = false, suffixible = false },
-    { value = "stock", prefixable = false, suffixible = false },
-    { value = "roux", prefixable = false, suffixible = false },
-    { value = "gravy", prefixable = false, suffixible = false },
-    { value = "bouillon", prefixable = false, suffixible = false },
-    { value = "ragout", prefixable = false, suffixible = false },
+    { value = "sauce", suffixible = false },
+    { value = "stock", suffixible = false },
+    { value = "roux", suffixible = false },
+    { value = "gravy", suffixible = false },
+    { value = "bouillon", suffixible = false },
+    { value = "ragout", suffixible = false },
 ]
 
 _food_movement_values = []

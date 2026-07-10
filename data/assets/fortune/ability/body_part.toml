@@ -2,7 +2,7 @@ category = "silly"
 # Body-part-theme silly ability entries.
 
 _prefix_values = [
-    { value = "toenail", prefixable = false, suffixible = true },
+    { value = "toenail", suffixible = true },
 ]
 
 _suffix_values = [
@@ -14,50 +14,50 @@ _suffix_values = [
 ]
 
 _domain_values = [
-    { value = "fist", prefixable = false, suffixible = false },
-    { value = "gut", prefixable = false, suffixible = false },
-    { value = "elbow", prefixable = false, suffixible = false },
-    { value = "knee", prefixable = false, suffixible = false },
-    { value = "tooth", prefixable = false, suffixible = false, plural = "teeth" },
-    { value = "nostril", prefixable = false, suffixible = false },
-    { value = "spine", prefixable = false, suffixible = false },
-    { value = "knuckle", prefixable = false, suffixible = false },
-    { value = "skull", prefixable = false, suffixible = false },
-    { value = "toenail", prefixable = false, suffixible = false },
+    { value = "fist", suffixible = false },
+    { value = "gut", suffixible = false },
+    { value = "elbow", suffixible = false },
+    { value = "knee", suffixible = false },
+    { value = "tooth", suffixible = false, plural = "teeth" },
+    { value = "nostril", suffixible = false },
+    { value = "spine", suffixible = false },
+    { value = "knuckle", suffixible = false },
+    { value = "skull", suffixible = false },
+    { value = "toenail", suffixible = false },
     { value = "elbow grease", prefixable = false, suffixible = false },
 ]
 
 _body_part_melee_values = [
-    { value = "slam", prefixable = false, suffixible = false },
-    { value = "drop", prefixable = false, suffixible = false },
-    { value = "poke", prefixable = false, suffixible = false },
-    { value = "punch", prefixable = false, suffixible = false },
-    { value = "kick", prefixable = false, suffixible = false },
-    { value = "bite", prefixable = false, suffixible = false },
-    { value = "headbutt", prefixable = false, suffixible = false },
-    { value = "stomp", prefixable = false, suffixible = false },
-    { value = "backhand", prefixable = false, suffixible = false },
+    { value = "slam", suffixible = false },
+    { value = "drop", suffixible = false },
+    { value = "poke", suffixible = false },
+    { value = "punch", suffixible = false },
+    { value = "kick", suffixible = false },
+    { value = "bite", suffixible = false },
+    { value = "headbutt", suffixible = false },
+    { value = "stomp", suffixible = false },
+    { value = "backhand", suffixible = false },
 ]
 
 _body_part_area_values = [
-    { value = "drop", prefixable = false, suffixible = false },
-    { value = "slam", prefixable = false, suffixible = false },
+    { value = "drop", suffixible = false },
+    { value = "slam", suffixible = false },
 ]
 
 _body_part_ranged_values = [
-    { value = "throw", prefixable = false, suffixible = false },
-    { value = "hurl", prefixable = false, suffixible = false },
-    { value = "flick", prefixable = false, suffixible = false },
+    { value = "throw", suffixible = false },
+    { value = "hurl", suffixible = false },
+    { value = "flick", suffixible = false },
 ]
 
 _body_part_status_values = [
-    { value = "jam", prefixable = false, suffixible = false },
-    { value = "wedge", prefixable = false, suffixible = false },
+    { value = "jam", suffixible = false },
+    { value = "wedge", suffixible = false },
 ]
 
 _body_part_defence_values = [
-    { value = "brace", prefixable = false, suffixible = false },
-    { value = "block", prefixable = false, suffixible = false },
+    { value = "brace", suffixible = false },
+    { value = "block", suffixible = false },
 ]
 
 _body_part_movement_values = [
@@ -68,13 +68,13 @@ other = [
 ]
 
 _noun_values = [
-    { value = "fist", prefixable = false, suffixible = false },
-    { value = "foot", prefixable = false, suffixible = false, plural = "feet" },
-    { value = "head", prefixable = false, suffixible = false },
-    { value = "elbow", prefixable = false, suffixible = false },
-    { value = "knee", prefixable = false, suffixible = false },
-    { value = "gut", prefixable = false, suffixible = false },
-    { value = "nostril", prefixable = false, suffixible = false },
+    { value = "fist", suffixible = false },
+    { value = "foot", suffixible = false, plural = "feet" },
+    { value = "head", suffixible = false },
+    { value = "elbow", suffixible = false },
+    { value = "knee", suffixible = false },
+    { value = "gut", suffixible = false },
+    { value = "nostril", suffixible = false },
 ]
 
 [["melee"]]

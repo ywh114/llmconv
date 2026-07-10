@@ -2,55 +2,55 @@ category = "tonal"
 # JRPG-theme ability entries (migrated from title spell pool).
 
 _jrpg_melee_values = [
-    { value = "rend", prefixable = false, suffixible = false },
-    { value = "combo", prefixable = false, suffixible = false },
-    { value = "bash", prefixable = false, suffixible = false },
-    { value = "slash", prefixable = false, suffixible = false },
-    { value = "claw", prefixable = false, suffixible = false },
+    { value = "rend", suffixible = false },
+    { value = "combo", suffixible = false },
+    { value = "bash", suffixible = false },
+    { value = "slash", suffixible = false },
+    { value = "claw", suffixible = false },
 ]
 
 _jrpg_area_values = [
-    { value = "meteor", prefixable = false, suffixible = false },
-    { value = "quake", prefixable = false, suffixible = false },
-    { value = "storm", prefixable = false, suffixible = false },
-    { value = "rain", prefixable = false, suffixible = false },
+    { value = "meteor", suffixible = false },
+    { value = "quake", suffixible = false },
+    { value = "storm", suffixible = false },
+    { value = "rain", suffixible = false },
 ]
 
 _jrpg_ranged_values = [
-    { value = "ball", prefixable = false, suffixible = false },
-    { value = "beam", prefixable = false, suffixible = false },
-    { value = "pulse", prefixable = false, suffixible = false },
-    { value = "comet", prefixable = false, suffixible = false },
+    { value = "ball", suffixible = false },
+    { value = "beam", suffixible = false },
+    { value = "pulse", suffixible = false },
+    { value = "comet", suffixible = false },
 ]
 
 _jrpg_status_values = [
-    { value = "haste", prefixable = false, suffixible = false },
-    { value = "slow", prefixable = false, suffixible = false },
+    { value = "haste", suffixible = false },
+    { value = "slow", suffixible = false },
     { value = "DPS effect", prefixable = false, suffixible = false },
-    { value = "stun", prefixable = false, suffixible = false },
-    { value = "berserk", prefixable = false, suffixible = false },
-    { value = "taunt", prefixable = false, suffixible = false },
-    { value = "regen", prefixable = false, suffixible = false },
-    { value = "revive", prefixable = false, suffixible = false, noun_form = "revival" },
+    { value = "stun", suffixible = false },
+    { value = "berserk", suffixible = false },
+    { value = "taunt", suffixible = false },
+    { value = "regen", suffixible = false },
+    { value = "revive", suffixible = false, noun_form = "revival" },
     { value = "full cure", prefixable = false, suffixible = false },
-    { value = "doublecast", prefixable = false, suffixible = false },
-    { value = "triplecast", prefixable = false, suffixible = false },
-    { value = "drain", prefixable = false, suffixible = false },
+    { value = "doublecast", suffixible = false },
+    { value = "triplecast", suffixible = false },
+    { value = "drain", suffixible = false },
     { value = "armor break", prefixable = false, suffixible = false },
-    { value = "poison", prefixable = false, suffixible = false },
-    { value = "paralysis", prefixable = false, suffixible = false },
+    { value = "poison", suffixible = false },
+    { value = "paralysis", suffixible = false },
     { value = "limit break", prefixable = false, suffixible = false },
-    { value = "curse", prefixable = false, suffixible = false },
+    { value = "curse", suffixible = false },
 ]
 
 _jrpg_defence_values = [
-    { value = "resist", prefixable = false, suffixible = false, noun_form = "resistance" },
-    { value = "reflect", prefixable = false, suffixible = false, noun_form = "reflection" },
+    { value = "resist", suffixible = false, noun_form = "resistance" },
+    { value = "reflect", suffixible = false, noun_form = "reflection" },
 ]
 
 _jrpg_movement_values = [
-    { value = "dash", prefixable = false, suffixible = false },
-    { value = "warp", prefixable = false, suffixible = false },
+    { value = "dash", suffixible = false },
+    { value = "warp", suffixible = false },
 ]
 
 _suffix_values = [
@@ -61,43 +61,30 @@ _suffix_values = [
 ]
 
 _domain_values = [
-    { value = "limit break", prefixable = false, suffixible = false },
-    { value = "overdrive", prefixable = false, suffixible = false },
-    { value = "trance", prefixable = false, suffixible = false },
-    { value = "summon", prefixable = false, suffixible = false },
-    { value = "ether", prefixable = false, suffixible = false },
-    { value = "elixir", prefixable = false, suffixible = false },
-    { value = "MP", prefixable = false, suffixible = false },
-    { value = "HP", prefixable = false, suffixible = false },
-    { value = "EXP", prefixable = false, suffixible = false },
-    { value = "random encounter", prefixable = false, suffixible = false },
-    { value = "boss theme", prefixable = false, suffixible = false },
-    { value = "save point", prefixable = false, suffixible = false },
-    { value = "skill tree", prefixable = false, suffixible = false },
+    { value = "summon", suffixible = false },
+    { value = "ether", suffixible = false },
+    { value = "elixir", suffixible = false },
+    { value = "MP", suffixible = false },
+    { value = "HP", suffixible = false },
+    { value = "EXP", suffixible = false },
 ]
 
 other = [
     { value = "level up", prefixable = false, suffixible = false },
-    { value = "limit break", prefixable = false, suffixible = false },
-    { value = "grind", prefixable = false, suffixible = false, past = "ground" },
-    { value = "minmax", prefixable = false, suffixible = false },
-    { value = "speedrun", prefixable = false, suffixible = false },
-    { value = "multiclass", prefixable = false, suffixible = false },
-    { value = "respec", prefixable = false, suffixible = false },
+    { value = "minmax", suffixible = false },
+    { value = "speedrun", suffixible = false },
+    { value = "multiclass", suffixible = false },
+    { value = "respec", suffixible = false },
     { value = "save scum", prefixable = false, suffixible = false },
 ]
 
 _noun_values = [
-    { value = "guild", prefixable = false, suffixible = false },
-    { value = "class", prefixable = false, suffixible = false },
-    { value = "ability point", prefixable = false, suffixible = false },
+    { value = "guild", suffixible = false },
+    { value = "class", suffixible = false },
     { value = "skill point", prefixable = false, suffixible = false },
-    { value = "crystal", prefixable = false, suffixible = false },
-    { value = "orb", prefixable = false, suffixible = false },
-    { value = "ultimate weapon", prefixable = false, suffixible = false },
-    { value = "key item", prefixable = false, suffixible = false },
-    { value = "camp", prefixable = false, suffixible = false },
-    { value = "potion", prefixable = false, suffixible = false },
+    { value = "crystal", suffixible = false },
+    { value = "orb", suffixible = false },
+    { value = "potion", suffixible = false },
 ]
 
 [["melee"]]

@@ -2,8 +2,8 @@ category = "elemental"
 # Water-elemental ability entries.
 
 _prefix_values = [
-    { value = "hydro", prefixable = false, suffixible = true },
-    { value = "aqua", prefixable = false, suffixible = true },
+    { value = "hydro", suffixible = true },
+    { value = "aqua", suffixible = true },
 ]
 
 _suffix_values = [
@@ -14,83 +14,83 @@ _suffix_values = [
 ]
 
 _domain_values = [
-    { value = "tsunami", prefixable = false, suffixible = false },
-    { value = "riptide", prefixable = false, suffixible = true },
-    { value = "undertow", prefixable = false, suffixible = false },
-    { value = "whirlpool", prefixable = false, suffixible = false },
-    { value = "maelstrom", prefixable = false, suffixible = false },
-    { value = "typhoon", prefixable = false, suffixible = false },
-    { value = "monsoon", prefixable = false, suffixible = false },
+    { value = "tsunami", suffixible = false },
+    { value = "riptide", suffixible = true },
+    { value = "undertow", suffixible = false },
+    { value = "whirlpool", suffixible = false },
+    { value = "maelstrom", suffixible = false },
+    { value = "typhoon", suffixible = false },
+    { value = "monsoon", suffixible = false },
     { value = "the abyss", prefixable = false, suffixible = false },
     { value = "the deep", prefixable = false, suffixible = false },
-    { value = "coral", prefixable = false, suffixible = false },
+    { value = "coral", suffixible = false },
     { value = "sea cucumber", prefixable = false, suffixible = false },
 ]
 
 _water_melee_values = [
-    { value = "crash", prefixable = false, suffixible = false },
-    { value = "jet", prefixable = false, suffixible = true },
+    { value = "crash", suffixible = false },
+    { value = "jet", suffixible = true },
 ]
 
 _water_area_values = [
-    { value = "tide", prefixable = false, suffixible = true },
-    { value = "wave", prefixable = false, suffixible = true },
-    { value = "storm", prefixable = false, suffixible = true },
-    { value = "deluge", prefixable = false, suffixible = true },
-    { value = "engulf", prefixable = false, suffixible = false },
-    { value = "flood", prefixable = false, suffixible = false },
+    { value = "tide", suffixible = true },
+    { value = "wave", suffixible = true },
+    { value = "storm", suffixible = true },
+    { value = "deluge", suffixible = true },
+    { value = "engulf", suffixible = false },
+    { value = "flood", suffixible = false },
 ]
 
 _water_ranged_values = [
-    { value = "spout", prefixable = false, suffixible = false },
-    { value = "torrent", prefixable = false, suffixible = true },
-    { value = "jet", prefixable = false, suffixible = true },
-    { value = "spray", prefixable = false, suffixible = true },
-    { value = "siphon", prefixable = false, suffixible = false },
+    { value = "spout", suffixible = false },
+    { value = "torrent", suffixible = true },
+    { value = "jet", suffixible = true },
+    { value = "spray", suffixible = true },
+    { value = "siphon", suffixible = false },
 ]
 
 _water_status_values = [
-    { value = "drown", prefixable = false, suffixible = false },
-    { value = "submerge", prefixable = false, suffixible = false },
-    { value = "brine", prefixable = false, suffixible = true },
-    { value = "engulf", prefixable = false, suffixible = false },
-    { value = "siphon", prefixable = false, suffixible = false },
+    { value = "drown", suffixible = false },
+    { value = "submerge", suffixible = false },
+    { value = "brine", suffixible = true },
+    { value = "engulf", suffixible = false },
+    { value = "siphon", suffixible = false },
 ]
 
 _water_defence_values = [
-    { value = "dam", prefixable = false, suffixible = false },
-    { value = "wave", prefixable = false, suffixible = false },
+    { value = "dam", suffixible = false },
+    { value = "wave", suffixible = false },
 ]
 
 _water_movement_values = [
-    { value = "surge", prefixable = false, suffixible = false },
-    { value = "flow", prefixable = false, suffixible = false },
+    { value = "surge", suffixible = false },
+    { value = "flow", suffixible = false },
 ]
 
 other = [
 ]
 
 _noun_values = [
-    { value = "tide", prefixable = false, suffixible = false },
-    { value = "wave", prefixable = false, suffixible = false },
-    { value = "flood", prefixable = false, suffixible = false },
-    { value = "storm", prefixable = false, suffixible = false },
-    { value = "torrent", prefixable = false, suffixible = false },
-    { value = "brine", prefixable = false, suffixible = false },
-    { value = "coral", prefixable = false, suffixible = false },
-    { value = "pearl", prefixable = false, suffixible = false },
+    { value = "tide", suffixible = false },
+    { value = "wave", suffixible = false },
+    { value = "flood", suffixible = false },
+    { value = "storm", suffixible = false },
+    { value = "torrent", suffixible = false },
+    { value = "brine", suffixible = false },
+    { value = "coral", suffixible = false },
+    { value = "pearl", suffixible = false },
     { value = "sea cucumber", prefixable = false, suffixible = false },
 ]
 
 _adj_values = [
-    { value = "tidal", prefixable = false, suffixible = false },
-    { value = "abyssal", prefixable = false, suffixible = false },
-    { value = "torrential", prefixable = false, suffixible = false },
-    { value = "briny", prefixable = false, suffixible = false },
-    { value = "pelagic", prefixable = false, suffixible = false },
-    { value = "drowning", prefixable = false, suffixible = false },
-    { value = "pearl", prefixable = false, suffixible = false },
-    { value = "moist", prefixable = false, suffixible = false },
+    { value = "tidal", suffixible = false },
+    { value = "abyssal", suffixible = false },
+    { value = "torrential", suffixible = false },
+    { value = "briny", suffixible = false },
+    { value = "pelagic", suffixible = false },
+    { value = "drowning", suffixible = false },
+    { value = "pearl", suffixible = false },
+    { value = "moist", suffixible = false },
 ]
 
 

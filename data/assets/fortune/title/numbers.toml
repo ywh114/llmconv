@@ -1,61 +1,66 @@
 roman_numeral = [
-    { value = "I", prefixable = true, suffixible = true },
-    { value = "II", prefixable = true, suffixible = true },
-    { value = "III", prefixable = true, suffixible = true },
-    { value = "IV", prefixable = true, suffixible = true },
-    { value = "V", prefixable = true, suffixible = true },
-    { value = "VI", prefixable = true, suffixible = true },
-    { value = "VII", prefixable = true, suffixible = true },
-    { value = "VIII", prefixable = true, suffixible = true },
-    { value = "IX", prefixable = true, suffixible = true },
-    { value = "X", prefixable = true, suffixible = true },
-    { value = "XI", prefixable = true, suffixible = true },
-    { value = "XII", prefixable = true, suffixible = true },
-    { value = "L", prefixable = true, suffixible = true },
-    { value = "C", prefixable = true, suffixible = true },
-    { value = "D", prefixable = true, suffixible = true },
-    { value = "M", prefixable = true, suffixible = true },
+    { value = "I" },
+    { value = "II" },
+    { value = "III" },
+    { value = "IV" },
+    { value = "V" },
+    { value = "VI" },
+    { value = "VII" },
+    { value = "VIII" },
+    { value = "IX" },
+    { value = "X" },
+    { value = "XI" },
+    { value = "XII" },
+    { value = "L" },
+    { value = "C" },
+    { value = "D" },
+    { value = "M" },
 ]
 digit = [
-    { value = "0", prefixable = true, suffixible = true },
-    { value = "1", prefixable = true, suffixible = true },
-    { value = "2", prefixable = true, suffixible = true },
-    { value = "3", prefixable = true, suffixible = true },
-    { value = "4", prefixable = true, suffixible = true },
-    { value = "5", prefixable = true, suffixible = true },
-    { value = "6", prefixable = true, suffixible = true },
-    { value = "7", prefixable = true, suffixible = true },
-    { value = "8", prefixable = true, suffixible = true },
-    { value = "9", prefixable = true, suffixible = true },
+    { value = "0" },
+    { value = "1" },
+    { value = "2" },
+    { value = "3" },
+    { value = "4" },
+    { value = "5" },
+    { value = "6" },
+    { value = "7" },
+    { value = "8" },
+    { value = "9" },
 ]
 _nonzero_digit = [
-    { value = "1", prefixable = true, suffixible = true },
-    { value = "2", prefixable = true, suffixible = true },
-    { value = "3", prefixable = true, suffixible = true },
-    { value = "4", prefixable = true, suffixible = true },
-    { value = "5", prefixable = true, suffixible = true },
-    { value = "6", prefixable = true, suffixible = true },
-    { value = "7", prefixable = true, suffixible = true },
-    { value = "8", prefixable = true, suffixible = true },
-    { value = "9", prefixable = true, suffixible = true },
+    { value = "1" },
+    { value = "2" },
+    { value = "3" },
+    { value = "4" },
+    { value = "5" },
+    { value = "6" },
+    { value = "7" },
+    { value = "8" },
+    { value = "9" },
 ]
 _ordinal_root = [
-    { value = "0th", prefixable = true, suffixible = true },
-    { value = "1st", prefixable = true, suffixible = true },
-    { value = "2nd", prefixable = true, suffixible = true },
-    { value = "3rd", prefixable = true, suffixible = true },
-    { value = "4th", prefixable = true, suffixible = true },
-    { value = "5th", prefixable = true, suffixible = true },
-    { value = "6th", prefixable = true, suffixible = true },
-    { value = "7th", prefixable = true, suffixible = true },
-    { value = "8th", prefixable = true, suffixible = true },
-    { value = "9th", prefixable = true, suffixible = true },
+    { value = "0th" },
+    { value = "1st" },
+    { value = "2nd" },
+    { value = "3rd" },
+    { value = "4th" },
+    { value = "5th" },
+    { value = "6th" },
+    { value = "7th" },
+    { value = "8th" },
+    { value = "9th" },
 ]
 
 [[ordinal]]
 patterns = [
   "{_ordinal_root}",
   "{_nonzero_number}{_ordinal_root}"
+]
+
+[[digit_ordinal]]
+patterns = [
+  "{_ordinal_root}",
 ]
 
 [[number]]
@@ -86,6 +91,7 @@ from = [
 [[expose]]
 slot = "ordinal"
 from = [
+    "digit_ordinal",
     "ordinal",
 ]
 

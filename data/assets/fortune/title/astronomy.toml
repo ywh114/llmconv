@@ -1,48 +1,48 @@
 astro_adj = [
-    { value = "cosmic", prefixable = true, suffixible = true },
-    { value = "stellar", prefixable = true, suffixible = true },
-    { value = "galactic", prefixable = true, suffixible = true },
-    { value = "nebular", prefixable = true, suffixible = true },
-    { value = "dark", prefixable = true, suffixible = true },
-    { value = "quantum", prefixable = true, suffixible = true },
-    { value = "relativistic", prefixable = true, suffixible = true },
-    { value = "gravitational", prefixable = true, suffixible = true },
-    { value = "interstellar", prefixable = true, suffixible = true },
-    { value = "extragalactic", prefixable = true, suffixible = true },
-    { value = "primordial", prefixable = true, suffixible = true },
-    { value = "accreting", prefixable = true, suffixible = true },
+    { value = "cosmic" },
+    { value = "stellar" },
+    { value = "galactic" },
+    { value = "nebular" },
+    { value = "dark" },
+    { value = "quantum" },
+    { value = "relativistic" },
+    { value = "gravitational" },
+    { value = "interstellar" },
+    { value = "extragalactic" },
+    { value = "primordial" },
+    { value = "accreting" },
 ]
 astro_noun = [
-    { value = "hole", prefixable = true, suffixible = true },
+    { value = "hole" },
     { value = "black hole", prefixable = false, suffixible = false },
-    { value = "star", prefixable = true, suffixible = true },
+    { value = "star" },
     { value = "neutron star", prefixable = false, suffixible = false },
-    { value = "pulsar", prefixable = true, suffixible = true },
-    { value = "quasar", prefixable = true, suffixible = true },
-    { value = "galaxy", prefixable = true, suffixible = true },
-    { value = "nebula", prefixable = true, suffixible = true, plural = "nebulae" },
-    { value = "supernova", prefixable = true, suffixible = true },
-    { value = "nova", prefixable = true, suffixible = true },
-    { value = "comet", prefixable = true, suffixible = true },
-    { value = "asteroid", prefixable = true, suffixible = true },
-    { value = "planet", prefixable = true, suffixible = true },
-    { value = "moon", prefixable = true, suffixible = true },
-    { value = "void", prefixable = true, suffixible = true },
-    { value = "singularity", prefixable = true, suffixible = true },
+    { value = "pulsar" },
+    { value = "quasar" },
+    { value = "galaxy" },
+    { value = "nebula", plural = "nebulae" },
+    { value = "supernova" },
+    { value = "nova" },
+    { value = "comet" },
+    { value = "asteroid" },
+    { value = "planet" },
+    { value = "moon" },
+    { value = "void" },
+    { value = "singularity" },
     { value = "event horizon", prefixable = false, suffixible = false },
     { value = "dark matter", prefixable = false, suffixible = false },
     { value = "dark energy", prefixable = false, suffixible = false },
     { value = "accretion disk", prefixable = false, suffixible = false },
-    { value = "jet", prefixable = true, suffixible = true },
-    { value = "exoplanet", prefixable = true, suffixible = true },
-    { value = "wormhole", prefixable = true, suffixible = true },
+    { value = "jet" },
+    { value = "exoplanet" },
+    { value = "wormhole" },
 ]
 
 astro_suf = [
-    { value = 'star', prefixable = true, suffixible = true },
-    { value = 'hole', prefixable = true, suffixible = true },
-    { value = 'void', prefixable = true, suffixible = true },
-    { value = 'jet', prefixable = true, suffixible = true },
+    { value = 'star' },
+    { value = 'hole' },
+    { value = 'void' },
+    { value = 'jet' },
 ]
 
 [[place]]
@@ -60,8 +60,6 @@ takes_of = true
 takes_in = false
 article = ""
 proper_noun = true
-prefixable = true
-suffixible = true
 
 [[place]]
 value = "large magellanic cloud"

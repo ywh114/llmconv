@@ -2,26 +2,26 @@ category = "tonal"
 # Buzzword-toned ability entries.
 
 _buzzword_melee_values = [
-    { value = "disrupt", prefixable = false, suffixible = false, noun_form = "disruption" },
+    { value = "disrupt", suffixible = false, noun_form = "disruption" },
 ]
 
 _buzzword_area_values = [
-    { value = "scale", prefixable = false, suffixible = false },
-    { value = "iterate", prefixable = false, suffixible = false, noun_form = "iteration" },
+    { value = "scale", suffixible = false },
+    { value = "iterate", suffixible = false, noun_form = "iteration" },
 ]
 
 _buzzword_status_values = [
-    { value = "disrupt", prefixable = false, suffixible = false, noun_form = "disruption" },
-    { value = "pivot", prefixable = false, suffixible = false },
-    { value = "onboard", prefixable = false, suffixible = false },
-    { value = "benchmark", prefixable = false, suffixible = false },
-    { value = "optimize", prefixable = false, suffixible = false, noun_form = "optimization" },
-    { value = "leverage", prefixable = false, suffixible = false },
+    { value = "disrupt", suffixible = false, noun_form = "disruption" },
+    { value = "pivot", suffixible = false },
+    { value = "onboard", suffixible = false },
+    { value = "benchmark", suffixible = false },
+    { value = "optimize", suffixible = false, noun_form = "optimization" },
+    { value = "leverage", suffixible = false },
 ]
 
 _buzzword_defence_values = [
-    { value = "safeguard", prefixable = false, suffixible = false },
-    { value = "secure", prefixable = false, suffixible = false, noun_form = "security" },
+    { value = "safeguard", suffixible = false },
+    { value = "secure", suffixible = false, noun_form = "security" },
 ]
 
 _suffix_values = [
@@ -33,39 +33,39 @@ _suffix_values = [
 ]
 
 other = [
-    { value = "disrupt", prefixable = false, suffixible = false, noun_form = "disruption" },
-    { value = "pivot", prefixable = false, suffixible = false },
-    { value = "iterate", prefixable = false, suffixible = false, noun_form = "iteration" },
-    { value = "leverage", prefixable = false, suffixible = false },
-    { value = "synergize", prefixable = false, suffixible = false, noun_form = "synergization" },
-    { value = "onboard", prefixable = false, suffixible = false },
+    { value = "disrupt", suffixible = false, noun_form = "disruption" },
+    { value = "pivot", suffixible = false },
+    { value = "iterate", suffixible = false, noun_form = "iteration" },
+    { value = "leverage", suffixible = false },
+    { value = "synergize", suffixible = false, noun_form = "synergization" },
+    { value = "onboard", suffixible = false },
 ]
 
 _noun_values = [
-    { value = "MVP", prefixable = false, suffixible = false },
-    { value = "pipeline", prefixable = false, suffixible = false },
-    { value = "roadmap", prefixable = false, suffixible = false },
-    { value = "funnel", prefixable = false, suffixible = false },
-    { value = "moonshot", prefixable = false, suffixible = false },
-    { value = "velocity", prefixable = false, suffixible = false },
+    { value = "MVP", suffixible = false },
+    { value = "pipeline", suffixible = false },
+    { value = "roadmap", suffixible = false },
+    { value = "funnel", suffixible = false },
+    { value = "moonshot", suffixible = false },
+    { value = "velocity", suffixible = false },
 ]
 
 _adj_values = [
-    { value = "disruptive", prefixable = false, suffixible = false },
-    { value = "scalable", prefixable = false, suffixible = false },
-    { value = "holistic", prefixable = false, suffixible = false },
-    { value = "data-driven", prefixable = false, suffixible = false },
-    { value = "agile", prefixable = false, suffixible = false },
-    { value = "world-class", prefixable = false, suffixible = false },
+    { value = "disruptive", suffixible = false },
+    { value = "scalable", suffixible = false },
+    { value = "holistic", suffixible = false },
+    { value = "data-driven", suffixible = false },
+    { value = "agile", suffixible = false },
+    { value = "world-class", suffixible = false },
 ]
 
 _adj_sup_values = [
-    { value = "disruptive", prefixable = false, suffixible = false },
-    { value = "scalable", prefixable = false, suffixible = false },
-    { value = "holistic", prefixable = false, suffixible = false },
-    { value = "data-driven", prefixable = false, suffixible = false },
-    { value = "agile", prefixable = false, suffixible = false },
-    { value = "world-class", prefixable = false, suffixible = false },
+    { value = "disruptive", suffixible = false },
+    { value = "scalable", suffixible = false },
+    { value = "holistic", suffixible = false },
+    { value = "data-driven", suffixible = false },
+    { value = "agile", suffixible = false },
+    { value = "world-class", suffixible = false },
 ]
 
 _buzzword_movement_values = []

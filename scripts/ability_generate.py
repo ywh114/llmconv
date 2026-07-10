@@ -24,7 +24,13 @@ from _grammar_cli import (
 )
 
 from ara.world import ability
-from ara.world.title import expand_traced, expand, expand_all, expand_all_traced
+from ara.world.title import (
+    cull_grammar,
+    expand_traced,
+    expand,
+    expand_all,
+    expand_all_traced,
+)
 
 STORY = "ability"
 DEFAULT_LEVEL = "complex"
@@ -131,6 +137,7 @@ def main() -> None:
         flavors=selected,
         slot_sources=args.parsed_slot_sources,
         story=pre_args.story,
+        cull_sources=False,
     )
 
     templates = _apply_modifiers(templates, args.slot_modifiers)
@@ -173,10 +180,11 @@ def main() -> None:
     print(f'Flavor: {label}\n')
     for i in range(args.final_count):
         tmpl, lvl = args.template if args.template else random.choice(templates)
+        use_grammar = cull_grammar(grammar)
         if args.verbose:
-            result, trace = expand_traced(tmpl, grammar)
+            result, trace = expand_traced(tmpl, use_grammar)
         else:
-            result = expand(tmpl, grammar)
+            result = expand(tmpl, use_grammar)
         print(f'  {result}')
         if args.verbose:
             print_verbose(tmpl, trace, level=lvl)

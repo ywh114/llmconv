@@ -2,16 +2,16 @@ category = "delivery"
 # Generic area-of-effect delivery ability entries.
 
 _area_area_values = [
-    { value = "storm", prefixable = false, suffixible = false },
-    { value = "pulse", prefixable = false, suffixible = false },
-    { value = "nova", prefixable = false, suffixible = false },
-    { value = "wave", prefixable = false, suffixible = false },
-    { value = "burst", prefixable = false, suffixible = false },
-    { value = "field", prefixable = false, suffixible = false },
-    { value = "blast", prefixable = false, suffixible = false },
-    { value = "zone", prefixable = false, suffixible = false },
-    { value = "aura", prefixable = false, suffixible = false },
-    { value = "cascade", prefixable = false, suffixible = false },
+    { value = "storm", suffixible = false },
+    { value = "pulse", suffixible = false },
+    { value = "nova", suffixible = false },
+    { value = "wave", suffixible = false },
+    { value = "burst", suffixible = false },
+    { value = "field", suffixible = false },
+    { value = "blast", suffixible = false },
+    { value = "zone", suffixible = false },
+    { value = "aura", suffixible = false },
+    { value = "cascade", suffixible = false },
 ]
 
 _suffix_values = [
@@ -23,18 +23,18 @@ _suffix_values = [
 ]
 
 _noun_values = [
-    { value = "blast", prefixable = false, suffixible = false },
-    { value = "radius", prefixable = false, suffixible = false, plural = "radii" },
-    { value = "splash", prefixable = false, suffixible = false },
-    { value = "shockwave", prefixable = false, suffixible = false },
-    { value = "fallout", prefixable = false, suffixible = false },
+    { value = "blast", suffixible = false },
+    { value = "radius", suffixible = false, plural = "radii" },
+    { value = "splash", suffixible = false },
+    { value = "shockwave", suffixible = false },
+    { value = "fallout", suffixible = false },
 ]
 
 _adj_values = [
-    { value = "wide-area", prefixable = false, suffixible = false },
-    { value = "carpet", prefixable = false, suffixible = false },
-    { value = "saturation", prefixable = false, suffixible = false },
-    { value = "indiscriminate", prefixable = false, suffixible = false },
+    { value = "wide-area", suffixible = false },
+    { value = "carpet", suffixible = false },
+    { value = "saturation", suffixible = false },
+    { value = "indiscriminate", suffixible = false },
 ]
 
 _area_movement_values = []

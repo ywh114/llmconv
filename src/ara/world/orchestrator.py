@@ -1158,7 +1158,7 @@ Recent speakers: {recent_speakers_str}
                 },
                 'verbose': {
                     'type': 'boolean',
-                    'description': 'Include per-slot provenance (which flavor each part came from). Default true.',
+                    'description': 'Include per-slot provenance (which flavor each part came from). Default false.',
                 },
             },
             required=[],
@@ -1430,7 +1430,7 @@ Recent speakers: {recent_speakers_str}
             required_slots = data.get('require') or None
             slot_sources_raw = data.get('slot') or data.get('slot_sources') or None
             count = int(data.get('count', 1))
-            verbose = data.get('verbose', True)
+            verbose = data.get('verbose', False)
             if isinstance(flavor, list):
                 flavors = flavor
             elif flavor:
@@ -1472,12 +1472,14 @@ Recent speakers: {recent_speakers_str}
                     story=str(story_name or ''),
                     flavors=flavors,
                     slot_sources=slot_sources,
+                    cull_sources=False,
                 )
                 lines = []
                 for _ in range(count):
+                    use_grammar = fortune.cull_grammar(grammar)
                     tmpl = template if template else random.choice(templates)
                     if verbose:
-                        raw, trace = fortune._title.expand_traced(tmpl, grammar)
+                        raw, trace = fortune._title.expand_traced(tmpl, use_grammar)
                         text = fortune._title.title_case(raw)
                         lines.append(f'Title: {text}')
                         for t in trace:
@@ -1486,7 +1488,7 @@ Recent speakers: {recent_speakers_str}
                                 slot_d = f'{t.get("parent","") + " -> " if t.get("parent") else ""}{t["slot"]}'; lines.append(f'  - {slot_d} [{t["source"]}] -> {val}')
                     else:
                         text = fortune._title.title_case(
-                            fortune._title.expand(tmpl, grammar)
+                            fortune._title.expand(tmpl, use_grammar)
                         )
                         lines.append(f'Title: {text}')
                 return '\n'.join(lines)
@@ -1543,13 +1545,15 @@ Recent speakers: {recent_speakers_str}
                     story=str(story_name or ''),
                     flavors=flavors,
                     slot_sources=slot_sources,
+                    cull_sources=False,
                 )
                 lines = []
                 for _ in range(count):
+                    use_grammar = fortune.cull_grammar(grammar)
                     tmpl = template if template else random.choice(templates)
                     if verbose:
                         raw, trace = fortune._title.expand_traced(
-                            tmpl, grammar,
+                            tmpl, use_grammar,
                         )
                         text = fortune._title.title_case(raw)
                         lines.append(f'Ability: {text}')
@@ -1560,7 +1564,7 @@ Recent speakers: {recent_speakers_str}
                     else:
                         text = fortune._title.title_case(
                             fortune._title.expand(
-                                tmpl, grammar,
+                                tmpl, use_grammar,
                             )
                         )
                         lines.append(f'Ability: {text}')

@@ -45,7 +45,7 @@ def build_parser(
         '-s', '--slot', dest='slot_sources', action='append', nargs='*',
         metavar='SLOT[:MOD] [SOURCES]',
         help='Restrict a slot to a list of sources. '
-        'SLOT may include :modifiers (e.g. noun:plural, ordinal:>1,<6). '
+        'SLOT may include :modifiers (e.g. noun:plural). '
         'Sources are comma or plus separated. '
         'A bare source that matches a merged technique/delivery group '
         '(e.g. status, melee, area for abilities) pulls from all flavors '

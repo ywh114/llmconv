@@ -2,8 +2,8 @@ category = "elemental"
 # Fire-elemental ability entries.
 
 _prefix_values = [
-    { value = "pyro", prefixable = false, suffixible = true },
-    { value = "igni", prefixable = false, suffixible = true },
+    { value = "pyro", suffixible = true },
+    { value = "igni", suffixible = true },
 ]
 
 _suffix_values = [
@@ -14,69 +14,69 @@ _suffix_values = [
 ]
 
 _domain_values = [
-    { value = "inferno", prefixable = false, suffixible = false },
-    { value = "ash", prefixable = false, suffixible = false },
-    { value = "scalding", prefixable = false, suffixible = false },
-    { value = "cinder", prefixable = false, suffixible = false },
-    { value = "wildfire", prefixable = false, suffixible = false },
-    { value = "magma", prefixable = false, suffixible = false },
+    { value = "inferno", suffixible = false },
+    { value = "ash", suffixible = false },
+    { value = "scalding", suffixible = false },
+    { value = "cinder", suffixible = false },
+    { value = "wildfire", suffixible = false },
+    { value = "magma", suffixible = false },
 ]
 
 _fire_melee_values = [
-    { value = "scorch", prefixable = false, suffixible = false },
-    { value = "blaze", prefixable = false, suffixible = false },
+    { value = "scorch", suffixible = false },
+    { value = "blaze", suffixible = false },
 ]
 
 _fire_area_values = [
-    { value = "explosion", prefixable = false, suffixible = false },
-    { value = "eruption", prefixable = false, suffixible = false },
-    { value = "airburst", prefixable = false, suffixible = false },
+    { value = "explosion", suffixible = false },
+    { value = "eruption", suffixible = false },
+    { value = "airburst", suffixible = false },
 ]
 
 _fire_ranged_values = [
-    { value = "incineration", prefixable = false, suffixible = false },
-    { value = "blast", prefixable = false, suffixible = false },
-    { value = "eruption", prefixable = false, suffixible = false },
-    { value = "torrent", prefixable = false, suffixible = false },
+    { value = "incineration", suffixible = false },
+    { value = "blast", suffixible = false },
+    { value = "eruption", suffixible = false },
+    { value = "torrent", suffixible = false },
 ]
 
 _fire_status_values = [
-    { value = "kindle", prefixable = false, suffixible = false },
-    { value = "immolation", prefixable = false, suffixible = false },
+    { value = "kindle", suffixible = false },
+    { value = "immolation", suffixible = false },
 ]
 
 _fire_defence_values = [
-    { value = "backdraft", prefixable = false, suffixible = false },
-    { value = "smother", prefixable = false, suffixible = false },
+    { value = "backdraft", suffixible = false },
+    { value = "smother", suffixible = false },
 ]
 
 _fire_movement_values = [
-    { value = "propellent", prefixable = false, suffixible = false },
+    { value = "propellent", suffixible = false },
 ]
 
 other = [
 ]
 
 _noun_values = [
-    { value = "pyre", prefixable = false, suffixible = false },
-    { value = "ember", prefixable = false, suffixible = false },
-    { value = "inferno", prefixable = false, suffixible = false },
-    { value = "magma", prefixable = false, suffixible = false },
-    { value = "blaze", prefixable = false, suffixible = true },
-    { value = "cinder", prefixable = false, suffixible = true },
-    { value = "flare", prefixable = false, suffixible = true },
-    { value = "rocket", prefixable = false, suffixible = true },
+    { value = "pyre", suffixible = false },
+    { value = "ember", suffixible = false },
+    { value = "inferno", suffixible = false },
+    { value = "magma", suffixible = false },
+    { value = "blaze", suffixible = true },
+    { value = "cinder", suffixible = true },
+    { value = "flare", suffixible = true },
+    { value = "rocket", suffixible = true },
 ]
 
 _adj_values = [
-    { value = "searing", prefixable = false, suffixible = false },
-    { value = "blazing", prefixable = false, suffixible = false },
-    { value = "scorching", prefixable = false, suffixible = false },
-    { value = "smoldering", prefixable = false, suffixible = false },
-    { value = "blistering", prefixable = false, suffixible = false },
-    { value = "burning", prefixable = false, suffixible = false },
-    { value = "roaring", prefixable = false, suffixible = false },
-    { value = "flaming", prefixable = false, suffixible = false },
+    { value = "searing", suffixible = false },
+    { value = "blazing", suffixible = false },
+    { value = "scorching", suffixible = false },
+    { value = "smoldering", suffixible = false },
+    { value = "blistering", suffixible = false },
+    { value = "burning", suffixible = false },
+    { value = "roaring", suffixible = false },
+    { value = "flaming", suffixible = false },
 ]
 
 

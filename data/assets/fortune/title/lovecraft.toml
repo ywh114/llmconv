@@ -1,77 +1,79 @@
 rank = [
-    { value = "acolyte", prefixable = true, suffixible = true },
-    { value = "neophyte", prefixable = true, suffixible = true },
-    { value = "initiate", prefixable = true, suffixible = true },
-    { value = "servitor", prefixable = true, suffixible = true },
-    { value = "disciple", prefixable = true, suffixible = true },
-    { value = "high priest", prefixable = true, suffixible = true },
-    { value = "transformed", prefixable = true, suffixible = true },
+    { value = "acolyte" },
+    { value = "neophyte" },
+    { value = "initiate" },
+    { value = "servitor" },
+    { value = "disciple" },
+    { value = "high priest", sticky = false },
+    { value = "transformed" },
 ]
 prefix = [
-    { value = "dark", prefixable = true, suffixible = true },
-    { value = "star", prefixable = true, suffixible = true },
-    { value = "void", prefixable = true, suffixible = true },
-    { value = "dead", prefixable = true, suffixible = true },
-    { value = "high", prefixable = true, suffixible = true },
+    { value = "dark" },
+    { value = "star" },
+    { value = "void" },
+    { value = "dead" },
+    { value = "high" },
 ]
 adj = [
-    { value = "outer", prefixable = true, suffixible = true },
-    { value = "elder", prefixable = true, suffixible = true },
-    { value = "old", prefixable = true, suffixible = true },
-    { value = "great", prefixable = true, suffixible = true },
-    { value = "blathering", prefixable = true, suffixible = true },
-    { value = "eldritch", prefixable = true, suffixible = true },
-    { value = "blasphemous", prefixable = true, suffixible = true },
-    { value = "unspeakable", prefixable = true, suffixible = true },
-    { value = "nameless", prefixable = true, suffixible = true },
-    { value = "forgotten", prefixable = true, suffixible = true },
-    { value = "drowned", prefixable = true, suffixible = true },
-    { value = "dreaming", prefixable = true, suffixible = true },
-    { value = "dead", prefixable = true, suffixible = true },
-    { value = "blind", prefixable = true, suffixible = true },
-    { value = "idiot", prefixable = true, suffixible = true },
-    { value = "dread", prefixable = true, suffixible = true },
-    { value = "foolish", prefixable = true, suffixible = true },
-    { value = "unknowable", prefixable = true, suffixible = true },
-    { value = "fathomless", prefixable = true, suffixible = true },
-    { value = "cosmic", prefixable = true, suffixible = true },
-    { value = "abyssal", prefixable = true, suffixible = true },
-    { value = "spectral", prefixable = true, suffixible = true },
-    { value = "starry", prefixable = true, suffixible = true },
+    { value = "outer" },
+    { value = "elder" },
+    { value = "old" },
+    { value = "great" },
+    { value = "blathering" },
+    { value = "eldritch" },
+    { value = "blasphemous" },
+    { value = "unspeakable" },
+    { value = "nameless" },
+    { value = "forgotten" },
+    { value = "drowned" },
+    { value = "dreaming" },
+    { value = "dead" },
+    { value = "blind" },
+    { value = "idiot" },
+    { value = "dread" },
+    { value = "foolish" },
+    { value = "unknowable" },
+    { value = "fathomless" },
+    { value = "cosmic" },
+    { value = "abyssal" },
+    { value = "spectral" },
+    { value = "starry" },
+    { value = "sane" },
+    { value = "insane" },
 ]
 adj_sup = [
-    { value = "oldest", prefixable = true, suffixible = true },
-    { value = "deepest", prefixable = true, suffixible = true },
-    { value = "outermost", prefixable = true, suffixible = true },
-    { value = "greatest", prefixable = true, suffixible = true },
+    { value = "oldest" },
+    { value = "deepest" },
+    { value = "outermost" },
+    { value = "greatest" },
     { value = "most blasphemous", prefixable = false, suffixible = false },
     { value = "most sane", prefixable = false, suffixible = false },
-    { value = "weakest", prefixable = true, suffixible = true },
-    { value = "youngest", prefixable = true, suffixible = true },
-    { value = "least", prefixable = true, suffixible = true },
+    { value = "weakest" },
+    { value = "youngest" },
+    { value = "least" },
     { value = "most sickly", prefixable = false, suffixible = false },
     { value = "least blasphemous", prefixable = false, suffixible = false },
     { value = "least sane", prefixable = false, suffixible = false },
 ]
 noun = [
-    { value = "sanity", prefixable = true, suffixible = true },
-    { value = "horror", prefixable = true, suffixible = true },
-    { value = "terror", prefixable = true, suffixible = true },
-    { value = "abomination", prefixable = true, suffixible = true },
-    { value = "horror", prefixable = true, suffixible = true },
-    { value = "terror", prefixable = true, suffixible = true },
-    { value = "madness", prefixable = true, suffixible = true },
-    { value = "dream", prefixable = true, suffixible = true },
-    { value = "nightmare", prefixable = true, suffixible = true },
-    { value = "star", prefixable = true, suffixible = true },
-    { value = "necronomicon", prefixable = true, suffixible = true },
-    { value = "shoggoth", prefixable = true, suffixible = true },
+    { value = "horror" },
+    { value = "terror" },
+    { value = "abomination" },
+    { value = "horror" },
+    { value = "terror" },
+    { value = "madness" },
+    { value = "dream" },
+    { value = "nightmare" },
+    { value = "star" },
+    { value = "necronomicon" },
+    { value = "shoggoth" },
+    { value = "byakhee" },
 ]
 entity = [
-    { value = "the Old Ones", prefixable = false, suffixible = false },
-    { value = "the Great Old Ones", prefixable = false, suffixible = false },
-    { value = "the Deep Ones", prefixable = false, suffixible = false },
-    { value = "Cthulu", prefixable = false, suffixible = false },
+    { value = "the Old Ones", prefixable = false, suffixible = false, plural = "the Old Ones" },
+    { value = "the Great Old Ones", prefixable = false, suffixible = false, plural = "the Great Old Ones" },
+    { value = "the Deep Ones", prefixable = false, suffixible = false, plural = "the Deep Ones"},
+    { value = "Cthulhu", prefixable = false, suffixible = false },
     { value = "Hastur", prefixable = false, suffixible = false },
     { value = "Tsathoggua", prefixable = false, suffixible = false },
     { value = "Azathoth", prefixable = false, suffixible = false },
@@ -81,57 +83,54 @@ entity = [
     { value = "Nodens", prefixable = false, suffixible = false },
 ]
 class = [
-    { value = "priest", prefixable = true, suffixible = true },
-    { value = "watcher", prefixable = true, suffixible = true },
-    { value = "dreamer", prefixable = true, suffixible = true },
-    { value = "summoner", prefixable = true, suffixible = true },
-    { value = "blatherer", prefixable = true, suffixible = true },
-    { value = "idiot", prefixable = true, suffixible = true },
-    { value = "spawn", prefixable = true, suffixible = true },
-    { value = "blessed", prefixable = true, suffixible = true },
-    { value = "herald", prefixable = true, suffixible = true },
-    { value = "idiot", prefixable = true, suffixible = true },
-    { value = "entity", prefixable = true, suffixible = true },
-    { value = "spawn", prefixable = true, suffixible = true },
-    { value = "horror", prefixable = true, suffixible = true },
-    { value = "terror", prefixable = true, suffixible = true },
-    { value = "thing", prefixable = true, suffixible = true },
-    { value = "aberration", prefixable = true, suffixible = true },
-    { value = "abomination", prefixable = true, suffixible = true },
-    { value = "cultist", prefixable = true, suffixible = true },
+    { value = "priest" },
+    { value = "watcher" },
+    { value = "dreamer" },
+    { value = "summoner" },
+    { value = "blatherer" },
+    { value = "idiot" },
+    { value = "spawn" },
+    { value = "blessed" },
+    { value = "herald" },
+    { value = "idiot" },
+    { value = "entity" },
+    { value = "spawn" },
+    { value = "horror" },
+    { value = "terror" },
+    { value = "thing" },
+    { value = "aberration" },
+    { value = "abomination" },
+    { value = "cultist" },
 ]
 suffix = [
-    { value = "spawn", prefixable = true, suffixible = true },
-    { value = "born", prefixable = true, suffixible = true },
-    { value = "kin", prefixable = true, suffixible = true },
-    { value = "kind", prefixable = true, suffixible = true },
-    { value = "ling", prefixable = true, suffixible = true },
-    { value = "seeker", prefixable = true, suffixible = true },
-    { value = "touched", prefixable = true, suffixible = true },
-    { value = "marked", prefixable = true, suffixible = true },
-    { value = "roused", prefixable = true, suffixible = true },
-    { value = "tainted", prefixable = true, suffixible = true },
+    { value = "spawn" },
+    { value = "born" },
+    { value = "kin" },
+    { value = "kind" },
+    { value = "ling" },
+    { value = "seeker" },
+    { value = "touched" },
+    { value = "marked" },
+    { value = "roused" },
+    { value = "tainted" },
 ]
 
 [[place]]
 value = "R'lyeh"
 article = ""
 proper_noun = true
-prefixable = true
 suffixible = false
 
 [[place]]
 value = "Yuggoth"
 article = ""
 proper_noun = true
-prefixable = true
 suffixible = false
 
 [[place]]
 value = "Abyss of Y'ha-nthlei"
 article = "the"
 proper_noun = true
-prefixable = true
 suffixible = false
 
 [[place]]
@@ -159,28 +158,24 @@ suffixible = false
 value = "Dreamlands"
 article = "the"
 proper_noun = true
-prefixable = true
 suffixible = false
 
 [[place]]
 value = "Ulthar"
 article = ""
 proper_noun = true
-prefixable = true
 suffixible = false
 
 [[place]]
 value = "Kadath"
 article = ""
 proper_noun = true
-prefixable = true
 suffixible = false
 
 [[place]]
 value = "abyss"
 article = "the"
 proper_noun = false
-prefixable = true
 suffixible = false
 
 [[place]]
@@ -194,14 +189,12 @@ suffixible = false
 value = "void"
 article = "the"
 proper_noun = false
-prefixable = true
 suffixible = false
 
 [[place]]
 value = "deep"
 article = "the"
 proper_noun = false
-prefixable = true
 suffixible = false
 
 [[place]]

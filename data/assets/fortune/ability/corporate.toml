@@ -2,31 +2,31 @@ category = "tonal"
 # Corporate-toned ability entries.
 
 _corporate_melee_values = [
-    { value = "downsize", prefixable = false, suffixible = false },
-    { value = "severance", prefixable = false, suffixible = false },
-    { value = "liquidation", prefixable = false, suffixible = false },
+    { value = "downsize", suffixible = false },
+    { value = "severance", suffixible = false },
+    { value = "liquidation", suffixible = false },
 ]
 
 _corporate_area_values = [
-    { value = "restructure", prefixable = false, suffixible = false },
-    { value = "downsize", prefixable = false, suffixible = false },
+    { value = "restructure", suffixible = false },
+    { value = "downsize", suffixible = false },
 ]
 
 _corporate_ranged_values = [
-    { value = "outsource", prefixable = false, suffixible = false, pos = "verb" },
+    { value = "outsource", suffixible = false, pos = "verb" },
 ]
 
 _corporate_status_values = [
-    { value = "audit", prefixable = false, suffixible = false },
-    { value = "acquire", prefixable = false, suffixible = false, noun_form = "acquisition" },
-    { value = "merger", prefixable = false, suffixible = false },
-    { value = "compliance", prefixable = false, suffixible = false },
-    { value = "outsource", prefixable = false, suffixible = false, pos = "verb" },
+    { value = "audit", suffixible = false },
+    { value = "acquire", suffixible = false, noun_form = "acquisition" },
+    { value = "merger", suffixible = false },
+    { value = "compliance", suffixible = false },
+    { value = "outsource", suffixible = false, pos = "verb" },
 ]
 
 _corporate_defence_values = [
-    { value = "indemnify", prefixable = false, suffixible = false, noun_form = "indemnification" },
-    { value = "hedge", prefixable = false, suffixible = false },
+    { value = "indemnify", suffixible = false, noun_form = "indemnification" },
+    { value = "hedge", suffixible = false },
 ]
 
 _corporate_movement_values = []
@@ -40,30 +40,30 @@ _suffix_values = [
 ]
 
 other = [
-    { value = "audit", prefixable = false, suffixible = false },
-    { value = "downsize", prefixable = false, suffixible = false, pos = "verb" },
-    { value = "termination", prefixable = false, suffixible = false },
-    { value = "outsource", prefixable = false, suffixible = false, pos = "verb" },
-    { value = "liquidation", prefixable = false, suffixible = false },
-    { value = "fire", prefixable = false, suffixible = false },
+    { value = "audit", suffixible = false },
+    { value = "downsize", suffixible = false, pos = "verb" },
+    { value = "termination", suffixible = false },
+    { value = "outsource", suffixible = false, pos = "verb" },
+    { value = "liquidation", suffixible = false },
+    { value = "fire", suffixible = false },
 ]
 
 _noun_values = [
     { value = "the board", prefixable = false, suffixible = false },
-    { value = "KPI", prefixable = false, suffixible = false },
-    { value = "redundancy", prefixable = false, suffixible = false },
-    { value = "severance", prefixable = false, suffixible = false },
-    { value = "shares", prefixable = false, suffixible = false },
-    { value = "productivity", prefixable = false, suffixible = false },
+    { value = "KPI", suffixible = false },
+    { value = "redundancy", suffixible = false },
+    { value = "severance", suffixible = false },
+    { value = "shares", suffixible = false },
+    { value = "productivity", suffixible = false },
 ]
 
 _adj_sup_values = [
-    { value = "executive", prefixable = false, suffixible = false },
-    { value = "senior", prefixable = false, suffixible = false },
-    { value = "junior", prefixable = false, suffixible = false },
-    { value = "acting", prefixable = false, suffixible = false },
-    { value = "associate", prefixable = false, suffixible = false },
-    { value = "quarterly", prefixable = false, suffixible = false },
+    { value = "executive", suffixible = false },
+    { value = "senior", suffixible = false },
+    { value = "junior", suffixible = false },
+    { value = "acting", suffixible = false },
+    { value = "associate", suffixible = false },
+    { value = "quarterly", suffixible = false },
 ]
 
 [["melee"]]

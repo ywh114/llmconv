@@ -1,47 +1,47 @@
 rank = [
-    { value = "helldiver", prefixable = true, suffixible = true },
-    { value = "marshal", prefixable = true, suffixible = true },
-    { value = "admiral", prefixable = true, suffixible = true },
-    { value = "citizen", prefixable = true, suffixible = true },
+    { value = "helldiver" },
+    { value = "marshal" },
+    { value = "admiral" },
+    { value = "citizen" },
 ]
 _class_root = [
-    { value = "diver", prefixable = true, suffixible = true },
-    { value = "patriot", prefixable = true, suffixible = true },
-    { value = "liberator", prefixable = true, suffixible = true },
-    { value = "democrat", prefixable = true, suffixible = true },
+    { value = "diver" },
+    { value = "patriot" },
+    { value = "liberator" },
+    { value = "democrat" },
 ]
 prefix = [
-    { value = "super", prefixable = true, suffixible = true },
-    { value = "ultra", prefixable = true, suffixible = true },
-    { value = "mega", prefixable = true, suffixible = true },
-    { value = "hyper", prefixable = true, suffixible = true },
+    { value = "super" },
+    { value = "ultra" },
+    { value = "mega" },
+    { value = "hyper" },
 ]
 adj = [
-    { value = "managed", prefixable = true, suffixible = true },
-    { value = "democratic", prefixable = true, suffixible = true },
-    { value = "liberated", prefixable = true, suffixible = true },
-    { value = "patriotic", prefixable = true, suffixible = true },
+    { value = "managed" },
+    { value = "democratic" },
+    { value = "liberated" },
+    { value = "patriotic" },
 ]
 adj_sup = [
-    { value = "supreme", prefixable = true, suffixible = true },
-    { value = "ultimate", prefixable = true, suffixible = true },
-    { value = "weakest", prefixable = true, suffixible = true },
-    { value = "least", prefixable = true, suffixible = true },
+    { value = "supreme" },
+    { value = "ultimate" },
+    { value = "weakest" },
+    { value = "least" },
     { value = "most undemocratic", prefixable = false, suffixible = false },
 ]
 noun = [
-    { value = "diver", prefixable = true, suffixible = true },
-    { value = "patriot", prefixable = true, suffixible = true },
-    { value = "liberator", prefixable = true, suffixible = true },
-    { value = "democrat", prefixable = true, suffixible = true },
-    { value = "democracy", prefixable = true, suffixible = true },
-    { value = "liberty", prefixable = true, suffixible = true },
-    { value = "freedom", prefixable = true, suffixible = true },
+    { value = "diver" },
+    { value = "patriot" },
+    { value = "liberator" },
+    { value = "democrat" },
+    { value = "democracy" },
+    { value = "liberty" },
+    { value = "freedom" },
 ]
 suffix = [
-    { value = "naut", prefixable = true, suffixible = true },
-    { value = "pod", prefixable = true, suffixible = true },
-    { value = "trooper", prefixable = true, suffixible = true },
+    { value = "naut" },
+    { value = "pod" },
+    { value = "trooper" },
 ]
 
 [[class]]

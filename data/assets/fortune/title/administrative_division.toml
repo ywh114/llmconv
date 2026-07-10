@@ -1,29 +1,29 @@
 rank = [
-    { value = "mayor", prefixable = true, suffixible = true },
-    { value = "governor", prefixable = true, suffixible = true },
-    { value = "senator", prefixable = true, suffixible = true },
-    { value = "commissioner", prefixable = true, suffixible = true },
+    { value = "mayor" },
+    { value = "governor" },
+    { value = "senator" },
+    { value = "commissioner" },
 ]
 noun = [
-    { value = "mayor", prefixable = true, suffixible = true },
-    { value = "governor", prefixable = true, suffixible = true },
-    { value = "commissioner", prefixable = true, suffixible = true },
-    { value = "sheriff", prefixable = true, suffixible = true },
+    { value = "mayor" },
+    { value = "governor" },
+    { value = "commissioner" },
+    { value = "sheriff" },
 ]
 _class_values = [
-    { value = "postmaster", prefixable = true, suffixible = true },
+    { value = "postmaster" },
     { value = "tax collector", prefixable = false, suffixible = false },
-    { value = "clerk", prefixable = true, suffixible = true },
-    { value = "registrar", prefixable = true, suffixible = true },
+    { value = "clerk" },
+    { value = "registrar" },
 ]
 adj = [
-    { value = "local", prefixable = true, suffixible = true },
-    { value = "regional", prefixable = true, suffixible = true },
-    { value = "federal", prefixable = true, suffixible = true },
+    { value = "local" },
+    { value = "regional" },
+    { value = "federal" },
 ]
 adj_sup = [
-    { value = "chief", prefixable = true, suffixible = true },
-    { value = "head", prefixable = true, suffixible = true },
+    { value = "chief" },
+    { value = "head" },
 ]
 
 [[place]]

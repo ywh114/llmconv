@@ -1,49 +1,49 @@
 _class_root = [
-    { value = "chef", prefixable = true, suffixible = true },
-    { value = "cuisinier", prefixable = true, suffixible = true },
-    { value = "patissier", prefixable = true, suffixible = true },
-    { value = "sommelier", prefixable = true, suffixible = true },
+    { value = "chef" },
+    { value = "cuisinier" },
+    { value = "patissier" },
+    { value = "sommelier" },
 ]
 prefix = [
 ]
 _class_values = [
-    { value = "chef", prefixable = true, suffixible = true },
-    { value = "patissier", prefixable = true, suffixible = true },
-    { value = "sommelier", prefixable = true, suffixible = true },
+    { value = "chef" },
+    { value = "patissier" },
+    { value = "sommelier" },
 ]
 adj = [
-    { value = "sous", prefixable = true, suffixible = true },
-    { value = "haute", prefixable = true, suffixible = true },
-    { value = "petit", prefixable = true, suffixible = true },
-    { value = "grande", prefixable = true, suffixible = true },
-    { value = "baguette", prefixable = true, suffixible = true },
+    { value = "sous" },
+    { value = "haute" },
+    { value = "petit" },
+    { value = "grande" },
+    { value = "baguette" },
 ]
 adj_sup = [
-    { value = "grand", prefixable = true, suffixible = true },
-    { value = "le gros", prefixable = true, suffixible = true },
-    { value = "le petit", prefixable = true, suffixible = true },
+    { value = "grand" },
+    { value = "le gros" },
+    { value = "le petit" },
 ]
 noun = [
-    { value = "chef", prefixable = true, suffixible = true },
-    { value = "cuisinier", prefixable = true, suffixible = true },
-    { value = "patissier", prefixable = true, suffixible = true },
-    { value = "baguette", prefixable = true, suffixible = true },
-    { value = "macaron", prefixable = true, suffixible = true },
-    { value = "escargot", prefixable = true, suffixible = true },
-    { value = "wine", prefixable = true, suffixible = true },
-    { value = "cuisine", prefixable = true, suffixible = true },
-    { value = "sauce", prefixable = true, suffixible = true },
-    { value = "baguettes", prefixable = true, suffixible = true },
-    { value = "macaron", prefixable = true, suffixible = true },
-    { value = "escargot", prefixable = true, suffixible = true },
-    { value = "wine", prefixable = true, suffixible = true },
+    { value = "chef" },
+    { value = "cuisinier" },
+    { value = "patissier" },
+    { value = "baguette" },
+    { value = "macaron" },
+    { value = "escargot" },
+    { value = "wine" },
+    { value = "cuisine" },
+    { value = "sauce" },
+    { value = "baguettes" },
+    { value = "macaron" },
+    { value = "escargot" },
+    { value = "wine" },
 ]
 suffix = [
-    { value = "iere", prefixable = true, suffixible = true },
-    { value = "ier", prefixable = true, suffixible = true },
-    { value = "eur", prefixable = true, suffixible = true },
-    { value = "age", prefixable = true, suffixible = true },
-    { value = "ade", prefixable = true, suffixible = true },
+    { value = "iere" },
+    { value = "ier" },
+    { value = "eur" },
+    { value = "age" },
+    { value = "ade" },
 ]
 
 [[class]]

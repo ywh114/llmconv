@@ -2,18 +2,18 @@ category = "concept"
 # Math / abstract-algebra ability entries.
 
 _prefix_values = [
-    { value = "homo", prefixable = false, suffixible = true },
-    { value = "homeo", prefixable = false, suffixible = true },
-    { value = "iso", prefixable = false, suffixible = true },
-    { value = "endo", prefixable = false, suffixible = true },
-    { value = "auto", prefixable = false, suffixible = true },
-    { value = "epi", prefixable = false, suffixible = true },
-    { value = "mono", prefixable = false, suffixible = true },
-    { value = "co", prefixable = false, suffixible = true },
-    { value = "contra", prefixable = false, suffixible = true },
-    { value = "topo", prefixable = false, suffixible = true },
-    { value = "poly", prefixable = false, suffixible = true },
-    { value = "functo", prefixable = false, suffixible = true },
+    { value = "homo", suffixible = true },
+    { value = "homeo", suffixible = true },
+    { value = "iso", suffixible = true },
+    { value = "endo", suffixible = true },
+    { value = "auto", suffixible = true },
+    { value = "epi", suffixible = true },
+    { value = "mono", suffixible = true },
+    { value = "co", suffixible = true },
+    { value = "contra", suffixible = true },
+    { value = "topo", suffixible = true },
+    { value = "poly", suffixible = true },
+    { value = "functo", suffixible = true },
 ]
 
 _suffix_values = [
@@ -30,93 +30,93 @@ _suffix_values = [
 ]
 
 _domain_values = [
-    { value = "topology", prefixable = false, suffixible = false },
-    { value = "manifold", prefixable = false, suffixible = false },
-    { value = "algebra", prefixable = false, suffixible = false },
-    { value = "category", prefixable = false, suffixible = false },
-    { value = "homology", prefixable = false, suffixible = false },
-    { value = "bundle", prefixable = false, suffixible = false },
-    { value = "spectrum", prefixable = false, suffixible = false },
+    { value = "topology", suffixible = false },
+    { value = "manifold", suffixible = false },
+    { value = "algebra", suffixible = false },
+    { value = "category", suffixible = false },
+    { value = "homology", suffixible = false },
+    { value = "bundle", suffixible = false },
+    { value = "spectrum", suffixible = false },
     { value = "CW complex", prefixable = false, suffixible = false },
-    { value = "simplex", prefixable = false, suffixible = false },
-    { value = "chain", prefixable = false, suffixible = false },
+    { value = "simplex", suffixible = false },
+    { value = "chain", suffixible = false },
 ]
 
 _math_melee_values = [
-    { value = "collapse", prefixable = false, suffixible = false, noun_form = "collapse" },
-    { value = "compactify", prefixable = false, suffixible = false, noun_form = "compactification" },
-    { value = "embed", prefixable = false, suffixible = false },
+    { value = "collapse", suffixible = false, noun_form = "collapse" },
+    { value = "compactify", suffixible = false, noun_form = "compactification" },
+    { value = "embed", suffixible = false },
 ]
 
 _math_area_values = [
-    { value = "collapse", prefixable = false, suffixible = false, noun_form = "collapse" },
-    { value = "compactify", prefixable = false, suffixible = false, noun_form = "compactification" },
-    { value = "triangulate", prefixable = false, suffixible = false, noun_form = "triangulation" },
-    { value = "path-connect", prefixable = false, suffixible = false, noun_form = "path-connectivity" },
+    { value = "collapse", suffixible = false, noun_form = "collapse" },
+    { value = "compactify", suffixible = false, noun_form = "compactification" },
+    { value = "triangulate", suffixible = false, noun_form = "triangulation" },
+    { value = "path-connect", suffixible = false, noun_form = "path-connectivity" },
 ]
 
 _math_ranged_values = [
-    { value = "diagonalize", prefixable = false, suffixible = false, noun_form = "diagonalization" },
-    { value = "path-connect", prefixable = false, suffixible = false, noun_form = "path-connectivity" },
+    { value = "diagonalize", suffixible = false, noun_form = "diagonalization" },
+    { value = "path-connect", suffixible = false, noun_form = "path-connectivity" },
 ]
 
 _math_status_values = [
-    { value = "normalize", prefixable = false, suffixible = false, noun_form = "normalization" },
-    { value = "centralize", prefixable = false, suffixible = false, noun_form = "centralization" },
-    { value = "factorize", prefixable = false, suffixible = false, noun_form = "factorization" },
-    { value = "trivialize", prefixable = false, suffixible = false, noun_form = "trivialization" },
-    { value = "parametrize", prefixable = false, suffixible = false, noun_form = "parametrization" },
-    { value = "complete", prefixable = false, suffixible = false, noun_form = "completion" },
-    { value = "embed", prefixable = false, suffixible = false },
+    { value = "normalize", suffixible = false, noun_form = "normalization" },
+    { value = "centralize", suffixible = false, noun_form = "centralization" },
+    { value = "factorize", suffixible = false, noun_form = "factorization" },
+    { value = "trivialize", suffixible = false, noun_form = "trivialization" },
+    { value = "parametrize", suffixible = false, noun_form = "parametrization" },
+    { value = "complete", suffixible = false, noun_form = "completion" },
+    { value = "embed", suffixible = false },
 ]
 
 _math_defence_values = [
-    { value = "closure", prefixable = false, suffixible = false },
-    { value = "invariant", prefixable = false, suffixible = false },
+    { value = "closure", suffixible = false },
+    { value = "invariant", suffixible = false },
 ]
 
 other = [
-    { value = "normalize", prefixable = false, suffixible = false, noun_form = "normalization" },
-    { value = "compactify", prefixable = false, suffixible = false, noun_form = "compactification"},
-    { value = "factorize", prefixable = false, suffixible = false, noun_form = "factor" },
-    { value = "embed", prefixable = false, suffixible = false },
-    { value = "collapse", prefixable = false, suffixible = false },
-    { value = "tensor", prefixable = false, suffixible = false, noun_form = "tensor" },
-    { value = "quotient", prefixable = false, suffixible = false, noun_form = "quotient" },
-    { value = "integration", prefixable = false, suffixible = false },
-    { value = "differentiation", prefixable = false, suffixible = false },
-    { value = "lift", prefixable = false, suffixible = false },
-    { value = "projection", prefixable = false, suffixible = false },
+    { value = "normalize", suffixible = false, noun_form = "normalization" },
+    { value = "compactify", suffixible = false, noun_form = "compactification"},
+    { value = "factorize", suffixible = false, noun_form = "factor" },
+    { value = "embed", suffixible = false },
+    { value = "collapse", suffixible = false },
+    { value = "tensor", suffixible = false, noun_form = "tensor" },
+    { value = "quotient", suffixible = false, noun_form = "quotient" },
+    { value = "integration", suffixible = false },
+    { value = "differentiation", suffixible = false },
+    { value = "lift", suffixible = false },
+    { value = "projection", suffixible = false },
 ]
 
 _noun_values = [
-    { value = "invariant", prefixable = false, suffixible = false },
-    { value = "kernel", prefixable = false, suffixible = false },
-    { value = "fiber", prefixable = false, suffixible = false },
-    { value = "diagram", prefixable = false, suffixible = false },
-    { value = "section", prefixable = false, suffixible = false },
+    { value = "invariant", suffixible = false },
+    { value = "kernel", suffixible = false },
+    { value = "fiber", suffixible = false },
+    { value = "diagram", suffixible = false },
+    { value = "section", suffixible = false },
     { value = "universal property", prefixable = false, suffixible = false },
-    { value = "axiom", prefixable = false, suffixible = false },
-    { value = "lemma", prefixable = false, suffixible = false },
-    { value = "triviality", prefixable = false, suffixible = false },
+    { value = "axiom", suffixible = false },
+    { value = "lemma", suffixible = false },
+    { value = "triviality", suffixible = false },
 ]
 
 _adj_values = [
-    { value = "abelian", prefixable = false, suffixible = false },
-    { value = "non-abelian", prefixable = false, suffixible = false },
-    { value = "compact", prefixable = false, suffixible = false },
-    { value = "connected", prefixable = false, suffixible = false },
-    { value = "smooth", prefixable = false, suffixible = false },
-    { value = "algebraic", prefixable = false, suffixible = false },
-    { value = "topological", prefixable = false, suffixible = false },
-    { value = "orientable", prefixable = false, suffixible = false },
+    { value = "abelian", suffixible = false },
+    { value = "non-abelian", suffixible = false },
+    { value = "compact", suffixible = false },
+    { value = "connected", suffixible = false },
+    { value = "smooth", suffixible = false },
+    { value = "algebraic", suffixible = false },
+    { value = "topological", suffixible = false },
+    { value = "orientable", suffixible = false },
 ]
 
 _adj_sup_values = [
-    { value = "topological", prefixable = false, suffixible = false },
-    { value = "transcendental", prefixable = false, suffixible = false },
-    { value = "simply-connected", prefixable = false, suffixible = false },
-    { value = "infinite-dimensional", prefixable = false, suffixible = false },
+    { value = "topological", suffixible = false },
+    { value = "transcendental", suffixible = false },
+    { value = "simply-connected", suffixible = false },
+    { value = "infinite-dimensional", suffixible = false },
 ]
 
 _math_movement_values = []

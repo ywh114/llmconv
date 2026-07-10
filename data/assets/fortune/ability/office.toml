@@ -2,29 +2,29 @@ category = "silly"
 # Office-theme silly ability entries.
 
 _office_melee_values = [
-    { value = "papercut", prefixable = false, suffixible = false },
-    { value = "staple", prefixable = false, suffixible = false },
-    { value = "three-hole-punch", prefixable = false, suffixible = false },
+    { value = "papercut", suffixible = false },
+    { value = "staple", suffixible = false },
+    { value = "three-hole-punch", suffixible = false },
 ]
 
 _office_area_values = [
-    { value = "shred", prefixable = false, suffixible = false },
-    { value = "print", prefixable = false, suffixible = false },
+    { value = "shred", suffixible = false },
+    { value = "print", suffixible = false },
 ]
 
 _office_ranged_values = [
-    { value = "fax", prefixable = false, suffixible = false },
-    { value = "carbon-copy", prefixable = false, suffixible = false },
+    { value = "fax", suffixible = false },
+    { value = "carbon-copy", suffixible = false },
 ]
 
 _office_status_values = [
-    { value = "memo", prefixable = false, suffixible = false },
-    { value = "carbon-copy", prefixable = false, suffixible = false },
+    { value = "memo", suffixible = false },
+    { value = "carbon-copy", suffixible = false },
 ]
 
 _office_defence_values = [
-    { value = "encrypt", prefixable = false, suffixible = false, noun_form = "encryption" },
-    { value = "shred", prefixable = false, suffixible = false },
+    { value = "encrypt", suffixible = false, noun_form = "encryption" },
+    { value = "shred", suffixible = false },
 ]
 
 _suffix_values = [
@@ -35,21 +35,21 @@ _suffix_values = [
 ]
 
 other = [
-    { value = "papercut", prefixable = false, suffixible = false },
-    { value = "fax", prefixable = false, suffixible = false },
-    { value = "staple", prefixable = false, suffixible = false },
-    { value = "shred", prefixable = false, suffixible = false },
-    { value = "file", prefixable = false, suffixible = false },
-    { value = "cc", prefixable = false, suffixible = false, noun_form = "cc'ing" },
+    { value = "papercut", suffixible = false },
+    { value = "fax", suffixible = false },
+    { value = "staple", suffixible = false },
+    { value = "shred", suffixible = false },
+    { value = "file", suffixible = false },
+    { value = "cc", suffixible = false, noun_form = "cc'ing" },
 ]
 
 _noun_values = [
-    { value = "paper", prefixable = false, suffixible = false },
-    { value = "toner", prefixable = false, suffixible = false },
-    { value = "memo", prefixable = false, suffixible = false },
+    { value = "paper", suffixible = false },
+    { value = "toner", suffixible = false },
+    { value = "memo", suffixible = false },
     { value = "TPS report", prefixable = false, suffixible = false },
-    { value = "watermark", prefixable = false, suffixible = false },
-    { value = "stapler", prefixable = false, suffixible = false },
+    { value = "watermark", suffixible = false },
+    { value = "stapler", suffixible = false },
 ]
 
 _office_movement_values = []

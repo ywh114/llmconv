@@ -1,6 +1,6 @@
 prefix = [
-    { value = "GNU+" },
-    { value = "GNU/" },
+    { value = "GNU+", supersticky = true },
+    { value = "GNU/", supersticky = true },
     { value = "libre" },
     { value = "open" },
     { value = "free" },
@@ -30,7 +30,6 @@ adj_sup = [
     { value = "FSF-approved" },
     { value = "free as in freedom" },
     { value = "free as in free beer" },
-    { value = "free and open source" },
 ]
 _foss_role_values = [
     { value = "contributor" },
@@ -55,10 +54,10 @@ class = [
     { value = "contributor" },
     { value = "committer" },
     { value = "packager" },
-    { value = "distro hopper", prefixable = false, suffixible = false },
-    { value = "kernel hacker", prefixable = false, suffixible = false },
-    { value = "arch user", prefixable = false, suffixible = false },
-    { value = "bug triager", prefixable = false, suffixible = false },
+    { value = "distro hopper", sticky = false, prefixable = false, suffixible = false },
+    { value = "arch user", sticky = false, prefixable = false, suffixible = false },
+    { value = "gentoo installer", sticky = false, prefixable = false, suffixible = false },
+    { value = "GNUisance" },
 ]
 noun = [
     { value = "linux" },
@@ -68,7 +67,7 @@ noun = [
     { value = "source" },
     { value = "repo" },
     { value = "PR" },
-    { value = "merge conflict", prefixable = false, suffixible = false },
+    { value = "merge conflict", sticky = false, prefixable = false, suffixible = false },
     { value = "dependency" },
     { value = "package" },
     { value = "copyleft" },
@@ -76,10 +75,13 @@ noun = [
     { value = "systemd" },
     { value = "sysVinit" },
     { value = "init" },
+    { value = "daemon" },
     { value = "tarball" },
     { value = "sudo", lowercase = "true" },
     { value = "root" },
     { value = "shebang" },
+    { value = "vim" },
+    { value = "emacs" },
 ]
 entity = [
     { value = "Stallman" },
@@ -127,6 +129,7 @@ _foss_license_values = [
 suffix = [
     { value = "-only", suffixible = false },
     { value = "-release", suffixible = false },
+    { value = "-git", suffixible = false },
     { value = ".conf.d", suffixible = false },
     { value = ".sh", suffixible = false },
     { value = ".tar.gz", suffixible = false },

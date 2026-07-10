@@ -91,15 +91,6 @@ def test_pos_noun_override() -> None:
     assert tokens.expand("{noun:noun}", grammar) == "Meteor"
 
 
-def test_number_constraints() -> None:
-    grammar = {
-        "ordinal": [{"value": "1st"}, {"value": "2nd"}, {"value": "3rd"}, {"value": "4th"}],
-    }
-    for _ in range(20):
-        result = tokens.expand("{ordinal:>1,<6}", grammar)
-        assert result in {"2nd", "3rd", "4th"}
-
-
 def test_value_with_embedded_slot() -> None:
     grammar = {
         "digit": [{"value": "7"}],
@@ -493,7 +484,7 @@ def test_expand_non_sticky_word_blocks_affix_attachment() -> None:
         'noun': [{'value': 'sous chef', 'sticky': False}],
     }
     assert tokens.expand('{prefix}{noun}', grammar) == 'Neo Sous Chef'
-    assert tokens.expand('{noun}{suffix}', grammar) == 'Sous Chef Ling'
+    assert tokens.expand('{noun}{suffix}', grammar) == 'Sous Chef'
 
 
 def test_expand_sticky_word_allows_affix_attachment() -> None:
@@ -502,3 +493,35 @@ def test_expand_sticky_word_allows_affix_attachment() -> None:
         'noun': [{'value': 'chef'}],
     }
     assert tokens.expand('{prefix}{noun}', grammar) == 'Neochef'
+
+
+def test_supersticky_prefix_sticks_right() -> None:
+    grammar = {
+        'prefix': [{'value': 'GNU/', 'supersticky': True}],
+        'noun': [{'value': 'distro hopper', 'sticky': False}],
+    }
+    assert tokens.expand('{prefix}{noun}', grammar) == 'GNU/Distro Hopper'
+
+
+def test_supersticky_plus_prefix_sticks_right() -> None:
+    grammar = {
+        'prefix': [{'value': 'GNU+', 'supersticky': True}],
+        'noun': [{'value': 'linux', 'sticky': False}],
+    }
+    assert tokens.expand('{prefix}{noun}', grammar) == 'GNU+Linux'
+
+
+def test_suffix_still_attaches_when_word_is_sticky() -> None:
+    grammar = {
+        'suffix': [{'value': 'ling'}],
+        'noun': [{'value': 'sous'}],
+    }
+    assert tokens.expand('{noun}{suffix}', grammar) == 'Sousling'
+
+
+def test_suffix_drops_when_word_rejects_it() -> None:
+    grammar = {
+        'suffix': [{'value': 'ling'}],
+        'noun': [{'value': 'sous', 'suffixible': False}],
+    }
+    assert tokens.expand('{noun}{suffix}', grammar) == 'Sous'

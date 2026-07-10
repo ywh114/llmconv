@@ -193,3 +193,50 @@ def test_orchestrator_registers_fortune_tools() -> None:
     assert "random" in orch.registry
     assert "title" in orch.registry
     assert "name" in orch.registry
+
+
+def test_cull_grammar_caps_dominant_source() -> None:
+    grammar = {
+        '__generic_slots__': {'noun'},
+        'noun': [
+            {'value': 'a', '_source': 'x'},
+            {'value': 'b', '_source': 'x'},
+            {'value': 'c', '_source': 'x'},
+            {'value': 'd', '_source': 'x'},
+            {'value': 'e', '_source': 'x'},
+            {'value': 'f', '_source': 'y'},
+            {'value': 'g', '_source': 'z'},
+        ],
+    }
+    culled = fortune.cull_grammar(grammar)
+    # total 7 * 0.4 = 2.8 -> cap 2. source x (5) capped to 2, y and z (1 each) kept.
+    assert len(culled['noun']) == 4
+    assert len([e for e in culled['noun'] if e['_source'] == 'x']) == 2
+    assert len([e for e in culled['noun'] if e['_source'] == 'y']) == 1
+    assert len([e for e in culled['noun'] if e['_source'] == 'z']) == 1
+
+
+def test_cull_grammar_is_random_per_call() -> None:
+    grammar = {
+        '__generic_slots__': {'noun'},
+        'noun': [
+            {'value': f'{i}', '_source': 'x'}
+            for i in range(200)
+        ]
+        + [
+            {'value': f'y{i}', '_source': 'y'}
+            for i in range(50)
+        ]
+        + [
+            {'value': f'z{i}', '_source': 'z'}
+            for i in range(50)
+        ],
+    }
+    first = {e['value'] for e in fortune.cull_grammar(grammar)['noun']}
+    different = False
+    for _ in range(10):
+        second = {e['value'] for e in fortune.cull_grammar(grammar)['noun']}
+        if second != first:
+            different = True
+            break
+    assert different

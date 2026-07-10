@@ -84,14 +84,14 @@ considerations = """
   fighter's title world and technique delivery to their combat style. Assign
   the returned abilities to that fighter; do not mix them into a shared pool.
 
-  Team 1 abilities: flavor="void,plague_doctor,corporate,office",
-  slot={"domain":["void"],"technique":["corporate","office"]}.
+  Team 1 abilities: flavor="void,melee,ice",
+  slot={"domain":["void"],"technique":["melee"]}.
 
-  Team 2 abilities: flavor="food,fire,water,melee,jrpg",
-  slot={"domain":["food"],"technique":["melee","fire","water"]}.
+  Team 2 abilities: flavor="plague_doctor,ranged,water",
+  slot={"domain":["plague_doctor"],"technique":["ranged"]}.
 
-  Team 3 abilities: flavor="quantum,tfr,ranged,space,defence",
-  slot={"domain":["quantum"],"technique":["ranged","space","tfr"]}.
+  Team 3 abilities: flavor="fire,melee,jrpg",
+  slot={"domain":["fire"],"technique":["melee","jrpg"]}.
 
 - Status page format (target: free). Build one page with title "Fighters" and
   sections merged by type:label:
@@ -143,47 +143,48 @@ exception is if their title is explicitly very prosy.
   "He staggers back from the wound I just gave him."
 
 TEAM SETUP (once per batch):
-- This is a 2v2v2 team battle. Three teams of two fighters each, six
+- This is a 3v3v3 team battle. Three teams of three fighters each, nine
   fighters total. Each team draws from a different world — a different set
   of title flavor combinations, surgically mixed using slot restrictions.
   Flavors determine a fighter's entire vibe: visual style, vernacular,
   values, and combat logic.
 
-  Team 1 (Eldritch Administration): fortune_title(
-    flavor="plague_doctor,corporate,administrative_division",
-    require=["place"],
-    slot={"adj":["plague_doctor"],"rank":["corporate"],"place":["administrative_division"]}
+  Team 1 (Court of the Old Ones): fortune_title(
+    flavor="feudal,lovecraft",
+    require=["rank","class","place"],
+    slot={"rank":["feudal"],"class":["lovecraft"],"place":["lovecraft"]}
   ).
 
-  Team 2 (Gastronomic Feudalism): fortune_title(
-    flavor="french_food,feudal,jrpg",
-    require=["place","thing"],
-    slot={"class":["french_food"],"rank":["feudal"],"place":["jrpg"]}
+  Team 2 (The Sick Fleet): fortune_title(
+    flavor="plague_doctor,warships",
+    require=["rank","class","place"],
+    slot={"rank":["warships"],"class":["plague_doctor"],"place":["plague_doctor"]}
   ).
 
-  Team 3 (Helldiver Physics): fortune_title(
-    flavor="super_earth,standard_model,tfr",
-    require=["place"],
-    slot={"rank":["super_earth"],"place":["super_earth"],"thing":["standard_model"]}
+  Team 3 (The People's Mythic Host): fortune_title(
+    flavor="fantasy,juche",
+    require=["rank","class","place"],
+    slot={"rank":["juche"],"class":["fantasy"],"place":["fantasy"]}
   ).
 
-- Generate two fighters per team (six total): call fortune_name and the
+- Generate three fighters per team (nine total): call fortune_name and the
   team's fortune_title for each. Spawn them all with spawn_anonymous; each
   fighter must include a one-line `description` (required by the tool).
 
 - Team affiliation is visible: tell the Narrator which fighters belong to
   which team when describing their entrances. Use team-coloured banners
-  or marks to distinguish them (e.g. sick-purple for Administration,
-  butter-gold for Gastronomy, democratic-blue for Helldiver Physics).
+  or marks to distinguish them (e.g. ink-black and rust-red for the Court
+  of the Old Ones, barnacled green and sick-lantern yellow for the Sick
+  Fleet, revolutionary red and mythic gold for the People's Mythic Host).
 
 - Use the names and titles exactly as generated — never shorten, abbreviate,
   or nick-name them.
 
 - Fighters should be caricatures of their titles and their team's world.
-  A plague-masked auditor should treat combat like a performance
-  review. A sauce-knight should judge opponents by their marbling and
-  reduction technique. A helldiver physicist should yell about gauge
-  invariance and the liberation of managed democracy.
+  A feudal cultist should treat combat like a dark ritual and a royal
+  sacrament. A plague-fleet officer should enforce quarantine with naval
+  discipline and a leech-cannon. A mythic commissar should rally
+  monster-comrades with revolutionary slogans and fire magic.
 
 - For flavour: use a single fortune tool per round, rotating — fortune_random
   one round, fortune_roll the next, etc. Don't call fortune_suite.
@@ -193,13 +194,14 @@ TEAM SETUP (once per batch):
 BATTLE (loop until one team remains):
 - fortune_roll resolves every decisive action. Track HP, decide damage,
   saves, detection, and roll. State the survival threshold before rolling.
-- "Nuclear Deterrence Battleship" one-shots anything. "Democrat Lawyer"
-  argues, maybe wins on a technicality, but takes a single hit and dies.
-  If HP hits 0, fighter is dead. Narrate the kill, exit dead fighters.
+- "Cultist-King against the Nameless City" one-shots anything. "Ghoul-Comrade
+  against the South" argues for the revolution, maybe wins by rhetoric, but
+  takes a single hit and dies. If HP hits 0, fighter is dead. Narrate the
+  kill, exit dead fighters.
 - Fighters get turns to act/speak. Narrator describes based on roll results.
 - Cassius/Lyra commentate on the culture clash between teams — the absurdity
-  of a plague-masked bureaucrat fighting a barnaise-wielding duke fighting
-  a gauge-boson-believing super-patriot.
+  of a crown-wearing cultist of Kadath fighting a masked naval surgeon
+  fighting a faerie general waving a red banner.
 - Spectator reacts between beats.
 
 MATCH END:

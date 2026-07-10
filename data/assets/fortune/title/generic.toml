@@ -1,13 +1,13 @@
 rank = [
-    { value = "master", prefixable = true, suffixible = true },
-    { value = "chief", prefixable = true, suffixible = true },
-    { value = "head", prefixable = true, suffixible = true },
+    { value = "master" },
+    { value = "chief" },
+    { value = "head" },
 ]
 prefix = [
-    { value = "neo", prefixable = true, suffixible = true },
-    { value = "proto", prefixable = true, suffixible = true },
-    { value = "pseudo", prefixable = true, suffixible = true },
-    { value = "meta", prefixable = true, suffixible = true },
+    { value = "neo" },
+    { value = "proto" },
+    { value = "pseudo" },
+    { value = "meta" },
 ]
 adj = [
     { value = "old" },
@@ -18,27 +18,27 @@ adj = [
     { value = "small" },
 ]
 adj_sup = [
-    { value = "best", prefixable = true, suffixible = true },
-    { value = "worst", prefixable = true, suffixible = true },
-    { value = "first", prefixable = true, suffixible = true },
-    { value = "last", prefixable = true, suffixible = true },
-    { value = "most", prefixable = true, suffixible = true },
-    { value = "least", prefixable = true, suffixible = true },
+    { value = "best" },
+    { value = "worst" },
+    { value = "first" },
+    { value = "last" },
+    { value = "most" },
+    { value = "least" },
 ]
 noun = [
-    { value = "person", prefixable = true, suffixible = true, plural = "people" },
-    { value = "man", prefixable = true, suffixible = true },
-    { value = "thing", prefixable = true, suffixible = true },
-    { value = "stuff", prefixable = true, suffixible = true, plural = "stuff" },
-    { value = "matter", prefixable = true, suffixible = true },
+    { value = "person", plural = "people" },
+    { value = "man" },
+    { value = "thing" },
+    { value = "stuff", plural = "stuff" },
+    { value = "matter" },
 ]
 entity = [
-    { value = "Me" }
+    { value = "Me", possessive = "My" },
 ]
 class = [
-    { value = "worker", prefixable = true, suffixible = true },
-    { value = "maker", prefixable = true, suffixible = true },
-    { value = "user", prefixable = true, suffixible = true },
+    { value = "worker" },
+    { value = "maker" },
+    { value = "user" },
 ]
 
 [["prefix+"]]
@@ -52,29 +52,21 @@ patterns = [
 value = "whole world"
 article = "the"
 proper_noun = false
-prefixable = true
-suffixible = true
 
 [[place]]
 value = "land"
 article = "the"
 proper_noun = false
-prefixable = true
-suffixible = true
 
 [[place]]
 value = "area"
 article = "the"
 proper_noun = false
-prefixable = true
-suffixible = true
 
 [[place]]
 value = "vicinity"
 article = "the"
 proper_noun = false
-prefixable = true
-suffixible = true
 
 [[subject]]
 patterns = [

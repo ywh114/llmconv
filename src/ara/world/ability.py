@@ -115,6 +115,7 @@ def load_ability_grammar(
     config: AraSettings | None = None,
     flavors: list[str] | str | None = None,
     slot_sources: dict[str, list[str]] | None = None,
+    cull_sources: bool = True,
 ) -> dict:
     primary, fallback = _ability_dirs(story, config)
     available = list_ability_flavors(story, config)
@@ -127,7 +128,9 @@ def load_ability_grammar(
     unknown = [s for s in selected if s not in available]
     if unknown:
         raise ValueError(f"Unknown ability flavor(s): {', '.join(unknown)}")
-    return build_grammar(selected, slot_sources or {}, primary, fallback)
+    return build_grammar(
+        selected, slot_sources or {}, primary, fallback, cull_sources=cull_sources
+    )
 
 
 def generate_ability(
@@ -138,6 +141,7 @@ def generate_ability(
     level: str | int | None = "2",
     slot_sources: dict[str, list[str]] | None = None,
     required_slots: list[str] | set[str] | None = None,
+    cull_sources: bool = True,
 ) -> str:
     primary, fallback = _ability_dirs(story, config)
     level_name, exact = _resolve_level(level)
@@ -154,7 +158,11 @@ def generate_ability(
                 f"No templates contain all required slots: {', '.join(sorted(required))}"
             )
     grammar = load_ability_grammar(
-        story=story, config=config, flavors=flavors, slot_sources=slot_sources,
+        story=story,
+        config=config,
+        flavors=flavors,
+        slot_sources=slot_sources,
+        cull_sources=cull_sources,
     )
     if template is not None:
         tmpl = template

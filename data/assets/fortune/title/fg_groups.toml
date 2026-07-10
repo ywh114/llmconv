@@ -1,51 +1,48 @@
 _group_root = [
-    { value = "group", prefixable = true, suffixible = true },
-    { value = "ring", prefixable = true, suffixible = true },
-    { value = "field", prefixable = true, suffixible = true },
-    { value = "module", prefixable = true, suffixible = true },
-    { value = "lattice", prefixable = true, suffixible = true },
+    { value = "group" },
+    { value = "ring" },
+    { value = "field" },
+    { value = "module" },
+    { value = "lattice" },
 ]
 _group_name = [
-    { value = "Z", prefixable = true, suffixible = true },
-    { value = "Z/{number}Z", prefixable = true, suffixible = true },
-    { value = "S({number})", prefixable = true, suffixible = true },
-    { value = "D({number})", prefixable = true, suffixible = true },
-    { value = "A({number})", prefixable = true, suffixible = true },
-    { value = "GL({number})", prefixable = true, suffixible = true },
-    { value = "SL({number})", prefixable = true, suffixible = true },
-    { value = "O({number})", prefixable = true, suffixible = true },
-    { value = "SO({number})", prefixable = true, suffixible = true },
+    { value = "Z" },
+    { value = "Z/{number}Z" },
+    { value = "S({number})" },
+    { value = "D({number})" },
+    { value = "A({number})" },
+    { value = "GL({number})" },
+    { value = "SL({number})" },
+    { value = "O({number})" },
+    { value = "SO({number})" },
 ]
 adj = [
     { value = "finitely generated", prefixable = false, suffixible = false },
-    { value = "infinite", prefixable = true, suffixible = true },
-    { value = "torsion", prefixable = true, suffixible = true },
-    { value = "cyclic", prefixable = true, suffixible = true },
-    { value = "free", prefixable = true, suffixible = true },
-    { value = "abelian", prefixable = true, suffixible = true },
-    { value = "nilpotent", prefixable = true, suffixible = true },
-    { value = "solvable", prefixable = true, suffixible = true },
+    { value = "infinite" },
+    { value = "torsion" },
+    { value = "cyclic" },
+    { value = "free" },
+    { value = "abelian" },
+    { value = "nilpotent" },
+    { value = "solvable" },
 ]
 adj_sup = [
-    { value = "universal", prefixable = true, suffixible = true },
+    { value = "universal" },
 ]
 rank = [
-    { value = "generator", prefixable = true, suffixible = true },
-    { value = "basis", prefixable = true, suffixible = true },
-    { value = "closure", prefixable = true, suffixible = true },
-    { value = "relation", prefixable = true, suffixible = true },
+    { value = "generator" },
+    { value = "basis" },
+    { value = "closure" },
+    { value = "relation" },
 ]
 suffix = [
-    { value = "oid", prefixable = true, suffixible = true },
-    { value = "ic", prefixable = true, suffixible = true },
-    { value = "al", prefixable = true, suffixible = true },
-    { value = "ive", prefixable = true, suffixible = true },
-    { value = "ary", prefixable = true, suffixible = true },
+    { value = "oid" },
+    { value = "ary" },
 ]
 noun = [
-    { value = "symmetries", prefixable = true, suffixible = true },
-    { value = "automorphisms", prefixable = true, suffixible = true },
-    { value = "cosets", prefixable = true, suffixible = true },
+    { value = "symmetries" },
+    { value = "automorphisms" },
+    { value = "cosets" },
 ]
 
 [[group]]

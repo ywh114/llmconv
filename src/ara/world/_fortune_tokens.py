@@ -40,6 +40,7 @@ class Article:
 class Affix:
     text: str
     side: str  # "left" for suffixes, "right" for prefixes
+    meta: dict[str, Any] = field(default_factory=dict)
 
 
 Token = Literal | Slot | Word | Article | Affix
@@ -50,6 +51,9 @@ Token = Literal | Slot | Word | Article | Affix
 # --------------------------------------------------------------------------- #
 
 _SLOT_RE = re.compile(r'\{([^}]+)\}')
+
+# Obscure placeholder used by supersticky tokens to stick to the next word.
+_SUPERSTICKY_PLACEHOLDER = '\uE000'
 
 
 def tokenize(pattern: str) -> list[Token]:
@@ -83,117 +87,6 @@ def tokenize(pattern: str) -> list[Token]:
 # --------------------------------------------------------------------------- #
 # Modifiers and entry selection
 # --------------------------------------------------------------------------- #
-
-_CONSTRAINT_RE = re.compile(r'^(<=|>=|<|>|=)?\s*(-?\d+(?:\.\d+)?)$')
-
-
-def _is_constraint(mod: str) -> bool:
-    return _CONSTRAINT_RE.match(mod) is not None
-
-
-def _is_constraint_modifier(mod: str) -> bool:
-    """True if the whole modifier is a comma-separated list of constraints."""
-    parts = [p.strip() for p in mod.split(',') if p.strip()]
-    return bool(parts) and all(_is_constraint(p) for p in parts)
-
-
-def _parse_constraint(mod: str) -> tuple[str, float]:
-    m = _CONSTRAINT_RE.match(mod)
-    if not m:
-        raise ValueError(f'Invalid number constraint: {mod}')
-    op = m.group(1) or '='
-    return op, float(m.group(2))
-
-
-def _numeric_value(text: str, kind: str) -> float | None:
-    """Best-effort numeric parse for ordinal/number/roman/digit entries."""
-    if kind == 'digit':
-        try:
-            return float(text)
-        except ValueError:
-            return None
-    if kind == 'ordinal':
-        # "1st", "2nd", "23rd", "24th"
-        m = re.match(r'^(\d+)', text)
-        if m:
-            return float(m.group(1))
-        return None
-    if kind == 'roman_numeral':
-        try:
-            return float(_roman_to_int(text))
-        except Exception:
-            return None
-    if kind == 'number':
-        try:
-            return float(text)
-        except ValueError:
-            return None
-    return None
-
-
-_ROMAN_MAP = {
-    'I': 1,
-    'V': 5,
-    'X': 10,
-    'L': 50,
-    'C': 100,
-    'D': 500,
-    'M': 1000,
-}
-
-
-def _roman_to_int(s: str) -> int:
-    total = 0
-    prev = 0
-    for ch in reversed(s.upper()):
-        val = _ROMAN_MAP.get(ch, 0)
-        if val < prev:
-            total -= val
-        else:
-            total += val
-            prev = val
-    return total
-
-
-def _apply_op(value: float, op: str, target: float) -> bool:
-    if op == '<':
-        return value < target
-    if op == '<=':
-        return value <= target
-    if op == '>':
-        return value > target
-    if op == '>=':
-        return value >= target
-    return value == target
-
-
-def _filter_entries(
-    entries: list[Any], modifiers: tuple[str, ...], kind: str
-) -> list[Any]:
-    """Filter grammar entries by numeric constraints, if any.
-
-    Constraints may be grouped with commas, e.g. ``>1,<6``.
-    """
-    constraints: list[tuple[str, float]] = []
-    for mod in modifiers:
-        for part in mod.split(','):
-            part = part.strip()
-            if part and _is_constraint(part):
-                constraints.append(_parse_constraint(part))
-    if not constraints:
-        return entries
-    filtered = []
-    for entry in entries:
-        text = _entry_text(entry)
-        if text is None:
-            continue
-        val = _numeric_value(text, kind)
-        if val is None:
-            continue
-        if all(_apply_op(val, op, target) for op, target in constraints):
-            filtered.append(entry)
-    return filtered or entries
-
 
 def _entry_text(entry: Any) -> str | None:
     if isinstance(entry, dict):
@@ -230,14 +123,7 @@ def select_entry(
     """Pick an entry, honoring numeric constraints and affix affinity."""
     if not entries:
         raise ValueError(f'No entries for slot {slot}')
-    kind = (
-        slot if slot in {'ordinal', 'number', 'roman_numeral', 'digit'} else ''
-    )
-    candidates = (
-        _filter_entries(entries, modifiers, kind) if kind else list(entries)
-    )
-    if not candidates:
-        candidates = list(entries)
+    candidates = list(entries)
     if requires_prefixable or requires_suffixible:
         compatible = [
             e
@@ -380,8 +266,6 @@ def _transform_value(value: str, modifier: str, meta: dict[str, Any]) -> str:
         return meta.get('comparative') or default_comparative(value)
     if modifier == 'possessive':
         return meta.get('possessive') or default_possessive(value)
-    if _is_constraint(modifier):
-        return value
     raise ValueError(f"Unknown modifier '{modifier}' for value '{value}'")
 
 
@@ -462,15 +346,13 @@ def entry_to_tokens(
         if not article:
             article, value = _split_article(value)
 
-        # Apply transforms (constraints were already handled during selection).
-        transforms = [m for m in modifiers if not _is_constraint_modifier(m)]
-        for mod in transforms:
+        for mod in modifiers:
             value = _transform_value(value, mod, meta)
             article = None
 
         tokens: list[Token] = []
         if is_affix:
-            tokens.append(Affix(value, side))
+            tokens.append(Affix(value, side, meta.copy()))
         else:
             if article:
                 tokens.append(Article(article))
@@ -1124,10 +1006,15 @@ def apply_sticky(tokens: list[Token]) -> list[Token]:
     for left_idx, right_idx in zip(reversed(indices[:-1]), reversed(indices[1:])):
         left = result[left_idx]
         right = result[right_idx]
-        if not _gap_needs_space(left, right):
-            continue
         between = result[left_idx + 1 : right_idx]
         if any(not isinstance(t, Literal) for t in between):
+            continue
+        # Supersticky tokens stick to the next word via an invisible placeholder.
+        if getattr(left, 'meta', {}).get('supersticky'):
+            if not between or ''.join(l.text for l in between).strip() != _SUPERSTICKY_PLACEHOLDER:
+                result[left_idx + 1 : right_idx] = [Literal(_SUPERSTICKY_PLACEHOLDER)]
+            continue
+        if not _gap_needs_space(left, right):
             continue
         if _is_preserved_separator(between):
             continue
@@ -1153,7 +1040,11 @@ def attach_affixes(tokens: list[Token]) -> list[Token]:
         while i < len(tokens):
             token = tokens[i]
             if isinstance(token, Affix):
-                if token.side == 'left' and result:
+                if token.side == 'left':
+                    if not result:
+                        # A suffix with nothing to attach to is dropped.
+                        i += 1
+                        continue
                     if isinstance(result[-1], Word):
                         prev = result[-1]
                         if prev.meta.get('suffixible', True):
@@ -1165,12 +1056,16 @@ def attach_affixes(tokens: list[Token]) -> list[Token]:
                     # A left affix after another affix: merge leftward into a combined affix.
                     if isinstance(result[-1], Affix):
                         prev = result.pop()
+                        merged_meta = {**prev.meta, **token.meta}
                         result.append(
-                            Affix(prev.text + token.text, side='left')
+                            Affix(prev.text + token.text, side='left', meta=merged_meta)
                         )
                         changed = True
                         i += 1
                         continue
+                    # Suffix cannot attach to a non-word (e.g. across a space): drop it.
+                    i += 1
+                    continue
                 if token.side == 'right' and i + 1 < len(tokens):
                     nxt = tokens[i + 1]
                     if isinstance(nxt, Word):
@@ -1184,8 +1079,9 @@ def attach_affixes(tokens: list[Token]) -> list[Token]:
                         continue
                     # A right affix before another affix: merge rightward.
                     if isinstance(nxt, Affix):
+                        merged_meta = {**token.meta, **nxt.meta}
                         result.append(
-                            Affix(token.text + nxt.text, side='right')
+                            Affix(token.text + nxt.text, side='right', meta=merged_meta)
                         )
                         changed = True
                         i += 2
@@ -1312,6 +1208,8 @@ def title_case_tokens(tokens: list[Token]) -> list[Token]:
                 is_first_word = True
         else:
             out.append(token)
+            if getattr(token, 'meta', {}).get('supersticky'):
+                is_first_word = False
     return out
 
 
@@ -1326,6 +1224,8 @@ def render_tokens(tokens: list[Token]) -> str:
     prev: Token | None = None
     for token in tokens:
         if isinstance(token, Literal):
+            if token.text == _SUPERSTICKY_PLACEHOLDER:
+                continue
             parts.append(token.text)
         elif isinstance(token, Word):
             if parts and isinstance(prev, Article):

@@ -2,37 +2,37 @@ category = "tonal"
 # tfr = "The Fire Rises" mod for Hearts of Iron IV
 
 _tfr_melee_values = [
-    { value = "spearhead", prefixable = false, suffixible = false },
-    { value = "assault", prefixable = false, suffixible = false },
+    { value = "spearhead", suffixible = false },
+    { value = "assault", suffixible = false },
 ]
 
 _tfr_area_values = [
     { value = "strategic bomb", prefixable = false, suffixible = false, pos = "verb" },
     { value = "naval blockade", prefixable = false, suffixible = false },
-    { value = "airstrike", prefixable = false, suffixible = false },
-    { value = "self-criticize", prefixable = false, suffixible = false, noun_form = "self-criticism" },
-    { value = "redistribution", prefixable = false, suffixible = false },
-    { value = "agitate", prefixable = false, suffixible = false, noun_form = "agitation" },
+    { value = "airstrike", suffixible = false },
+    { value = "self-criticize", suffixible = false, noun_form = "self-criticism" },
+    { value = "redistribution", suffixible = false },
+    { value = "agitate", suffixible = false, noun_form = "agitation" },
 ]
 
 _tfr_status_values = [
-    { value = "balkinize", prefixable = false, suffixible = false, noun_form = "balkinization" },
-    { value = "nationalize", prefixable = false, suffixible = false, noun_form = "nationalization" },
-    { value = "collectivize", prefixable = false, suffixible = false, noun_form = "collectivization" },
-    { value = "redistribute", prefixable = false, suffixible = false, noun_form = "redistribution" },
-    { value = "industrialize", prefixable = false, suffixible = false, noun_form = "industrialization" },
-    { value = "agitate", prefixable = false, suffixible = false, noun_form = "agitation" },
-    { value = "mobilize", prefixable = false, suffixible = false, noun_form = "mobilization" },
-    { value = "rectify", prefixable = false, suffixible = false, noun_form = "rectification" },
-    { value = "rally", prefixable = false, suffixible = false },
-    { value = "self-criticize", prefixable = false, suffixible = false, noun_form = "self-criticism" },
-    { value = "redistribute", prefixable = false, suffixible = false, noun_form = "redistribution" },
+    { value = "balkinize", suffixible = false, noun_form = "balkinization" },
+    { value = "nationalize", suffixible = false, noun_form = "nationalization" },
+    { value = "collectivize", suffixible = false, noun_form = "collectivization" },
+    { value = "redistribute", suffixible = false, noun_form = "redistribution" },
+    { value = "industrialize", suffixible = false, noun_form = "industrialization" },
+    { value = "agitate", suffixible = false, noun_form = "agitation" },
+    { value = "mobilize", suffixible = false, noun_form = "mobilization" },
+    { value = "rectify", suffixible = false, noun_form = "rectification" },
+    { value = "rally", suffixible = false },
+    { value = "self-criticize", suffixible = false, noun_form = "self-criticism" },
+    { value = "redistribute", suffixible = false, noun_form = "redistribution" },
 ]
 
 _tfr_defence_values = [
-    { value = "fortify", prefixable = false, suffixible = false, noun_form = "fortification" },
-    { value = "entrench", prefixable = false, suffixible = false, noun_form = "entrenchment" },
-    { value = "line", prefixable = false, suffixible = false },
+    { value = "fortify", suffixible = false, noun_form = "fortification" },
+    { value = "entrench", suffixible = false, noun_form = "entrenchment" },
+    { value = "line", suffixible = false },
 ]
 
 other = [
@@ -45,19 +45,19 @@ _suffix_values = [
 ]
 
 _noun_values = [
-    { value = "destiny", prefixable = false, suffixible = false },
-    { value = "struggle", prefixable = false, suffixible = false },
+    { value = "destiny", suffixible = false },
+    { value = "struggle", suffixible = false },
 ]
 
 _adj_values = [
-    { value = "popular", prefixable = false, suffixible = false },
-    { value = "people's", prefixable = false, suffixible = false },
-    { value = "vanguard", prefixable = false, suffixible = false },
-    { value = "national", prefixable = false, suffixible = false },
-    { value = "permanent", prefixable = false, suffixible = false },
-    { value = "left-wing", prefixable = false, suffixible = false },
-    { value = "right-wing", prefixable = false, suffixible = false },
-    { value = "centrist", prefixable = false, suffixible = false },
+    { value = "popular", suffixible = false },
+    { value = "people's", suffixible = false },
+    { value = "vanguard", suffixible = false },
+    { value = "national", suffixible = false },
+    { value = "permanent", suffixible = false },
+    { value = "left-wing", suffixible = false },
+    { value = "right-wing", suffixible = false },
+    { value = "centrist", suffixible = false },
 ]
 
 _tfr_movement_values = []

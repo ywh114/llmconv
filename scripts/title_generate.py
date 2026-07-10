@@ -130,7 +130,11 @@ def main() -> None:
         )
 
     grammar = title.build_grammar(
-        selected, args.parsed_slot_sources, primary, fallback,
+        selected,
+        args.parsed_slot_sources,
+        primary,
+        fallback,
+        cull_sources=False,
     )
 
     # Apply CLI slot modifiers to templates, e.g. --slot noun:plural turns
@@ -175,10 +179,11 @@ def main() -> None:
     print(f'Flavor: {label}\n')
     for i in range(args.final_count):
         tmpl, lvl = args.template if args.template else random.choice(templates)
+        use_grammar = title.cull_grammar(grammar)
         if args.verbose:
-            result, trace = title.expand_traced(tmpl, grammar)
+            result, trace = title.expand_traced(tmpl, use_grammar)
         else:
-            result = title.expand(tmpl, grammar)
+            result = title.expand(tmpl, use_grammar)
         print(f'  {result}')
         if args.verbose:
             print_verbose(tmpl, trace, level=lvl)

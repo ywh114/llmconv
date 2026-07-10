@@ -38,7 +38,7 @@ moderate = [
 
 complex = [
     "{adj_sup} {verb:noun} of {noun:plural}",
-    "{ordinal:>1,<6} {verb:noun}",
+    "{ordinal} {verb:noun}",
     "{verb:past} {noun}",
     "{verb:past} {verb}",
     "{noun:possessive} {verb:noun}",
@@ -55,7 +55,7 @@ insane = [
     "{adj_sup} {adj_sup} {verb:noun}",
     "{verb:gerund} {verb:gerund} {noun}",
     "{verb} of {verb:noun}",
-    "{ordinal:>1,<6} {adj_sup} {verb:noun}",
+    "{ordinal} {adj_sup} {verb:noun}",
     "{adj} {adj} {verb:noun} of {noun}",
     "{prefix+}{prefix+}{verb:noun}",
     "{noun:possessive} {verb:noun} of {noun:plural}",

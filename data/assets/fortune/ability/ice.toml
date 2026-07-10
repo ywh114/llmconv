@@ -2,8 +2,8 @@ category = "elemental"
 # Ice-elemental ability entries.
 
 _prefix_values = [
-    { value = "cryo", prefixable = false, suffixible = true },
-    { value = "hoar", prefixable = false, suffixible = false },
+    { value = "cryo", suffixible = true },
+    { value = "hoar", suffixible = false },
 ]
 
 _suffix_values = [
@@ -14,74 +14,74 @@ _suffix_values = [
 ]
 
 _domain_values = [
-    { value = "tundra", prefixable = false, suffixible = false },
-    { value = "mountain", prefixable = false, suffixible = false },
-    { value = "permafrost", prefixable = false, suffixible = false, plural = "permafrost" },
-    { value = "blizzard", prefixable = false, suffixible = false },
-    { value = "glacier", prefixable = false, suffixible = false },
-    { value = "avalanche", prefixable = false, suffixible = false },
-    { value = "hoarfrost", prefixable = false, suffixible = false, plural = "hoarfrost" },
-    { value = "frost", prefixable = false, suffixible = false, plural = "frost" },
-    { value = "shiver", prefixable = false, suffixible = true },
-    { value = "hail", prefixable = false, suffixible = true, plural = "hail" },
-    { value = "whiteout", prefixable = false, suffixible = false },
+    { value = "tundra", suffixible = false },
+    { value = "mountain", suffixible = false },
+    { value = "permafrost", suffixible = false, plural = "permafrost" },
+    { value = "blizzard", suffixible = false },
+    { value = "glacier", suffixible = false },
+    { value = "avalanche", suffixible = false },
+    { value = "hoarfrost", suffixible = false, plural = "hoarfrost" },
+    { value = "frost", suffixible = false, plural = "frost" },
+    { value = "shiver", suffixible = true },
+    { value = "hail", suffixible = true, plural = "hail" },
+    { value = "whiteout", suffixible = false },
 ]
 
 _ice_melee_values = [
-    { value = "shatter", prefixable = false, suffixible = false },
-    { value = "spear", prefixable = false, suffixible = false },
-    { value = "fracture", prefixable = false, suffixible = false },
-    { value = "shear", prefixable = false, suffixible = false },
+    { value = "shatter", suffixible = false },
+    { value = "spear", suffixible = false },
+    { value = "fracture", suffixible = false },
+    { value = "shear", suffixible = false },
 ]
 
 _ice_area_values = [
-    { value = "storm", prefixable = false, suffixible = false },
-    { value = "avalanche", prefixable = false, suffixible = false },
-    { value = "blizzard", prefixable = false, suffixible = false },
+    { value = "storm", suffixible = false },
+    { value = "avalanche", suffixible = false },
+    { value = "blizzard", suffixible = false },
 ]
 
 _ice_ranged_values = [
-    { value = "shard", prefixable = false, suffixible = false },
-    { value = "icicle", prefixable = false, suffixible = false },
-    { value = "spear", prefixable = false, suffixible = false },
+    { value = "shard", suffixible = false },
+    { value = "icicle", suffixible = false },
+    { value = "spear", suffixible = false },
 ]
 
 _ice_status_values = [
-    { value = "freeze", prefixable = false, suffixible = false },
-    { value = "preserve", prefixable = false, suffixible = false, noun_form = "preservation" },
-    { value = "encase", prefixable = false, suffixible = false, noun_form = "encasement" },
+    { value = "freeze", suffixible = false },
+    { value = "preserve", suffixible = false, noun_form = "preservation" },
+    { value = "encase", suffixible = false, noun_form = "encasement" },
 ]
 
 _ice_defence_values = [
-    { value = "hibernate", prefixable = false, suffixible = false, noun_form = "hibernation" },
-    { value = "still", prefixable = false, suffixible = false, noun_form = "stillness" },
+    { value = "hibernate", suffixible = false, noun_form = "hibernation" },
+    { value = "still", suffixible = false, noun_form = "stillness" },
 ]
 
 _ice_movement_values = [
-    { value = "creep", prefixable = false, suffixible = false, noun_form = "stillness" },
+    { value = "creep", suffixible = false, noun_form = "stillness" },
 ]
 
 other = [
 ]
 
 _noun_values = [
-    { value = "rime", prefixable = false, suffixible = false, plural = "rime" },
-    { value = "ice", prefixable = false, suffixible = false, plural = "ice" },
-    { value = "snow", prefixable = false, suffixible = false, plural = "ice" },
-    { value = "glacier", prefixable = false, suffixible = false },
-    { value = "blizzard", prefixable = false, suffixible = false },
-    { value = "permafrost", prefixable = false, suffixible = false },
-    { value = "whiteout", prefixable = false, suffixible = false },
+    { value = "rime", suffixible = false, plural = "rime" },
+    { value = "ice", suffixible = false, plural = "ice" },
+    { value = "snow", suffixible = false, plural = "ice" },
+    { value = "glacier", suffixible = false },
+    { value = "blizzard", suffixible = false },
+    { value = "permafrost", suffixible = false },
+    { value = "whiteout", suffixible = false },
 ]
 
 _adj_values = [
-    { value = "biting", prefixable = false, suffixible = false },
-    { value = "howling", prefixable = false, suffixible = false },
-    { value = "bitter", prefixable = false, suffixible = false },
-    { value = "frozen", prefixable = false, suffixible = false },
-    { value = "icy", prefixable = false, suffixible = false },
-    { value = "bleak", prefixable = false, suffixible = false },
-    { value = "white", prefixable = false, suffixible = false },
+    { value = "biting", suffixible = false },
+    { value = "howling", suffixible = false },
+    { value = "bitter", suffixible = false },
+    { value = "frozen", suffixible = false },
+    { value = "icy", suffixible = false },
+    { value = "bleak", suffixible = false },
+    { value = "white", suffixible = false },
 ]
 
 
