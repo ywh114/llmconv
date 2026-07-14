@@ -80,8 +80,14 @@ class StructuredDebugBridge:
         return {
             "scene": self.state.scene.id,
             "location": self.state.loc.name,
-            "here": [{"name": c.name, "title": c.title} for c in self.state.here_chars],
-            "away": [{"name": c.name, "title": c.title} for c in self.state.away_chars],
+            "here": [
+                {"name": c.name, "title": c.title, "current_sprite": c.current_sprite}
+                for c in self.state.here_chars
+            ],
+            "away": [
+                {"name": c.name, "title": c.title, "current_sprite": c.current_sprite}
+                for c in self.state.away_chars
+            ],
             "context_length": len(self.state.ctx.context),
             "last_speaker": (
                 self.state.decision.next_char.name
@@ -110,12 +116,18 @@ class StructuredDebugBridge:
             "hidden": player.hidden,
             "visible_to": list(player.visible_to),
             "importance": player.importance.name,
+            "current_sprite": player.current_sprite,
         }
 
     def _cmd_here(self, args: list[str]) -> dict[str, Any]:
         return {
             "characters": [
-                {"name": c.name, "title": c.title, "importance": c.importance.name}
+                {
+                    "name": c.name,
+                    "title": c.title,
+                    "importance": c.importance.name,
+                    "current_sprite": c.current_sprite,
+                }
                 for c in sorted(self.state.here_chars, key=lambda x: x.name)
             ]
         }
@@ -123,7 +135,12 @@ class StructuredDebugBridge:
     def _cmd_away(self, args: list[str]) -> dict[str, Any]:
         return {
             "characters": [
-                {"name": c.name, "title": c.title, "importance": c.importance.name}
+                {
+                    "name": c.name,
+                    "title": c.title,
+                    "importance": c.importance.name,
+                    "current_sprite": c.current_sprite,
+                }
                 for c in sorted(self.state.away_chars, key=lambda x: x.name)
             ]
         }
@@ -202,6 +219,7 @@ class StructuredDebugBridge:
         return {
             "character": name,
             "title": char.title,
+            "current_sprite": char.current_sprite,
             "status": dict(char.status) if char.status else None,
         }
 

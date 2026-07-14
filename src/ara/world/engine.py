@@ -179,6 +179,7 @@ class EngineStepResult:
         *needs_player_input*).
     :ivar enter: Names of characters that entered this turn.
     :ivar exit: Names of characters that exited this turn.
+    :ivar spawn: Names of anonymous characters spawned this turn.
     :ivar sprite_changes: Mapping of character names → new sprite names applied
         this turn.
     :ivar switch_background: Background stem activated for the current location,
@@ -197,6 +198,7 @@ class EngineStepResult:
     speaker_title: str = ""
     enter: list[str] = field(default_factory=list)
     exit: list[str] = field(default_factory=list)
+    spawn: list[str] = field(default_factory=list)
     sprite_changes: dict[str, str] = field(default_factory=dict)
     switch_background: str = ""
     system_changes: dict[str, Any] = field(default_factory=dict)
@@ -1327,6 +1329,7 @@ class Engine:
 
         # Apply anonymous character spawns from the orchestrator decision.
         spawned_canonical: list[str] = []
+        spawned_here: set[Character] = set()
         existing_canonical = {c.canonical_name for c in scene.character_pool}
         for spawn in decision.spawn_anonymous:
             name = spawn.get("name", "")
@@ -1347,6 +1350,7 @@ class Engine:
             )
             scene.character_pool.add(new_char)
             here_chars.add(new_char)
+            spawned_here.add(new_char)
             ctx.add_entities(new_char.canonical_name)
             spawned_canonical.append(new_char.canonical_name)
             existing_canonical.add(new_char.canonical_name)
@@ -1388,6 +1392,7 @@ class Engine:
                 speaker_title=decision.next_char.title,
                 enter=[c.canonical_name for c in decision.entering_chars],
                 exit=[c.canonical_name for c in decision.exiting_chars],
+                spawn=spawned_canonical,
                 sprite_changes=sprite_changes,
                 switch_background=switch_background,
                 system_changes=decision.system_changes,
@@ -1491,6 +1496,7 @@ class Engine:
                 speaker_title=decision.next_char.title,
                 enter=enter_names,
                 exit=exit_names,
+                spawn=spawned_canonical,
                 sprite_changes=sprite_changes,
                 switch_background=switch_background,
                 system_changes=decision.system_changes,
@@ -1526,6 +1532,7 @@ class Engine:
             speaker_title=decision.next_char.title,
             enter=enter_names,
             exit=exit_names,
+            spawn=spawned_canonical,
             sprite_changes=sprite_changes,
             switch_background=switch_background,
             system_changes=decision.system_changes,

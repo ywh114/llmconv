@@ -28,16 +28,12 @@ adj_sup = [
 noun = [
     { value = "person", plural = "people" },
     { value = "man" },
-    { value = "thing" },
-    { value = "stuff", plural = "stuff" },
-    { value = "matter" },
 ]
 entity = [
     { value = "Me", possessive = "My" },
 ]
 class = [
     { value = "worker" },
-    { value = "maker" },
     { value = "user" },
 ]
 
@@ -47,16 +43,6 @@ patterns = [
     "{prefix}{prefix}",
     "{prefix}{prefix}{prefix}",
 ]
-
-[[place]]
-value = "whole world"
-article = "the"
-proper_noun = false
-
-[[place]]
-value = "land"
-article = "the"
-proper_noun = false
 
 [[place]]
 value = "area"

@@ -469,6 +469,7 @@ class SaveManager:
             "story_history": story_history_docs,
             "orchestrator_wiki": wiki_docs,
             "queue": queue if queue is not None else [],
+            "archived_scene_snapshots": list(story._archived_scene_snapshots),
         }
         return snapshot
 
@@ -541,6 +542,7 @@ class SaveManager:
         story._current_scene = None
         story._state = "idle"
         story.engine._running = False
+        story._archived_scene_snapshots = list(data.get("archived_scene_snapshots", []))
 
         # Set story state before loading scene
         saved_history = list(data.get("scene_history", []))

@@ -56,16 +56,20 @@ html, body {
   --sprite-translate-x: -50%;
   left: calc(var(--slot-left) * 1%);
   top: calc(var(--slot-top) * 1%);
-  height: calc(var(--vn-sprite-height) * var(--slot-scale));
-  width: auto;
-  object-fit: contain;
   transform: translate(var(--sprite-translate-x), calc(-100% + 3vh));
   transition: opacity var(--vn-fade-duration) ease-in-out,
               transform var(--vn-slide-duration) ease-out,
               left var(--vn-slide-duration) ease-out,
-              top var(--vn-slide-duration) ease-out,
-              height var(--vn-slide-duration) ease-out;
+              top var(--vn-slide-duration) ease-out;
   filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));
+  pointer-events: none;
+}
+
+.vn-sprite > img {
+  display: block;
+  height: calc(var(--vn-sprite-height) * var(--slot-scale));
+  width: auto;
+  object-fit: contain;
 }
 
 .vn-sprite.vn-hidden {
@@ -77,6 +81,33 @@ html, body {
   filter: drop-shadow(0 0 16px var(--vn-border-glow))
           drop-shadow(0 4px 12px rgba(0,0,0,0.4));
   transform: translate(var(--sprite-translate-x), calc(-100% - 8px + 3vh));
+}
+
+/* -------------------------------------------------------------------
+   Nametag above a sprite
+   ------------------------------------------------------------------- */
+.vn-nametag {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 0.4rem;
+  padding: 0.2rem 0.6rem;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid var(--vn-gold-dark);
+  border-radius: 4px;
+  color: var(--vn-text);
+  font-family: var(--vn-font-display);
+  font-size: 0.8rem;
+  white-space: nowrap;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+  pointer-events: none;
+  opacity: 0.85;
+  transition: opacity var(--vn-fade-duration) ease-in-out;
+}
+
+.vn-hidden .vn-nametag {
+  opacity: 0;
 }
 
 /* -------------------------------------------------------------------
@@ -164,6 +195,110 @@ html, body {
 }
 
 /* -------------------------------------------------------------------
+   Hamburger menu (mobile-first feature access)
+   ------------------------------------------------------------------- */
+#vn-menu-btn,
+#vn-eye-btn {
+  position: absolute;
+  left: 0.75rem;
+  z-index: 100;
+  width: 2.5rem;
+  height: 2.5rem;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--vn-gold-dark);
+  border-radius: 6px;
+  color: var(--vn-text);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  transition: background 0.2s ease, opacity 0.2s ease;
+}
+
+#vn-menu-btn {
+  top: 0.75rem;
+}
+
+#vn-eye-btn {
+  top: 3.5rem;
+}
+
+#vn-menu-btn:hover,
+#vn-eye-btn:hover {
+  background: rgba(0, 0, 0, 0.75);
+}
+
+#vn-eye-btn.vn-mode-hidden {
+  opacity: 0.4;
+}
+
+body.vn-hide-nametags .vn-nametag {
+  display: none;
+}
+
+#vn-menu {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: min(75vw, 280px);
+  z-index: 110;
+  background: var(--vn-bg-overlay);
+  border-right: 2px solid var(--vn-gold-dark);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transform: translateX(-100%);
+  transition: transform 0.25s ease-out;
+  backdrop-filter: blur(6px);
+}
+
+#vn-menu.vn-visible {
+  transform: translateX(0);
+}
+
+#vn-menu-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  font-family: var(--vn-font-display);
+  font-size: 1.25rem;
+  color: var(--vn-gold);
+}
+
+#vn-menu-close {
+  background: none;
+  border: none;
+  color: var(--vn-text);
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 0.25rem;
+}
+
+.vn-menu-item {
+  width: 100%;
+  text-align: left;
+  padding: 0.75rem 1rem;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--vn-gold-dark);
+  border-radius: 6px;
+  color: var(--vn-text);
+  font-family: var(--vn-font-body);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.vn-menu-item:hover {
+  background: rgba(0, 0, 0, 0.5);
+  border-color: var(--vn-gold);
+}
+
+/* -------------------------------------------------------------------
    Dialogue box
    ------------------------------------------------------------------- */
 #vn-dialogue {
@@ -182,6 +317,30 @@ html, body {
     0 0 0 1px rgba(0,0,0,0.3),
     0 8px 32px rgba(0,0,0,0.5),
     inset 0 0 20px var(--vn-border-glow);
+  backdrop-filter: blur(4px);
+  transition: transform 0.25s ease-out, opacity 0.25s ease-out;
+}
+
+#vn-dialogue.vn-collapsed {
+  transform: translateX(-50%) translateY(120%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+#vn-collapse-btn {
+  position: absolute;
+  top: -1.5rem;
+  right: 0.5rem;
+  width: 2rem;
+  height: 1.5rem;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--vn-gold-dark);
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+  color: var(--vn-text);
+  font-size: 0.8rem;
+  line-height: 1;
+  cursor: pointer;
   backdrop-filter: blur(4px);
 }
 
@@ -380,6 +539,7 @@ html, body {
   z-index: 30;
   display: none;
   flex-direction: column;
+  align-items: center;
   background: rgba(10, 10, 20, 0.95);
   padding: 2rem 3rem;
   overflow-y: auto;
@@ -389,13 +549,8 @@ html, body {
   display: flex;
 }
 
-#vn-history h2 {
-  font-family: var(--vn-font-display);
-  color: var(--vn-gold);
+#vn-history .vn-panel-header {
   margin-bottom: 1.5rem;
-  text-align: center;
-  font-weight: normal;
-  letter-spacing: 2px;
 }
 
 .vn-history-entry {
@@ -470,19 +625,14 @@ html, body {
   display: none;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   background: rgba(10, 10, 20, 0.92);
+  padding: 2rem;
+  overflow-y: auto;
 }
 
 #vn-settings.vn-visible {
   display: flex;
-}
-
-#vn-settings h2 {
-  font-family: var(--vn-font-display);
-  color: var(--vn-gold);
-  margin-bottom: 2rem;
-  letter-spacing: 2px;
 }
 
 .vn-setting-row {
@@ -513,19 +663,14 @@ html, body {
   display: none;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   background: rgba(10, 10, 20, 0.92);
+  padding: 2rem;
+  overflow-y: auto;
 }
 
 #vn-keybinds.vn-visible {
   display: flex;
-}
-
-#vn-keybinds h2 {
-  font-family: var(--vn-font-display);
-  color: var(--vn-gold);
-  margin-bottom: 2rem;
-  letter-spacing: 2px;
 }
 
 .vn-keybind-row {
@@ -573,13 +718,6 @@ html, body {
 
 #vn-system.vn-visible {
   display: flex;
-}
-
-#vn-system h2 {
-  font-family: var(--vn-font-display);
-  color: var(--vn-gold);
-  margin-bottom: 1.5rem;
-  letter-spacing: 2px;
 }
 
 #vn-system-content {
@@ -773,6 +911,39 @@ html, body {
 }
 
 /* -------------------------------------------------------------------
+   Panel headers & close buttons
+   ------------------------------------------------------------------- */
+.vn-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 800px;
+  margin-bottom: 1rem;
+}
+
+.vn-panel-header h2 {
+  font-family: var(--vn-font-title);
+  color: var(--vn-gold);
+  margin: 0;
+}
+
+.vn-panel-close {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--vn-gold-dark);
+  border-radius: 4px;
+  color: var(--vn-text);
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0.35rem 0.6rem;
+  cursor: pointer;
+}
+
+.vn-panel-close:hover {
+  border-color: var(--vn-gold);
+}
+
+/* -------------------------------------------------------------------
    Save/Load panel
    ------------------------------------------------------------------- */
 #vn-saveload {
@@ -782,15 +953,16 @@ html, body {
   display: none;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   background: var(--vn-bg-overlay);
   backdrop-filter: blur(8px);
   padding: 2rem;
+  overflow-y: auto;
 }
 #vn-saveload.vn-visible {
   display: flex;
 }
-#vn-saveload h2 {
+#vn-saveload > h2 {
   font-family: var(--vn-font-title);
   color: var(--vn-gold);
   margin-bottom: 1rem;
@@ -806,10 +978,10 @@ html, body {
   background: var(--vn-bg-panel);
   border: 1px solid var(--vn-gold-dark);
   border-radius: 6px;
-  padding: 1rem;
+  padding: 1.25rem;
   cursor: default;
   transition: transform 0.15s ease, border-color 0.15s ease;
-  min-height: 120px;
+  min-height: 150px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -873,18 +1045,14 @@ html, body {
   display: none;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   background: var(--vn-bg-overlay);
   backdrop-filter: blur(8px);
   padding: 2rem;
+  overflow-y: auto;
 }
 #vn-debug.vn-visible {
   display: flex;
-}
-#vn-debug h2 {
-  font-family: var(--vn-font-title);
-  color: var(--vn-gold);
-  margin-bottom: 1rem;
 }
 .vn-debug-row {
   display: flex;
@@ -1014,4 +1182,165 @@ html, body {
 @keyframes vn-pulse {
   0%, 100% { opacity: 0.5; }
   50% { opacity: 1; }
+}
+
+/* ===================================================================
+   Mobile / small-screen responsive layout
+   =================================================================== */
+
+@media (max-width: 768px) {
+  :root {
+    --vn-font-size-dialogue: 1.05rem;
+    --vn-font-size-name: 1rem;
+    --vn-font-size-choice: 1rem;
+    --vn-dialogue-padding: 1rem;
+    --vn-dialogue-max-width: 100%;
+    --vn-choice-max-width: 100%;
+    --vn-sprite-height: 42vh;
+  }
+
+  /* Keep sprites in the upper vertical space so they are not hidden behind the
+     enlarged mobile dialogue box. The dialogue sits in the bottom ~22vh. */
+  #vn-sprites {
+    inset: auto;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 22vh;
+  }
+
+  #vn-dialogue {
+    bottom: 0.5rem;
+    left: 0.5rem;
+    right: 0.5rem;
+    transform: none;
+    width: auto;
+    border-radius: 8px;
+    padding: 1rem;
+  }
+
+  #vn-text {
+    max-height: calc(4 * var(--vn-line-height) * var(--vn-font-size-dialogue));
+  }
+
+  #vn-controls {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.35rem;
+  }
+
+  .vn-control-btn {
+    font-size: 0.9rem;
+    padding: 0.35rem 0.6rem;
+    flex: 1 1 auto;
+    min-width: 3.5rem;
+  }
+
+  #vn-keybinds-hint {
+    display: none;
+  }
+
+  #vn-title h1 {
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .vn-title-btn {
+    width: min(80%, 260px);
+    margin: 0.4rem 0;
+    padding: 0.7rem 1rem;
+    font-size: 1rem;
+  }
+
+  .vn-choice {
+    margin: 0.35rem 0.75rem;
+    padding: 0.85rem 1rem;
+  }
+
+  .vn-custom-input-row {
+    flex-direction: column;
+    padding: 0 0.75rem;
+  }
+
+  .vn-custom-send {
+    width: 100%;
+  }
+
+  .vn-attempt-input {
+    margin: 0.5rem 0.75rem 0;
+  }
+
+  #vn-history {
+    padding: 1rem;
+  }
+
+  #vn-history h2 {
+    margin-bottom: 1rem;
+  }
+
+  .vn-history-entry {
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.75rem;
+  }
+
+  #vn-system {
+    padding: 1rem;
+  }
+
+  #vn-system-content {
+    max-width: 100%;
+  }
+
+  .vn-setting-row,
+  .vn-keybind-row {
+    width: min(90%, 360px);
+  }
+
+  #vn-saveload {
+    padding: 1rem;
+  }
+
+  #vn-saveload-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .vn-saveload-cell {
+    min-height: 130px;
+    padding: 1rem;
+  }
+
+  #vn-debug {
+    padding: 1rem;
+  }
+
+  .vn-debug-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.35rem;
+  }
+
+  .vn-debug-row input,
+  .vn-debug-row button {
+    width: 100%;
+  }
+
+  #vn-keybinds-hint {
+    display: none;
+  }
+
+  #vn-transition .vn-transition-scene {
+    font-size: 1.75rem;
+  }
+}
+
+@media (max-width: 360px) {
+  :root {
+    --vn-font-size-dialogue: 0.95rem;
+    --vn-sprite-height: 38vh;
+  }
+
+  #vn-saveload-grid {
+    grid-template-columns: 1fr;
+  }
 }

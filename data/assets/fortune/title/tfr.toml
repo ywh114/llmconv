@@ -12,7 +12,7 @@ adj_sup = [
     { value = "most reactionary", prefixable = false, suffixible = false },
     { value = "weakest" },
 ]
-far_right = [
+_far_right_values = [
     { value = "wahhabism" },
     { value = "classical fascism", sticky = false, prefixable = false, suffixible = false },
     { value = "clerical fascism", sticky = false, prefixable = false, suffixible = false },
@@ -48,7 +48,7 @@ _adj_far_right = [
     { value = "neo-nazi", sticky = false },
     { value = "obliteration of the self", prefixable = false, suffixible = false },
 ]
-left = [
+_left_values = [
     { value = "chekist communism", prefixable = false, suffixible = false },
     { value = "jacobinism" },
     { value = "juche" },
@@ -131,7 +131,7 @@ _adj_left = [
     { value = "patriotic socialist", sticky = false, prefixable = false, suffixible = false },
     { value = "pragmatic socialist", sticky = false, prefixable = false, suffixible = false },
 ]
-centre = [
+_centre_values = [
     { value = "centrism" },
     { value = "centrist pluralism", sticky = false, prefixable = false, suffixible = false },
     { value = "christian democracy", sticky = false, prefixable = false, suffixible = false },
@@ -159,7 +159,7 @@ _adj_centre = [
     { value = "democratic populist", sticky = false, prefixable = false, suffixible = false },
     { value = "right-centrist", sticky = false },
 ]
-libertarian = [
+_libertarian_values = [
     { value = "right anarchism", sticky = false, prefixable = false, suffixible = false },
     { value = "right libertarianism", sticky = false, prefixable = false, suffixible = false },
     { value = "trumpism (libertarian)", sticky = false, prefixable = false, suffixible = false },
@@ -169,7 +169,7 @@ _adj_libertarian = [
     { value = "right libertarianist", sticky = false, prefixable = false, suffixible = false },
     { value = "trumpism (libertarian)", sticky = false, prefixable = false, suffixible = false },
 ]
-right = [
+_right_values = [
     { value = "neo-soviet putinism", sticky = false, prefixable = false, suffixible = false },
     { value = "liberal putinism", sticky = false, prefixable = false, suffixible = false },
     { value = "bleeding heart putinism", sticky = false, prefixable = false, suffixible = false },
@@ -209,7 +209,7 @@ _adj_right = [
     { value = "naturalized derzhavist", prefixable = false, suffixible = false },
     { value = "revivalist derzhavist", prefixable = false, suffixible = false },
 ]
-auth = [
+_auth_values = [
     { value = "transhumanism" },
     { value = "popular derzhavism", prefixable = false, suffixible = false },
     { value = "alexander lukashenko thought", prefixable = false, suffixible = false },
@@ -309,6 +309,56 @@ _adj_auth = [
     { value = "strasserist" },
 ]
 
+[[far_right]]
+patterns = [
+    "{_far_right_values}",
+]
+[[left]]
+patterns = [
+    "{_left_values}",
+]
+[[centre]]
+patterns = [
+    "{_centre_values}",
+]
+[[libertarian]]
+patterns = [
+    "{_libertarian_values}",
+]
+[[right]]
+patterns = [
+    "{_right_values}",
+]
+[[auth]]
+patterns = [
+    "{_auth_values}",
+]
+
+[[adj_far_right]]
+patterns = [
+    "{_adj_far_right}",
+]
+[[adj_left]]
+patterns = [
+    "{_adj_left}",
+]
+[[adj_centre]]
+patterns = [
+    "{_adj_centre}",
+]
+[[adj_libertarian]]
+patterns = [
+    "{_adj_libertarian}",
+]
+[[adj_right]]
+patterns = [
+    "{_adj_right}",
+]
+[[adj_auth]]
+patterns = [
+    "{_adj_auth}",
+]
+
 [[expose]]
 slot = "adj_sup"
 from = [
@@ -318,12 +368,12 @@ from = [
 [[expose]]
 slot = "adj"
 from = [
-    "_adj_far_right",
-    "_adj_left",
-    "_adj_centre",
-    "_adj_libertarian",
-    "_adj_right",
-    "_adj_auth",
+    "adj_far_right",
+    "adj_left",
+    "adj_centre",
+    "adj_libertarian",
+    "adj_right",
+    "adj_auth",
 ]
 
 [[expose]]

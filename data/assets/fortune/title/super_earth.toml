@@ -52,8 +52,6 @@ patterns = [
 
 [[place]]
 value = "super earth"
-takes_of = true
-takes_in = false
 article = ""
 proper_noun = true
 prefixable = false
@@ -61,8 +59,6 @@ suffixible = false
 
 [[place]]
 value = "terminid front"
-takes_of = true
-takes_in = false
 article = "the"
 proper_noun = false
 prefixable = false
@@ -70,8 +66,6 @@ suffixible = false
 
 [[place]]
 value = "automaton sector"
-takes_of = true
-takes_in = false
 article = "the"
 proper_noun = false
 prefixable = false

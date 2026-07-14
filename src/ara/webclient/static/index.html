@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ara — Visual Novel</title>
-  <link rel="stylesheet" href="/static/css/style.css?v=28">
+  <link rel="stylesheet" href="/static/css/style.css?v=37">
 </head>
 <body>
 
@@ -14,8 +14,27 @@
   <!-- Character sprites -->
   <div id="vn-sprites"></div>
 
+  <!-- Hamburger menu (mobile-first access to all features) -->
+  <button id="vn-menu-btn" aria-label="Menu">☰</button>
+  <button id="vn-eye-btn" aria-label="Toggle nametags" title="Toggle nametags">👁</button>
+  <div id="vn-menu">
+    <div id="vn-menu-header">
+      <span>Menu</span>
+      <button id="vn-menu-close" aria-label="Close">✕</button>
+    </div>
+    <button class="vn-menu-item" data-action="save">Quick Save</button>
+    <button class="vn-menu-item" data-action="load">Load</button>
+    <button class="vn-menu-item" data-action="history">History</button>
+    <button class="vn-menu-item" data-action="auto">Auto</button>
+    <button class="vn-menu-item" data-action="system">System</button>
+    <button class="vn-menu-item" data-action="settings">Settings</button>
+    <button class="vn-menu-item" data-action="keybinds">Keybinds</button>
+    <button class="vn-menu-item" data-action="debug">Debug</button>
+  </div>
+
   <!-- Dialogue box -->
   <div id="vn-dialogue">
+    <button id="vn-collapse-btn" aria-label="Collapse dialogue">▼</button>
     <div id="vn-name"></div>
     <div id="vn-speaker-title"></div>
     <div id="vn-text"><span class="vn-cursor"></span></div>
@@ -33,13 +52,19 @@
 
   <!-- History / backlog -->
   <div id="vn-history">
-    <h2>History</h2>
+    <div class="vn-panel-header">
+      <h2>History</h2>
+      <button class="vn-panel-close" data-close="vn-history" aria-label="Close">✕</button>
+    </div>
     <div id="vn-history-list"></div>
   </div>
 
   <!-- Keybinds reference -->
   <div id="vn-keybinds">
-    <h2>Keybinds</h2>
+    <div class="vn-panel-header">
+      <h2>Keybinds</h2>
+      <button class="vn-panel-close" data-close="vn-keybinds" aria-label="Close">✕</button>
+    </div>
     <div class="vn-keybind-row"><span class="vn-key">Space</span><span>Advance / skip typing</span></div>
     <div class="vn-keybind-row"><span class="vn-key">H</span><span>Toggle history</span></div>
     <div class="vn-keybind-row"><span class="vn-key">S</span><span>Toggle settings</span></div>
@@ -55,14 +80,20 @@
 
   <!-- System / player status overlay -->
   <div id="vn-system">
-    <h2>System</h2>
+    <div class="vn-panel-header">
+      <h2>System</h2>
+      <button class="vn-panel-close" data-close="vn-system" aria-label="Close">✕</button>
+    </div>
     <div id="vn-system-content"></div>
     <button class="vn-title-btn" id="btn-system-close">Close</button>
   </div>
 
   <!-- Settings panel -->
   <div id="vn-settings">
-    <h2>Settings</h2>
+    <div class="vn-panel-header">
+      <h2>Settings</h2>
+      <button class="vn-panel-close" data-close="vn-settings" aria-label="Close">✕</button>
+    </div>
     <div class="vn-setting-row">
       <label>Text Speed</label>
       <input type="range" id="setting-text-speed" min="5" max="100" value="30">
@@ -96,14 +127,20 @@
 
   <!-- Save/Load panel -->
   <div id="vn-saveload">
-    <h2 id="vn-saveload-title">Saves</h2>
+    <div class="vn-panel-header">
+      <h2 id="vn-saveload-title">Saves</h2>
+      <button class="vn-panel-close" data-close="vn-saveload" aria-label="Close">✕</button>
+    </div>
     <div id="vn-saveload-grid"></div>
     <button class="vn-title-btn" id="btn-saveload-close">Close</button>
   </div>
 
   <!-- Debug panel -->
   <div id="vn-debug">
-    <h2>Debug</h2>
+    <div class="vn-panel-header">
+      <h2>Debug</h2>
+      <button class="vn-panel-close" data-close="vn-debug" aria-label="Close">✕</button>
+    </div>
     <div class="vn-debug-row">
       <input type="text" id="vn-debug-cmd" placeholder="command">
       <input type="text" id="vn-debug-args" placeholder="args (space separated)">
@@ -122,7 +159,7 @@
   <!-- Keybinds hint (visible during gameplay) -->
   <div id="vn-keybinds-hint">[k: keybinds]</div>
 
-  <script src="/static/js/vn.js?v=28"></script>
-  <script src="/static/js/ui.js?v=28"></script>
+  <script src="/static/js/vn.js?v=37"></script>
+  <script src="/static/js/ui.js?v=37"></script>
 </body>
 </html>

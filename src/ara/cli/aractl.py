@@ -550,6 +550,13 @@ def cmd_debug(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_status(args: argparse.Namespace) -> int:
+    client = _get_client(args)
+    result = client.debug("status", args=[args.name])
+    _print(result, args)
+    return 0
+
+
 def cmd_save(args: argparse.Namespace) -> int:
     client = _get_client(args)
     result = client.save(slot=args.slot)
@@ -686,6 +693,9 @@ def main(argv: list[str] | None = None) -> int:
     debug_parser.add_argument("command", help="Debug command name")
     debug_parser.add_argument("args", nargs="*", help="Command arguments")
 
+    status_parser = sub.add_parser("status", help="Show a character's status (alias for debug status)")
+    status_parser.add_argument("name", help="Character name")
+
     save_parser = sub.add_parser("save", help="Save current state to a slot")
     save_parser.add_argument("slot", type=int, default=1, nargs="?", help="Slot number (1-99)")
 
@@ -726,6 +736,7 @@ def main(argv: list[str] | None = None) -> int:
         "reply": cmd_reply,
         "attempt": cmd_attempt,
         "debug": cmd_debug,
+        "status": cmd_status,
         "save": cmd_save,
         "load": cmd_load,
         "saves": cmd_saves,

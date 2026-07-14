@@ -254,12 +254,18 @@
   // Save/Load panel
   // -------------------------------------------------------------------
 
+  function getSelectedStoryId() {
+    const picker = document.getElementById('vn-story-picker');
+    return picker ? picker.value : null;
+  }
+
   async function openSaveload() {
     $saveload.classList.add('vn-visible');
     const onTitle = !$title.classList.contains('vn-hidden');
+    const storyId = onTitle ? getSelectedStoryId() : null;
     $saveloadGrid.innerHTML = '<div style="color:var(--vn-gold)">Loading…</div>';
     try {
-      const data = await window.VN.listSaves();
+      const data = await window.VN.listSaves(storyId);
       const saves = data.saves || [];
       const saveMap = new Map(saves.map(s => [s.slot, s]));
       $saveloadGrid.innerHTML = '';
@@ -299,7 +305,7 @@
             e.stopPropagation();
             $saveload.classList.remove('vn-visible');
             $title.classList.add('vn-hidden');
-            window.VN.load(slot).catch(err => {
+            window.VN.load(slot, storyId).catch(err => {
               alert('Load failed: ' + err.message);
             });
           };
@@ -313,7 +319,7 @@
           btnDelete.onclick = (e) => {
             e.stopPropagation();
             if (confirm(`Delete save slot ${slot}?`)) {
-              window.VN.delete(slot).then(() => openSaveload()).catch(err => {
+              window.VN.delete(slot, storyId).then(() => openSaveload()).catch(err => {
                 alert('Delete failed: ' + err.message);
               });
             }
@@ -400,12 +406,35 @@
   });
 
   // -------------------------------------------------------------------
-  // History overlay — click outside to close
+  // Panel close helpers (mobile-friendly: buttons + tap outside)
   // -------------------------------------------------------------------
-  $history.addEventListener('click', (e) => {
-    if (e.target === $history) {
-      $history.classList.remove('vn-visible');
-    }
+  function closeAllPanels() {
+    $history.classList.remove('vn-visible');
+    $keybinds.classList.remove('vn-visible');
+    $saveload.classList.remove('vn-visible');
+    $debug.classList.remove('vn-visible');
+    $settings.classList.remove('vn-visible');
+    $system.classList.remove('vn-visible');
+  }
+
+  document.querySelectorAll('.vn-panel-close').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = btn.dataset.close;
+      const panel = document.getElementById(id);
+      if (panel) panel.classList.remove('vn-visible');
+    });
+  });
+
+  const panelIds = ['vn-history', 'vn-keybinds', 'vn-saveload', 'vn-debug', 'vn-settings', 'vn-system'];
+  panelIds.forEach(id => {
+    const panel = document.getElementById(id);
+    if (!panel) return;
+    panel.addEventListener('click', (e) => {
+      if (e.target === panel) {
+        panel.classList.remove('vn-visible');
+      }
+    });
   });
 
   // -------------------------------------------------------------------
@@ -514,6 +543,92 @@
           $settings.classList.add('vn-visible');
           break;
       }
+    });
+  }
+
+  // -------------------------------------------------------------------
+  // Hamburger menu (mobile-first feature access)
+  // -------------------------------------------------------------------
+  const $menuBtn = document.getElementById('vn-menu-btn');
+  const $menu = document.getElementById('vn-menu');
+  const $menuClose = document.getElementById('vn-menu-close');
+
+  function openMenu() {
+    if ($menu) $menu.classList.add('vn-visible');
+  }
+  function closeMenu() {
+    if ($menu) $menu.classList.remove('vn-visible');
+  }
+
+  if ($menuBtn && $menu) {
+    $menuBtn.addEventListener('click', openMenu);
+    $menuClose.addEventListener('click', closeMenu);
+
+    $menu.addEventListener('click', (e) => {
+      const item = e.target.closest('.vn-menu-item');
+      if (!item) return;
+      const action = item.dataset.action;
+      closeMenu();
+      switch (action) {
+        case 'save':
+          window.VN.save(1).catch(err => alert('Save failed: ' + err.message));
+          break;
+        case 'load':
+          openSaveload();
+          break;
+        case 'history':
+          window.VN.toggleHistory();
+          break;
+        case 'auto': {
+          const on = window.VN.toggleAuto();
+          const autoBtn = $controls && $controls.querySelector('[data-action="auto"]');
+          if (autoBtn) autoBtn.classList.toggle('active', on);
+          break;
+        }
+        case 'system':
+          $system.classList.add('vn-visible');
+          renderSystem();
+          break;
+        case 'settings':
+          $settings.classList.add('vn-visible');
+          break;
+        case 'keybinds':
+          $keybinds.classList.add('vn-visible');
+          break;
+        case 'debug':
+          $debug.classList.add('vn-visible');
+          break;
+      }
+    });
+
+    // Close menu when Escape is pressed or another overlay opens.
+    document.addEventListener('keydown', (e) => {
+      if (e.code === 'Escape') closeMenu();
+    });
+  }
+
+  // -------------------------------------------------------------------
+  // Eye button: toggle nametag visibility
+  // -------------------------------------------------------------------
+  const $eyeBtn = document.getElementById('vn-eye-btn');
+  if ($eyeBtn) {
+    let eyeMode = 0; // 0 = show nametags, 1 = hide nametags
+    $eyeBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      eyeMode = eyeMode === 0 ? 1 : 0;
+      $eyeBtn.classList.toggle('vn-mode-hidden', eyeMode === 1);
+      window.VN.setVisibilityMode(eyeMode);
+    });
+  }
+
+  // -------------------------------------------------------------------
+  // Dialogue collapse / restore
+  // -------------------------------------------------------------------
+  const $collapseBtn = document.getElementById('vn-collapse-btn');
+  if ($collapseBtn) {
+    $collapseBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      window.VN.collapseDialogue();
     });
   }
 })();

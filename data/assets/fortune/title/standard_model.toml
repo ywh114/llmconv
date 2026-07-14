@@ -20,7 +20,7 @@ boson = [
 
 quark = [
     { value = "quark" },
-    { value = "up quark", sticky = false },
+    { value = "Up quark", sticky = false },
     { value = "down quark", sticky = false },
     { value = "charm quark", sticky = false },
     { value = "strange quark", sticky = false },

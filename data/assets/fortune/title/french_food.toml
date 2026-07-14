@@ -24,7 +24,7 @@ adj_sup = [
     { value = "le petit" },
 ]
 noun = [
-    { value = "chef" },
+    { value = "chef", plural = "chefs" },
     { value = "cuisinier" },
     { value = "patissier" },
     { value = "baguette" },

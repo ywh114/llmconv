@@ -12,6 +12,7 @@
      ------------------------------------------------------------------ */
   const $bg = document.getElementById('vn-background');
   const $sprites = document.getElementById('vn-sprites');
+  const $dialogue = document.getElementById('vn-dialogue');
   const $name = document.getElementById('vn-name');
   const $title = document.getElementById('vn-speaker-title');
 
@@ -191,14 +192,71 @@
     return slots;
   }
 
+  function isMobileViewport() {
+    return window.innerWidth <= 768;
+  }
+
   function getSlots(count) {
     if (count <= 0) return [];
+    const mobile = isMobileViewport();
+
     if (count <= 4) {
+      // On mobile, raise sprites into the dedicated upper sprite area so they
+      // use vertical space instead of piling up behind the dialogue box.
+      if (mobile) {
+        if (count === 1) return [{ left: 50, top: 82, scale: 0.78 }];
+        if (count === 2) return [
+          { left: 25, top: 82, scale: 0.68 },
+          { left: 75, top: 82, scale: 0.68 },
+        ];
+        if (count === 3) {
+          // 3 characters fit side-by-side on mobile when scaled down.
+          return distribute(3, 86, 82, 0.55);
+        }
+        // 4 characters: a compact 2x2 grid.
+        return [
+          { left: 25, top: 86, scale: 0.52 },
+          { left: 75, top: 86, scale: 0.52 },
+          { left: 25, top: 58, scale: 0.52 },
+          { left: 75, top: 58, scale: 0.52 },
+        ];
+      }
+      // Improved desktop layouts for small casts; 4+ keeps the original spread.
+      if (count === 1) return [{ left: 50, top: 100, scale: 1.0 }];
+      if (count === 2) return [
+        { left: 25, top: 100, scale: 0.9 },
+        { left: 75, top: 100, scale: 0.9 },
+      ];
+      if (count === 3) return [
+        { left: 28, top: 100, scale: 0.88 },
+        { left: 50, top: 100, scale: 0.92 },
+        { left: 72, top: 100, scale: 0.88 },
+      ];
       return distribute(count, 84, 100, 0.85);
     }
 
     // 5–8 characters: stacked rows. Higher rows are in front because their
     // sprite artwork extends upward and should overlap the row below.
+    if (mobile) {
+      const bottom = [
+        { left: 18, top: 88, scale: 0.62 },
+        { left: 50, top: 88, scale: 0.62 },
+        { left: 82, top: 88, scale: 0.62 },
+      ];
+      const middle = [
+        { left: 32, top: 68, scale: 0.56 },
+        { left: 68, top: 68, scale: 0.56 },
+      ];
+      const topRow = [
+        { left: 25, top: 52, scale: 0.52 },
+        { left: 75, top: 52, scale: 0.52 },
+      ];
+      if (count === 5) return bottom.concat(middle);
+      if (count === 6) return bottom.concat(middle).concat(topRow.slice(0, 1));
+      if (count === 7) return bottom.concat(middle).concat(topRow.slice(0, 2));
+      return bottom.concat(middle).concat(topRow); // 8
+    }
+
     const bottom = [
       { left: 15, top: 100, scale: 0.85 },
       { left: 50, top: 100, scale: 0.85 },
@@ -242,9 +300,11 @@
       $sprites.classList.toggle('vn-zoom-layout', isZoom);
     }
 
-    // Fade out sprites that left.
+    // Fade out sprites that left or switched to sprite='none'.
     Array.from($sprites.children).forEach(el => {
-      if (!visibleChars.find(c => c.name === el.dataset.name)) {
+      const char = visibleChars.find(c => c.name === el.dataset.name);
+      const spriteName = char ? (char.current_sprite || 'default_neutral') : null;
+      if (!char || spriteName === 'none') {
         if (isZoom) {
           clearSpriteAndTimer(el);
           el.remove();
@@ -260,21 +320,19 @@
       }
     });
 
-    const slots = isZoom ? [] : getSlots(visibleChars.length);
+    // Characters with no sprite (e.g. Spectator) should not occupy a slot.
+    const displayChars = visibleChars.filter(c => {
+      const spriteName = c.current_sprite || 'default_neutral';
+      return spriteName !== 'none';
+    });
 
-    visibleChars.forEach((c, i) => {
+    const slots = isZoom ? [] : getSlots(displayChars.length);
+
+    displayChars.forEach((c, i) => {
       const slot = slots[i];
       const isSpeaking = c.name === speakerName;
       const spriteName = c.current_sprite || 'default_neutral';
       let el = $sprites.querySelector(`[data-name="${c.name}"]`);
-
-      if (spriteName === 'none') {
-        if (el) {
-          clearSpriteAndTimer(el);
-          el.remove();
-        }
-        return;
-      }
 
       const needsRebuild = el && (
         el.dataset.sprite !== spriteName ||
@@ -314,8 +372,8 @@
             applyZoomFocus(wrapper, img);
           };
           img.onerror = () => {
-            if (!isAnon) img.src = assetUrl('cc', 'Cheshire/default_neutral.png');
-            wrapper.classList.remove('vn-hidden');
+            clearSpriteAndTimer(wrapper);
+            wrapper.remove();
           };
           img.src = url;
           startFocusLoop(wrapper, img);
@@ -332,32 +390,46 @@
           img.alt = c.name;
           wrapper.appendChild(img);
 
+          const tag = document.createElement('div');
+          tag.className = 'vn-nametag';
+          tag.textContent = c.display_name || c.name;
+          wrapper.appendChild(tag);
+
           img.onload = () => {
             applyCropStyles(wrapper, img);
             wrapper.classList.remove('vn-hidden');
           };
           img.onerror = () => {
-            if (!isAnon) img.src = assetUrl('cc', 'Cheshire/default_neutral.png');
-            wrapper.classList.remove('vn-hidden');
+            clearSpriteAndTimer(wrapper);
+            wrapper.remove();
           };
           img.src = url;
           el = wrapper;
         } else {
-          el = document.createElement('img');
-          el.className = 'vn-sprite vn-hidden';
-          el.dataset.name = c.name;
-          el.dataset.sprite = spriteName;
-          el.alt = c.name;
-          $sprites.appendChild(el);
+          const wrapper = document.createElement('div');
+          wrapper.className = 'vn-sprite vn-hidden';
+          wrapper.dataset.name = c.name;
+          wrapper.dataset.sprite = spriteName;
+          $sprites.appendChild(wrapper);
 
-          el.src = url;
+          const img = document.createElement('img');
+          img.alt = c.name;
+          img.src = url;
+          wrapper.appendChild(img);
+
+          const tag = document.createElement('div');
+          tag.className = 'vn-nametag';
+          tag.textContent = c.display_name || c.name;
+          wrapper.appendChild(tag);
+
           const tempImg = new Image();
-          tempImg.onload = () => el.classList.remove('vn-hidden');
+          tempImg.onload = () => wrapper.classList.remove('vn-hidden');
           tempImg.onerror = () => {
-            if (!isAnon) el.src = assetUrl('cc', 'Cheshire/default_neutral.png');
-            el.classList.remove('vn-hidden');
+            clearSpriteAndTimer(wrapper);
+            wrapper.remove();
           };
           tempImg.src = url;
+          el = wrapper;
         }
       }
 
@@ -387,7 +459,7 @@
 
     // Bring the speaking sprite to the front in normal layouts.
     if (!isZoom) {
-      visibleChars.forEach(c => {
+      displayChars.forEach(c => {
         if (c.name === speakerName) {
           const el = $sprites.querySelector(`[data-name="${c.name}"]`);
           if (el) $sprites.appendChild(el);
@@ -452,12 +524,16 @@
   /* ------------------------------------------------------------------
      Text typing
      ------------------------------------------------------------------ */
-  async function typeText(speaker, text) {
+  async function typeText(speaker, text, speakerTitle) {
     const myGen = ++_typeGen;
     const pages = splitIntoPages(text);
     $name.textContent = speaker || '';
-    const char = speaker ? STATE.pool.find(c => c.name === speaker) : null;
-    $title.textContent = char && char.title ? char.title : '';
+    let title = speakerTitle || '';
+    if (!title && speaker) {
+      const char = STATE.pool.find(c => c.name === speaker);
+      if (char && char.title) title = char.title;
+    }
+    $title.textContent = title;
 
     for (let p = 0; p < pages.length; p++) {
       if (myGen !== _typeGen) {
@@ -590,7 +666,14 @@
   /* ------------------------------------------------------------------
      Event processing
      ------------------------------------------------------------------ */
-  function applyEnterExit(enter, exit) {
+  function applyEnterExit(enter, exit, spawn) {
+    // Merge newly spawned anonymous characters into the pool and here list.
+    (spawn || []).forEach(name => {
+      if (!STATE.here.find(c => c.name === name)) {
+        const char = STATE.pool.find(c => c.name === name);
+        if (char) STATE.here.push(char);
+      }
+    });
     (enter || []).forEach(name => {
       if (!STATE.here.find(c => c.name === name)) {
         const char = STATE.pool.find(c => c.name === name);
@@ -600,6 +683,18 @@
     (exit || []).forEach(name => {
       const idx = STATE.here.findIndex(c => c.name === name);
       if (idx !== -1) STATE.here.splice(idx, 1);
+    });
+  }
+
+  function mergeCharacterPool(characters) {
+    if (!Array.isArray(characters)) return;
+    characters.forEach(c => {
+      const idx = STATE.pool.findIndex(existing => existing.name === c.name);
+      if (idx === -1) {
+        STATE.pool.push(c);
+      } else {
+        STATE.pool[idx] = c;
+      }
     });
   }
 
@@ -651,7 +746,8 @@
     }
 
     if (ev.type === 'turn' || ev.type === 'finalize_turn') {
-      applyEnterExit(ev.enter, ev.exit);
+      if (ev.scene && ev.scene.characters) mergeCharacterPool(ev.scene.characters);
+      applyEnterExit(ev.enter, ev.exit, ev.spawn);
       if (ev.sprite_changes) {
         Object.entries(ev.sprite_changes).forEach(([name, sprite]) => {
           const char = STATE.here.find(c => c.name === name);
@@ -668,12 +764,13 @@
       if (!output) return 'continue';
 
       addToHistory(ev.speaker || null, output);
-      await typeText(ev.speaker || null, output);
+      await typeText(ev.speaker || null, output, ev.speaker_title);
       return 'wait';
     }
 
     if (ev.type === 'needs_player_input') {
-      applyEnterExit(ev.enter, ev.exit);
+      if (ev.scene && ev.scene.characters) mergeCharacterPool(ev.scene.characters);
+      applyEnterExit(ev.enter, ev.exit, ev.spawn);
       if (ev.sprite_changes) {
         Object.entries(ev.sprite_changes).forEach(([name, sprite]) => {
           const char = STATE.here.find(c => c.name === name);
@@ -758,7 +855,14 @@
             e.target.closest('#vn-keybinds') ||
             e.target.closest('#vn-saveload') ||
             e.target.closest('#vn-debug') ||
-            e.target.closest('#vn-system')) {
+            e.target.closest('#vn-system') ||
+            e.target.closest('#vn-menu-btn') ||
+            e.target.closest('#vn-eye-btn') ||
+            e.target.closest('#vn-menu')) {
+          return;
+        }
+        if (window.VN.isDialogueCollapsed()) {
+          window.VN.restoreDialogue();
           return;
         }
         if (isTyping()) {
@@ -773,6 +877,10 @@
         }
         if (e.code === 'Space') {
           e.preventDefault();
+          if (window.VN.isDialogueCollapsed()) {
+            window.VN.restoreDialogue();
+            return;
+          }
           if (isTyping()) {
             skipTyping();
             return;
@@ -899,27 +1007,32 @@
     return resp.json();
   }
 
-  async function postLoad(slot) {
+  async function postLoad(slot, storyId) {
+    const body = { slot };
+    if (storyId) body.story_id = storyId;
     const resp = await fetch('/load', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ slot }),
+      body: JSON.stringify(body),
     });
     if (!resp.ok) throw new Error('Load failed');
     return resp.json();
   }
 
-  async function getSaves() {
-    const resp = await fetch('/saves');
+  async function getSaves(storyId) {
+    const url = storyId ? `/saves?story_id=${encodeURIComponent(storyId)}` : '/saves';
+    const resp = await fetch(url);
     if (!resp.ok) throw new Error('List saves failed');
     return resp.json();
   }
 
-  async function postDelete(slot) {
+  async function postDelete(slot, storyId) {
+    const body = { slot };
+    if (storyId) body.story_id = storyId;
     const resp = await fetch('/delete-save', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ slot }),
+      body: JSON.stringify(body),
     });
     if (!resp.ok) throw new Error('Delete failed');
     return resp.json();
@@ -1086,7 +1199,7 @@
         hideLoading();
       }
     },
-    async load(slot) {
+    async load(slot, storyId) {
       showLoading('Loading…');
       // Stop any running game loop before mutating state
       _running = false;
@@ -1105,7 +1218,7 @@
       }
       let data;
       try {
-        data = await postLoad(slot);
+        data = await postLoad(slot, storyId);
         _running = true;
       } finally {
         hideLoading();
@@ -1116,19 +1229,32 @@
       }
       return data;
     },
-    async listSaves() {
-      return getSaves();
+    async listSaves(storyId) {
+      return getSaves(storyId);
     },
-    async delete(slot) {
+    async delete(slot, storyId) {
       showLoading('Deleting…');
       try {
-        return await postDelete(slot);
+        return await postDelete(slot, storyId);
       } finally {
         hideLoading();
       }
     },
     async debug(command, args) {
       return postDebug(command, args || []);
+    },
+    isDialogueCollapsed() {
+      return $dialogue && $dialogue.classList.contains('vn-collapsed');
+    },
+    collapseDialogue() {
+      if ($dialogue) $dialogue.classList.add('vn-collapsed');
+    },
+    restoreDialogue() {
+      if ($dialogue) $dialogue.classList.remove('vn-collapsed');
+    },
+    setVisibilityMode(mode) {
+      document.body.classList.remove('vn-hide-nametags');
+      if (mode === 1) document.body.classList.add('vn-hide-nametags');
     },
   };
 
@@ -1153,4 +1279,41 @@
       window.VN.toggleAuto();
     }
   });
+
+  /* ------------------------------------------------------------------
+     Mobile tap-to-skip-typing on the dialogue box
+     ------------------------------------------------------------------ */
+  if ($dialogue) {
+    $dialogue.addEventListener('touchstart', (e) => {
+      if (e.target.closest('#vn-controls') ||
+          e.target.closest('#vn-choices') ||
+          e.target.closest('input') ||
+          e.target.closest('textarea')) {
+        return;
+      }
+      if (window.VN.isDialogueCollapsed()) {
+        e.preventDefault();
+        window.VN.restoreDialogue();
+        return;
+      }
+      if (isTyping()) {
+        e.preventDefault();
+        skipTyping();
+      }
+    }, { passive: false });
+  }
+
+  // Global tap/click restore for collapsed dialogue.
+  function restoreIfCollapsed(e) {
+    if (!window.VN.isDialogueCollapsed()) return;
+    if (e.target.closest('#vn-menu') ||
+        e.target.closest('#vn-menu-btn') ||
+        e.target.closest('#vn-eye-btn')) {
+      return;
+    }
+    if (e.type === 'touchstart') e.preventDefault();
+    window.VN.restoreDialogue();
+  }
+  document.addEventListener('click', restoreIfCollapsed);
+  document.addEventListener('touchstart', restoreIfCollapsed, { passive: false });
 })();

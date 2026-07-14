@@ -52,7 +52,7 @@ _water_ranged_values = [
 _water_status_values = [
     { value = "drown", suffixible = false },
     { value = "submerge", suffixible = false },
-    { value = "brine", suffixible = true },
+    { value = "brine", suffixible = true, plural = "brine" },
     { value = "engulf", suffixible = false },
     { value = "siphon", suffixible = false },
 ]

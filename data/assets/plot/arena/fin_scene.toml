@@ -8,11 +8,7 @@ player = "Spectator"
 narrator = "Narrator"
 
 [character.sprites]
-Cassius = "none"
-Lyra = "none"
 Spectator = "none"
-Narrator = "none"
-Crowd = "none"
 
 [location]
 pool = ["arena"]

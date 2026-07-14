@@ -5,7 +5,7 @@ from __future__ import annotations
 import random
 import re
 from dataclasses import dataclass, field
-from typing import Any
+from typing import Any, Callable
 
 
 # --------------------------------------------------------------------------- #
@@ -1256,12 +1256,20 @@ def render_tokens(tokens: list[Token]) -> str:
     return ''.join(parts).strip()
 
 
+#: Ordered token-stream assembly rules. Each rule takes and returns a token
+#: list; rules run in declared order. Add or reorder rules here.
+ASSEMBLY_RULES: list[Callable[[list[Token]], list[Token]]] = [
+    apply_sticky,
+    attach_affixes,
+    apply_articles,
+    title_case_tokens,
+]
+
+
 def render_pipeline(tokens: list[Token]) -> str:
-    """Run all rendering passes and return the final string."""
-    tokens = apply_sticky(tokens)
-    tokens = attach_affixes(tokens)
-    tokens = apply_articles(tokens)
-    tokens = title_case_tokens(tokens)
+    """Run all assembly rules in declared order and return the final string."""
+    for rule in ASSEMBLY_RULES:
+        tokens = rule(tokens)
     return render_tokens(tokens)
 
 

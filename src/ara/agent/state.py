@@ -114,8 +114,14 @@ def engine_to_dict(engine: Engine) -> dict[str, Any]:
     return {
         "finished": engine.finished,
         "next_scene": engine.next_scene,
-        "here": [{"name": c.name, "title": c.title} for c in engine.here_chars],
-        "away": [{"name": c.name, "title": c.title} for c in engine.away_chars],
+        "here": [
+            {"name": c.name, "title": c.title, "current_sprite": c.current_sprite}
+            for c in engine.here_chars
+        ],
+        "away": [
+            {"name": c.name, "title": c.title, "current_sprite": c.current_sprite}
+            for c in engine.away_chars
+        ],
         "location": engine.loc.name if engine.loc else None,
         "world_time": engine.world_time,
         "current_speaker": current_speaker,

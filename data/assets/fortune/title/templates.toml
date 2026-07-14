@@ -62,11 +62,15 @@ simple = [
 
     # Modified
     "{adj} {subject}",
+    "{adj} {subject}",
+    "{adj} {subject}",
     "{adj} {rank}",
     "{adj} {class}",
     "{adj_sup} {subject}",
     "{adj_sup} {rank}",
     "{adj_sup} {class}",
+    "The {adj} {subject}",
+    "The {adj} {subject}",
     "The {adj} {subject}",
     "The {adj} {rank}",
     "The {adj} {class}",
@@ -80,7 +84,6 @@ simple = [
     # Numbers/oridnals subject
     "{subject} {roman_numeral}",
     "{subject} {number}",
-    "{subject}-{number}",
     "{ordinal} {subject}",
 
     # Prefix compounds (short, natural)
@@ -132,6 +135,10 @@ moderate = [
     "{adj_sup} {subject}",
     "{adj_sup} {adj} {subject}",
     "{adj} {adj} {subject}",
+    "{adj} {adj} {subject}",
+    "{adj} {adj} {subject}",
+    "{adj} {adj} {rank}",
+    "{adj} {adj} {class}",
 
     # Prefix stacks on the subject
     "{prefix+} {subject}",
@@ -178,11 +185,11 @@ moderate = [
 complex = [
     # Multi-clause coordination
     "{subject} of {place} and {subject} of {place}",
-    "{subject} of {noun} and {subject} of {entity}",
+    "{subject} of {noun:plural} and {subject} of {entity}",
 
     # Heavy modification
     "{adj} {adj} {subject} of {place}",
-    "{adj} {adj} {subject} of {noun}",
+    "{adj} {adj} {subject} of {noun:plural}",
     "{adj} {adj} {subject} of {entity}",
     "{prefix+}, {adj} {subject}",
     "{adj_sup} {subject;0}, {adj_sup} {subject;0}",
@@ -195,7 +202,7 @@ complex = [
 
     # Prefix stack + subject + prepositional phrase
     "{prefix+}{subject} of {place}",
-    "{prefix+}{subject} of {noun}",
+    "{prefix+}{subject} of {noun:plural}",
     "{prefix+}{subject} of {entity}",
 
     # Appositive-style
@@ -266,7 +273,7 @@ insane = [
     "{adj_sup}{suffix} {adj} {subject3} of {noun:plural}",
     "{adj} {noun}{suffix} and {noun}{suffix} {subject3}",
     "{prefix+}{noun}{suffix} of {place} and {noun:plural}",
-    "{prefix+}{noun}{suffix} of {noun} and {place}",
+    "{prefix+}{noun}{suffix} of {noun:plural} and {place}",
     "{adj} {noun}{suffix} {prefix+}{subject3}",
 
     # Modifier-driven templates

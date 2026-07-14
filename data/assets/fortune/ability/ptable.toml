@@ -1,0 +1,377 @@
+category = "concept"
+
+_alkali_metal_values = [
+    { value = "lithium" },
+    { value = "sodium" },
+    { value = "potassium" },
+    { value = "rubidium" },
+    { value = "caesium" },
+    { value = "francium" },
+]
+
+_alkaline_earth_values = [
+    { value = "beryllium" },
+    { value = "magnesium" },
+    { value = "calcium" },
+    { value = "strontium" },
+    { value = "barium" },
+    { value = "radium" },
+]
+
+_transition_metal_values = [
+    { value = "scandium" },
+    { value = "titanium" },
+    { value = "vanadium" },
+    { value = "chromium" },
+    { value = "manganese" },
+    { value = "iron" },
+    { value = "cobalt" },
+    { value = "nickel" },
+    { value = "copper" },
+    { value = "zinc" },
+    { value = "yttrium" },
+    { value = "zirconium" },
+    { value = "niobium" },
+    { value = "molybdenum" },
+    { value = "technetium" },
+    { value = "ruthenium" },
+    { value = "rhodium" },
+    { value = "palladium" },
+    { value = "silver" },
+    { value = "cadmium" },
+    { value = "hafnium" },
+    { value = "tantalum" },
+    { value = "tungsten" },
+    { value = "rhenium" },
+    { value = "osmium" },
+    { value = "iridium" },
+    { value = "platinum" },
+    { value = "gold" },
+    { value = "mercury" },
+    { value = "rutherfordium" },
+    { value = "dubnium" },
+    { value = "seaborgium" },
+    { value = "bohrium" },
+    { value = "hassium" },
+    { value = "meitnerium" },
+    { value = "darmstadtium" },
+    { value = "roentgenium" },
+    { value = "copernicium" },
+]
+
+_post_transition_metal_values = [
+    { value = "aluminium" },
+    { value = "gallium" },
+    { value = "indium" },
+    { value = "tin" },
+    { value = "thallium" },
+    { value = "lead" },
+    { value = "bismuth" },
+    { value = "nihonium" },
+    { value = "flerovium" },
+    { value = "moscovium" },
+    { value = "livermorium" },
+]
+
+_metalloid_values = [
+    { value = "boron" },
+    { value = "silicon" },
+    { value = "germanium" },
+    { value = "arsenic" },
+    { value = "antimony" },
+    { value = "tellurium" },
+    { value = "polonium" },
+]
+
+_nonmetal_values = [
+    { value = "hydrogen" },
+    { value = "carbon" },
+    { value = "nitrogen" },
+    { value = "oxygen" },
+    { value = "phosphorus" },
+    { value = "sulfur" },
+    { value = "selenium" },
+]
+
+_halogen_values = [
+    { value = "fluorine" },
+    { value = "chlorine" },
+    { value = "bromine" },
+    { value = "iodine" },
+    { value = "astatine" },
+    { value = "tennessine" },
+]
+
+_noble_gas_values = [
+    { value = "helium" },
+    { value = "neon" },
+    { value = "argon" },
+    { value = "krypton" },
+    { value = "xenon" },
+    { value = "radon" },
+    { value = "oganesson" },
+]
+
+_lanthanide_values = [
+    { value = "lanthanum" },
+    { value = "cerium" },
+    { value = "praseodymium" },
+    { value = "neodymium" },
+    { value = "promethium" },
+    { value = "samarium" },
+    { value = "europium" },
+    { value = "gadolinium" },
+    { value = "terbium" },
+    { value = "dysprosium" },
+    { value = "holmium" },
+    { value = "erbium" },
+    { value = "thulium" },
+    { value = "ytterbium" },
+    { value = "lutetium" },
+]
+
+_actinide_values = [
+    { value = "actinium" },
+    { value = "thorium" },
+    { value = "protactinium" },
+    { value = "uranium" },
+    { value = "neptunium" },
+    { value = "plutonium" },
+    { value = "americium" },
+    { value = "curium" },
+    { value = "berkelium" },
+    { value = "californium" },
+    { value = "einsteinium" },
+    { value = "fermium" },
+    { value = "mendelevium" },
+    { value = "nobelium" },
+    { value = "lawrencium" },
+]
+
+adj = [
+    { value = "radioactive" },
+    { value = "noble" },
+    { value = "metallic" },
+    { value = "nonmetallic" },
+    { value = "reactive" },
+    { value = "inert" },
+    { value = "volatile" },
+    { value = "corrosive" },
+    { value = "toxic" },
+    { value = "catalytic" },
+    { value = "magnetic" },
+    { value = "acidic" },
+    { value = "basic" },
+    { value = "alkaline" },
+    { value = "ionic" },
+    { value = "covalent" },
+]
+
+ptable_groups = [
+    { value = "alkali metal", sticky = false, prefixable = false, suffixible = false },
+    { value = "alkaline earth metal", sticky = false, prefixable = false, suffixible = false },
+    { value = "transition metal", sticky = false, prefixable = false, suffixible = false },
+    { value = "post-transition metal", sticky = false, prefixable = false, suffixible = false },
+    { value = "metalloid", sticky = false, prefixable = false, suffixible = false },
+    { value = "nonmetal", sticky = false, prefixable = false, suffixible = false },
+    { value = "halogen", sticky = false, prefixable = false, suffixible = false },
+    { value = "noble gas", sticky = false, prefixable = false, suffixible = false },
+    { value = "lanthanide", sticky = false, prefixable = false, suffixible = false },
+    { value = "actinide", sticky = false, prefixable = false, suffixible = false },
+]
+
+_melee_values = [
+    { value = "oxidize", suffixible = false, noun_form = "oxidation" },
+    { value = "corrode", suffixible = false, noun_form = "corrosion" },
+    { value = "etch", suffixible = false, noun_form = "etching" },
+    { value = "burn", suffixible = false },
+    { value = "ignite", suffixible = false, noun_form = "ignition" },
+    { value = "bond", suffixible = false },
+    { value = "dissolve", suffixible = false, noun_form = "dissolution" },
+    { value = "ionize", suffixible = false, noun_form = "ionization" },
+    { value = "catalyze", suffixible = false, noun_form = "catalysis" },
+    { value = "neutralize", suffixible = false, noun_form = "neutralization" },
+    { value = "reduce", suffixible = false, noun_form = "reduction" },
+    { value = "hydrolyze", suffixible = false, noun_form = "hydrolysis" },
+]
+
+_area_values = [
+    { value = "combust", suffixible = false, noun_form = "combustion" },
+    { value = "explode", suffixible = false, noun_form = "explosion" },
+    { value = "detonate", suffixible = false, noun_form = "detonation" },
+    { value = "vaporize", suffixible = false, noun_form = "vaporization" },
+    { value = "aerosolize", suffixible = false, noun_form = "aerosolization" },
+    { value = "fume", suffixible = false },
+    { value = "react", suffixible = false, noun_form = "reaction" },
+    { value = "radiate", suffixible = false, noun_form = "radiation" },
+    { value = "contaminate", suffixible = false, noun_form = "contamination" },
+    { value = "oxidize", suffixible = false, noun_form = "oxidation" },
+    { value = "ignite", suffixible = false, noun_form = "ignition" },
+]
+
+_ranged_values = [
+    { value = "precipitate", suffixible = false, noun_form = "precipitation" },
+    { value = "crystallize", suffixible = false, noun_form = "crystallization" },
+    { value = "discharge", suffixible = false, noun_form = "discharge" },
+    { value = "emit", suffixible = false, noun_form = "emission" },
+    { value = "eject", suffixible = false, noun_form = "ejection" },
+    { value = "jet", suffixible = false },
+    { value = "spray", suffixible = false },
+    { value = "spatter", suffixible = false },
+    { value = "spew", suffixible = false },
+    { value = "hurl", suffixible = false },
+    { value = "squirt", suffixible = false },
+    { value = "inject", suffixible = false, noun_form = "injection" },
+]
+
+_status_values = [
+    { value = "poison", suffixible = false, noun_form = "poisoning" },
+    { value = "intoxicate", suffixible = false, noun_form = "intoxication" },
+    { value = "infect", suffixible = false, noun_form = "infection" },
+    { value = "contaminate", suffixible = false, noun_form = "contamination" },
+    { value = "irradiate", suffixible = false, noun_form = "irradiation" },
+    { value = "oxidize", suffixible = false, noun_form = "oxidation" },
+    { value = "reduce", suffixible = false, noun_form = "reduction" },
+    { value = "corrode", suffixible = false, noun_form = "corrosion" },
+    { value = "burn", suffixible = false },
+    { value = "blister", suffixible = false },
+    { value = "sicken", suffixible = false },
+    { value = "stun", suffixible = false },
+    { value = "toxify", suffixible = false, noun_form = "toxification" },
+]
+
+_defence_values = [
+    { value = "neutralize", suffixible = false, noun_form = "neutralization" },
+    { value = "buffer", suffixible = false, noun_form = "buffer" },
+    { value = "shield", suffixible = false, noun_form = "shield" },
+    { value = "insulate", suffixible = false, noun_form = "insulation" },
+    { value = "purify", suffixible = false, noun_form = "purification" },
+    { value = "filter", suffixible = false, noun_form = "filtration" },
+    { value = "absorb", suffixible = false, noun_form = "absorption" },
+    { value = "sequester", suffixible = false, noun_form = "sequestration" },
+    { value = "detoxify", suffixible = false, noun_form = "detoxification" },
+    { value = "stabilize", suffixible = false, noun_form = "stabilization" },
+]
+
+_movement_values = [
+    { value = "diffuse", suffixible = false, noun_form = "diffusion" },
+    { value = "dissolve", suffixible = false, noun_form = "dissolution" },
+    { value = "flow", suffixible = false },
+    { value = "permeate", suffixible = false, noun_form = "permeation" },
+    { value = "migrate", suffixible = false, noun_form = "migration" },
+    { value = "sublimate", suffixible = false, noun_form = "sublimation" },
+    { value = "evaporate", suffixible = false, noun_form = "evaporation" },
+    { value = "condense", suffixible = false, noun_form = "condensation" },
+    { value = "distill", suffixible = false, noun_form = "distillation" },
+    { value = "osmose", suffixible = false, noun_form = "osmosis" },
+    { value = "percolate", suffixible = false, noun_form = "percolation" },
+    { value = "leach", suffixible = false, noun_form = "leaching" },
+]
+
+_other_values = [
+    { value = "oxidize", suffixible = false, noun_form = "oxidation" },
+    { value = "reduce", suffixible = false, noun_form = "reduction" },
+    { value = "ionize", suffixible = false, noun_form = "ionization" },
+    { value = "hydrolyze", suffixible = false, noun_form = "hydrolysis" },
+    { value = "catalyze", suffixible = false, noun_form = "catalysis" },
+    { value = "synthesize", suffixible = false, noun_form = "synthesis" },
+    { value = "analyze", suffixible = false, noun_form = "analysis" },
+    { value = "titrate", suffixible = false, noun_form = "titration" },
+    { value = "refine", suffixible = false, noun_form = "refinement" },
+    { value = "extract", suffixible = false, noun_form = "extraction" },
+    { value = "electrolyze", suffixible = false, noun_form = "electrolysis" },
+    { value = "polymerize", suffixible = false, noun_form = "polymerization" },
+    { value = "decompose", suffixible = false, noun_form = "decomposition" },
+    { value = "react", suffixible = false, noun_form = "reaction" },
+    { value = "purify", suffixible = false, noun_form = "purification" },
+    { value = "distill", suffixible = false, noun_form = "distillation" },
+    { value = "crystallize", suffixible = false, noun_form = "crystallization" },
+    { value = "fuse", suffixible = false, noun_form = "fusion" },
+    { value = "fission", suffixible = false, noun_form = "fission" },
+    { value = "decay", suffixible = false, noun_form = "decay" },
+    { value = "transmute", suffixible = false, noun_form = "transmutation" },
+]
+
+[[alkali_metal]]
+patterns = ["{_alkali_metal_values}"]
+
+[[alkaline_earth]]
+patterns = ["{_alkaline_earth_values}"]
+
+[[transition_metal]]
+patterns = ["{_transition_metal_values}"]
+
+[[post_transition_metal]]
+patterns = ["{_post_transition_metal_values}"]
+
+[[metalloid]]
+patterns = ["{_metalloid_values}"]
+
+[[nonmetal]]
+patterns = ["{_nonmetal_values}"]
+
+[[halogen]]
+patterns = ["{_halogen_values}"]
+
+[[noble_gas]]
+patterns = ["{_noble_gas_values}"]
+
+[[lanthanide]]
+patterns = ["{_lanthanide_values}"]
+
+[[actinide]]
+patterns = ["{_actinide_values}"]
+
+[["melee"]]
+patterns = ["{_melee_values}"]
+
+[["area"]]
+patterns = ["{_area_values}"]
+
+[["ranged"]]
+patterns = ["{_ranged_values}"]
+
+[["status"]]
+patterns = ["{_status_values}"]
+
+[["defence"]]
+patterns = ["{_defence_values}"]
+
+[["movement"]]
+patterns = ["{_movement_values}"]
+
+[["other"]]
+patterns = ["{_other_values}"]
+
+
+[[expose]]
+slot = "noun"
+from = [
+    "alkali_metal",
+    "alkaline_earth",
+    "transition_metal",
+    "post_transition_metal",
+    "metalloid",
+    "nonmetal",
+    "halogen",
+    "noble_gas",
+    "lanthanide",
+    "actinide",
+    "ptable_groups",
+]
+
+[[expose]]
+slot = "adj"
+from = ["adj"]
+
+[[expose]]
+slot = "verb"
+from = [
+    "melee",
+    "area",
+    "ranged",
+    "status",
+    "defence",
+    "movement",
+    "other",
+]

@@ -4,10 +4,10 @@ sprites = ["default_neutral", "default_xneutral"]
 default_sprite = "default_neutral"
 
 [default_neutral]
-topleft = [243, 124]
-bottomright = [843, 740]
-center = [571, 442]
-focus = [[567, 204, 101]]
+topleft = [389, 198]
+bottomright = [1349, 1284]
+center = [914, 707]
+focus = [[907, 326, 101]]
 
 [default_xneutral]
 topleft = [243, 124]

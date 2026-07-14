@@ -1,4 +1,4 @@
-astro_adj = [
+adj = [
     { value = "cosmic" },
     { value = "stellar" },
     { value = "galactic" },
@@ -38,17 +38,8 @@ astro_noun = [
     { value = "wormhole" },
 ]
 
-astro_suf = [
-    { value = 'star' },
-    { value = 'hole' },
-    { value = 'void' },
-    { value = 'jet' },
-]
-
 [[place]]
 value = "milky way"
-takes_of = true
-takes_in = false
 article = "the"
 proper_noun = false
 prefixable = false
@@ -56,15 +47,13 @@ suffixible = false
 
 [[place]]
 value = "andromeda"
-takes_of = true
-takes_in = false
 article = ""
 proper_noun = true
+prefixable = false
+suffixible = false
 
 [[place]]
 value = "large magellanic cloud"
-takes_of = true
-takes_in = false
 article = "the"
 proper_noun = false
 prefixable = false
@@ -72,8 +61,6 @@ suffixible = false
 
 [[place]]
 value = "small magellanic cloud"
-takes_of = true
-takes_in = false
 article = "the"
 proper_noun = false
 prefixable = false
@@ -81,8 +68,6 @@ suffixible = false
 
 [[place]]
 value = "virgo cluster"
-takes_of = true
-takes_in = false
 article = "the"
 proper_noun = false
 prefixable = false
@@ -90,8 +75,6 @@ suffixible = false
 
 [[place]]
 value = "coma cluster"
-takes_of = true
-takes_in = false
 article = "the"
 proper_noun = false
 prefixable = false
@@ -99,8 +82,6 @@ suffixible = false
 
 [[place]]
 value = "sombrero galaxy"
-takes_of = true
-takes_in = false
 article = "the"
 proper_noun = false
 prefixable = false
@@ -108,8 +89,6 @@ suffixible = false
 
 [[place]]
 value = "whirlpool galaxy"
-takes_of = true
-takes_in = false
 article = "the"
 proper_noun = false
 prefixable = false
@@ -117,8 +96,6 @@ suffixible = false
 
 [[place]]
 value = "local group"
-takes_of = true
-takes_in = false
 article = "the"
 proper_noun = false
 prefixable = false
@@ -126,8 +103,6 @@ suffixible = false
 
 [[place]]
 value = "solar system"
-takes_of = true
-takes_in = false
 article = "the"
 proper_noun = false
 prefixable = false
@@ -135,8 +110,6 @@ suffixible = false
 
 [[place]]
 value = "oort cloud"
-takes_of = true
-takes_in = false
 article = "the"
 proper_noun = false
 prefixable = false
@@ -144,17 +117,13 @@ suffixible = false
 
 [[place]]
 value = "kuiper belt"
-takes_of = true
-takes_in = false
 article = "the"
 proper_noun = false
 prefixable = false
 suffixible = false
 
 [[place]]
-value = "void"
-takes_of = true
-takes_in = true
+value = "interstellar void"
 article = "the"
 proper_noun = false
 prefixable = false
@@ -162,8 +131,6 @@ suffixible = false
 
 [[place]]
 value = "big bang"
-takes_of = true
-takes_in = false
 article = "the"
 proper_noun = false
 prefixable = false
@@ -171,13 +138,13 @@ suffixible = false
 
 [[noun]]
 patterns = [
-    "{astro_adj} {astro_noun}",
+    "{adj} {astro_noun}",
 ]
 
 [[expose]]
 slot = "adj"
 from = [
-    "astro_adj",
+    "adj",
 ]
 
 [[expose]]
@@ -191,9 +158,4 @@ from = [
 slot = "place"
 from = [
     "place",
-]
-[[expose]]
-slot = "suffix"
-from = [
-    "astro_suf",
 ]

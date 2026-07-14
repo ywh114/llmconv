@@ -17,6 +17,7 @@ from starlette.responses import FileResponse, JSONResponse
 from starlette.routing import Mount, Route
 from starlette.staticfiles import StaticFiles
 
+from ara.agent.server import AgentServer
 from ara.config import AraSettings
 from ara.webclient.proxy import AgentProxy, DirectProxy
 from ara.webclient.stories import discover_stories
@@ -93,6 +94,29 @@ async def _proxy_call(proxy: AgentProxy, method: str, **kwargs: Any) -> Any:
     return await loop.run_in_executor(None, fn)
 
 
+def _switch_story(proxy: AgentProxy, story_id: str | None, settings: AraSettings | None = None) -> bool:
+    """Switch a DirectProxy to *story_id* if it differs from the current story.
+
+    Returns True when a new AgentServer was installed.
+    """
+    if not story_id or not isinstance(proxy, DirectProxy):
+        return False
+    stories = discover_stories()
+    story_info = next((s for s in stories if s["id"] == story_id), None)
+    if not story_info:
+        return False
+    from ara.llm.client import LLMClient
+    from ara.memory.chroma import ChromaStore
+    from ara.world.story import Story
+    settings = settings or AraSettings()
+    db = ChromaStore(settings)
+    client = LLMClient(settings)
+    new_story = Story(settings, db, client, Path(story_info["path"]))
+    new_server = AgentServer(new_story, socket_path="")
+    proxy.server = new_server
+    return True
+
+
 # --------------------------------------------------------------------------- #
 # Route handlers
 # --------------------------------------------------------------------------- #
@@ -104,21 +128,8 @@ async def _post_start(request: Request) -> JSONResponse:
     story_id = data.get("story_id")
     proxy = request.app.state.proxy
     try:
-        # Internal-server mode: support story switching
-        if story_id and isinstance(proxy, DirectProxy):
-            from ara.config import AraSettings
-            from ara.llm.client import LLMClient
-            from ara.memory.chroma import ChromaStore
-            from ara.world.story import Story
-            stories = discover_stories()
-            story_info = next((s for s in stories if s["id"] == story_id), None)
-            if story_info:
-                settings: AraSettings = getattr(request.app.state, 'settings', AraSettings())
-                db = ChromaStore(settings)
-                client = LLMClient(settings)
-                new_story = Story(settings, db, client, Path(story_info["path"]))
-                new_server = AgentServer(new_story, socket_path="")
-                proxy.server = new_server
+        settings = getattr(request.app.state, 'settings', None)
+        _switch_story(proxy, story_id, settings)
         result = await _proxy_call(proxy, "start", scene_id=scene_id)
         return JSONResponse(result)
     except Exception as exc:
@@ -228,8 +239,11 @@ async def _post_save(request: Request) -> JSONResponse:
 async def _post_load(request: Request) -> JSONResponse:
     data = await request.json()
     slot = int(data.get("slot", 1))
+    story_id = data.get("story_id", "")
     proxy = request.app.state.proxy
     try:
+        settings = getattr(request.app.state, 'settings', None)
+        _switch_story(proxy, story_id, settings)
         result = await _proxy_call(proxy, "load", slot=slot)
         return JSONResponse(result)
     except Exception as exc:

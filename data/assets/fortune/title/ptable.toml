@@ -1,0 +1,236 @@
+category = "science"
+
+_alkali_metal_values = [
+    { value = "lithium" },
+    { value = "sodium" },
+    { value = "potassium" },
+    { value = "rubidium" },
+    { value = "caesium" },
+    { value = "francium" },
+]
+
+_alkaline_earth_values = [
+    { value = "beryllium" },
+    { value = "magnesium" },
+    { value = "calcium" },
+    { value = "strontium" },
+    { value = "barium" },
+    { value = "radium" },
+]
+
+_transition_metal_values = [
+    { value = "scandium" },
+    { value = "titanium" },
+    { value = "vanadium" },
+    { value = "chromium" },
+    { value = "manganese" },
+    { value = "iron" },
+    { value = "cobalt" },
+    { value = "nickel" },
+    { value = "copper" },
+    { value = "zinc" },
+    { value = "yttrium" },
+    { value = "zirconium" },
+    { value = "niobium" },
+    { value = "molybdenum" },
+    { value = "technetium" },
+    { value = "ruthenium" },
+    { value = "rhodium" },
+    { value = "palladium" },
+    { value = "silver" },
+    { value = "cadmium" },
+    { value = "hafnium" },
+    { value = "tantalum" },
+    { value = "tungsten" },
+    { value = "rhenium" },
+    { value = "osmium" },
+    { value = "iridium" },
+    { value = "platinum" },
+    { value = "gold" },
+    { value = "mercury" },
+    { value = "rutherfordium" },
+    { value = "dubnium" },
+    { value = "seaborgium" },
+    { value = "bohrium" },
+    { value = "hassium" },
+    { value = "meitnerium" },
+    { value = "darmstadtium" },
+    { value = "roentgenium" },
+    { value = "copernicium" },
+]
+
+_post_transition_metal_values = [
+    { value = "aluminium" },
+    { value = "gallium" },
+    { value = "indium" },
+    { value = "tin" },
+    { value = "thallium" },
+    { value = "lead" },
+    { value = "bismuth" },
+    { value = "nihonium" },
+    { value = "flerovium" },
+    { value = "moscovium" },
+    { value = "livermorium" },
+]
+
+_metalloid_values = [
+    { value = "boron" },
+    { value = "silicon" },
+    { value = "germanium" },
+    { value = "arsenic" },
+    { value = "antimony" },
+    { value = "tellurium" },
+    { value = "polonium" },
+]
+
+_nonmetal_values = [
+    { value = "hydrogen" },
+    { value = "carbon" },
+    { value = "nitrogen" },
+    { value = "oxygen" },
+    { value = "phosphorus" },
+    { value = "sulfur" },
+    { value = "selenium" },
+]
+
+_halogen_values = [
+    { value = "fluorine" },
+    { value = "chlorine" },
+    { value = "bromine" },
+    { value = "iodine" },
+    { value = "astatine" },
+    { value = "tennessine" },
+]
+
+_noble_gas_values = [
+    { value = "helium" },
+    { value = "neon" },
+    { value = "argon" },
+    { value = "krypton" },
+    { value = "xenon" },
+    { value = "radon" },
+    { value = "oganesson" },
+]
+
+_lanthanide_values = [
+    { value = "lanthanum" },
+    { value = "cerium" },
+    { value = "praseodymium" },
+    { value = "neodymium" },
+    { value = "promethium" },
+    { value = "samarium" },
+    { value = "europium" },
+    { value = "gadolinium" },
+    { value = "terbium" },
+    { value = "dysprosium" },
+    { value = "holmium" },
+    { value = "erbium" },
+    { value = "thulium" },
+    { value = "ytterbium" },
+    { value = "lutetium" },
+]
+
+_actinide_values = [
+    { value = "actinium" },
+    { value = "thorium" },
+    { value = "protactinium" },
+    { value = "uranium" },
+    { value = "neptunium" },
+    { value = "plutonium" },
+    { value = "americium" },
+    { value = "curium" },
+    { value = "berkelium" },
+    { value = "californium" },
+    { value = "einsteinium" },
+    { value = "fermium" },
+    { value = "mendelevium" },
+    { value = "nobelium" },
+    { value = "lawrencium" },
+]
+
+adj = [
+    { value = "radioactive" },
+    { value = "noble" },
+    { value = "metallic" },
+    { value = "nonmetallic" },
+    { value = "reactive" },
+    { value = "inert" },
+    { value = "volatile" },
+    { value = "corrosive" },
+    { value = "toxic" },
+    { value = "catalytic" },
+    { value = "magnetic" },
+    { value = "acidic" },
+    { value = "basic" },
+    { value = "alkaline" },
+    { value = "ionic" },
+    { value = "covalent" },
+    { value = "Van der Waals", lowercase = true },
+]
+
+class = [
+    { value = "alkali metal", sticky = false, prefixable = false, suffixible = false },
+    { value = "alkaline earth metal", sticky = false, prefixable = false, suffixible = false },
+    { value = "transition metal", sticky = false, prefixable = false, suffixible = false },
+    { value = "post-transition metal", sticky = false, prefixable = false, suffixible = false },
+    { value = "metalloid", sticky = false, prefixable = false, suffixible = false },
+    { value = "nonmetal", sticky = false, prefixable = false, suffixible = false },
+    { value = "halogen", sticky = false, prefixable = false, suffixible = false },
+    { value = "noble gas", sticky = false, prefixable = false, suffixible = false },
+    { value = "lanthanide", sticky = false, prefixable = false, suffixible = false },
+    { value = "actinide", sticky = false, prefixable = false, suffixible = false },
+]
+
+[[alkali_metal]]
+patterns = ["{_alkali_metal_values}"]
+
+[[alkaline_earth]]
+patterns = ["{_alkaline_earth_values}"]
+
+[[transition_metal]]
+patterns = ["{_transition_metal_values}"]
+
+[[post_transition_metal]]
+patterns = ["{_post_transition_metal_values}"]
+
+[[metalloid]]
+patterns = ["{_metalloid_values}"]
+
+[[nonmetal]]
+patterns = ["{_nonmetal_values}"]
+
+[[halogen]]
+patterns = ["{_halogen_values}"]
+
+[[noble_gas]]
+patterns = ["{_noble_gas_values}"]
+
+[[lanthanide]]
+patterns = ["{_lanthanide_values}"]
+
+[[actinide]]
+patterns = ["{_actinide_values}"]
+
+
+[[expose]]
+slot = "noun"
+from = [
+    "alkali_metal",
+    "alkaline_earth",
+    "transition_metal",
+    "post_transition_metal",
+    "metalloid",
+    "nonmetal",
+    "halogen",
+    "noble_gas",
+    "lanthanide",
+    "actinide",
+]
+
+[[expose]]
+slot = "class"
+from = ["class"]
+
+[[expose]]
+slot = "adj"
+from = ["adj"]

@@ -275,6 +275,7 @@ class StoryStep:
     :ivar speaker: Name of the character whose turn this was.
     :ivar enter: Names of characters that entered this turn.
     :ivar exit: Names of characters that exited this turn.
+    :ivar spawn: Names of anonymous characters spawned this turn.
     :ivar sprite_changes: Mapping of character names → new sprite names.
     :ivar switch_background: Background stem activated for the current location.
     :ivar location: Current location (for scene_loaded/turn/needs_player_input).
@@ -294,6 +295,7 @@ class StoryStep:
     speaker_title: str = ""
     enter: list[str] = field(default_factory=list)
     exit: list[str] = field(default_factory=list)
+    spawn: list[str] = field(default_factory=list)
     sprite_changes: dict[str, str] = field(default_factory=dict)
     switch_background: str = ""
     system_changes: dict[str, Any] = field(default_factory=dict)
@@ -379,6 +381,7 @@ class Story:
         self._story_memory = StoryMemory(db)
         self._live_characters: dict[str, Character] = {}
         self._live_locations: dict[str, Location] = {}
+        self._archived_scene_snapshots: list[dict[str, Any]] = []
         self._registry_indexed: bool = False
         if initial_scene_path.name == "ini_scene.toml":
             self._story_dir = initial_scene_path.parent
@@ -445,6 +448,7 @@ class Story:
             self._current_path = self.initial_scene_path
         self._prev_scene = None
         self._scene_history = []
+        self._archived_scene_snapshots = []
         self._current_scene = None
         self._state = "loading"
         self._loaded_settings = set()
@@ -492,6 +496,7 @@ class Story:
                     speaker_title=result.speaker_title,
                     enter=result.enter,
                     exit=result.exit,
+                    spawn=result.spawn,
                     sprite_changes=result.sprite_changes,
                     switch_background=result.switch_background,
                     system_changes=result.system_changes,
@@ -505,6 +510,7 @@ class Story:
                 speaker_title=result.speaker_title,
                 enter=result.enter,
                 exit=result.exit,
+                spawn=result.spawn,
                 sprite_changes=result.sprite_changes,
                 switch_background=result.switch_background,
                 system_changes=result.system_changes,
@@ -886,6 +892,14 @@ class Story:
 
         # Archive scratchpads now that finalization and summarization are done.
         _archive_scratchpads(self._current_scene, self.engine)
+
+        # Telescope: archive a full snapshot of the scene that just ended.
+        # This is inert gameplay baggage; it lets saves carry prior scene state.
+        from ara.persistence.save import SaveManager
+        manager = SaveManager(self.config)
+        self._archived_scene_snapshots.append(
+            manager._build_snapshot(self, queue=[])
+        )
 
         self._state = "loading"
         return self._load_scene()

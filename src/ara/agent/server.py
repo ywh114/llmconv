@@ -53,6 +53,7 @@ def _step_to_dict(step: Any) -> dict[str, Any]:
         "speaker_title": step.speaker_title,
         "enter": step.enter,
         "exit": step.exit,
+        "spawn": step.spawn,
         "sprite_changes": step.sprite_changes,
         "switch_background": step.switch_background,
         "system_changes": step.system_changes,

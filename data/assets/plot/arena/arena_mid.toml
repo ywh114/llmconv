@@ -14,10 +14,7 @@ player = "Spectator"
 narrator = "Narrator"
 
 [character.sprites]
-Cassius = "none"
-Lyra = "none"
 Spectator = "none"
-Narrator = "none"
 
 [location]
 pool = ["arena"]
@@ -151,25 +148,27 @@ TEAM SETUP (once per batch):
 
   Team 1 (Court of the Old Ones): fortune_title(
     flavor="feudal,lovecraft",
-    require=["rank","class","place"],
-    slot={"rank":["feudal"],"class":["lovecraft"],"place":["lovecraft"]}
+    require=["rank","class"],
+    slot={"class":["lovecraft"]}
   ).
 
   Team 2 (The Sick Fleet): fortune_title(
     flavor="plague_doctor,warships",
-    require=["rank","class","place"],
-    slot={"rank":["warships"],"class":["plague_doctor"],"place":["plague_doctor"]}
+    require=["rank","class"],
+    slot={"rank":["warships"]}
   ).
 
   Team 3 (The People's Mythic Host): fortune_title(
     flavor="fantasy,juche",
-    require=["rank","class","place"],
-    slot={"rank":["juche"],"class":["fantasy"],"place":["fantasy"]}
+    require=["rank","class"],
+    slot={"rank":["juche"]}
   ).
 
 - Generate three fighters per team (nine total): call fortune_name and the
   team's fortune_title for each. Spawn them all with spawn_anonymous; each
-  fighter must include a one-line `description` (required by the tool).
+  fighter must include a one-line `description` and a `sprite` from the arena
+  anonymous zodiac pool (aries, taurus, gemini, cancer, leo, virgo, libra,
+  scorpio, sagittarius, capricorn, aquarius, pisces).
 
 - Team affiliation is visible: tell the Narrator which fighters belong to
   which team when describing their entrances. Use team-coloured banners
@@ -188,6 +187,8 @@ TEAM SETUP (once per batch):
 
 - For flavour: use a single fortune tool per round, rotating — fortune_random
   one round, fortune_roll the next, etc. Don't call fortune_suite.
+
+- Let every fighter get a short introduction before combat begins. Narrator describes each fighter's entrance and a glimpse of their style; allow Cassius, Lyra, and Spectator reaction beats before anyone attacks. Do not start rolling for combat until all fighters have been introduced.
 
 - Narrator describes entrance. Then give Spectator a turn to react.
 

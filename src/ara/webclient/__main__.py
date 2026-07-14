@@ -35,6 +35,11 @@ def main(argv: list[str] | None = None) -> int:
         help="Host to bind to (default: 127.0.0.1)",
     )
     parser.add_argument(
+        "--expose",
+        action="store_true",
+        help="Bind to all interfaces (0.0.0.0) so the server is reachable from other machines",
+    )
+    parser.add_argument(
         "--agent-socket",
         default=None,
         help="Path to the Ara agent UNIX socket (default: data/sockets/ara_agent.sock)",
@@ -79,7 +84,8 @@ def main(argv: list[str] | None = None) -> int:
     else:
         app = create_app(socket_path=args.agent_socket)
 
-    uvicorn.run(app, host=args.host, port=args.port, log_level="info")
+    host = "0.0.0.0" if args.expose else args.host
+    uvicorn.run(app, host=host, port=args.port, log_level="info")
     return 0
 
 

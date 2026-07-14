@@ -1,0 +1,47 @@
+# Symbols used by gen_crowd.py to render the procedural crowd sprite.
+# Grouped by family for readability; the script flattens them at runtime.
+
+[zodiac]
+symbols = ["♈", "♉", "♊", "♋", "♌", "♍", "♎", "♏", "♐", "♑", "♒", "♓"]
+
+[punctuation]
+symbols = ["?", "!"]
+
+[stars]
+symbols = ["✦", "✧", "★", "☆", "✶", "✷", "✹", "✺", "❖"]
+
+[shapes]
+symbols = ["◆", "◇", "●", "○", "◐", "◑"]
+
+[card_suits]
+symbols = ["♠", "♥", "♦", "♣"]
+
+[chess]
+symbols = ["♔", "♕", "♖", "♗", "♘", "♙"]
+
+[misc]
+symbols = ["⚔", "⚖", "⚡", "☀", "☁", "☂", "☽", "☾"]
+
+[music]
+symbols = ["♪", "♫", "♬"]
+
+[arrows]
+symbols = ["▲", "▼", "◀", "▶", "↑", "↓", "←", "→", "↔", "↕"]
+
+[flowers]
+symbols = ["✿", "❀"]
+
+[dice]
+symbols = ["⚀", "⚁", "⚂", "⚃", "⚄", "⚅"]
+
+[planets]
+symbols = ["☉", "☿", "♀", "♁", "♂", "♃", "♄", "⛢", "♆", "♇"]
+
+[hands]
+symbols = ["☚", "☛", "☜", "☞", "☟", "🖟", "🖠"]
+
+[faces]
+symbols = ["☹", "☺", "☻", "☠", "⍨", "⍤"]
+
+[religious]
+symbols = ["✡", "✝", "☪", "☸", "☯"]

@@ -14,10 +14,7 @@ player = "Spectator"
 narrator = "Narrator"
 
 [character.sprites]
-Cassius = "none"
-Lyra = "none"
 Spectator = "none"
-Narrator = "none"
 
 [location]
 pool = ["arena"]
@@ -160,7 +157,8 @@ FIGHTER SETUP (once per batch):
   kill.
 - For flavour: use a single fortune tool per round, rotating — fortune_random one
   round, fortune_roll the next, etc. Don't call fortune_suite (it averages out).
-- Spawn fighters: fortune_name result goes to `name`, fortune_title result goes to `title`, and include a one-line `description` (required by spawn_anonymous). Display will be "[TITLE] name".
+- Spawn fighters: fortune_name result goes to `name`, fortune_title result goes to `title`, include a one-line `description`, and set `sprite` to one of the arena anonymous zodiac sprites (aries, taurus, gemini, cancer, leo, virgo, libra, scorpio, sagittarius, capricorn, aquarius, pisces). Display will be "[TITLE] name".
+- Let every fighter get a short introduction before combat begins. Narrator describes each fighter's entrance and a glimpse of their style; allow Cassius, Lyra, and Spectator reaction beats before anyone attacks. Do not start rolling for combat until all fighters have been introduced.
 - Narrator describes entrance. Then give Spectator a turn to react.
 
 BATTLE (loop until one fighter dies):

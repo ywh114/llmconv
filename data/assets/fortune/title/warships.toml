@@ -1,25 +1,40 @@
-ship_adj = [
+adj = [
     { value = "fleet" },
     { value = "stealth" },
-    { value = "amphibious assault", prefixable = false, suffixible = false },
+    { value = "amphibious assault", suffixible = false },
+    { value = "ballistic missile", suffixible = false },
     { value = "guided missile", prefixable = false, suffixible = false },
     { value = "nuclear" },
     { value = "fast attack", prefixable = false, suffixible = false },
     { value = "heavy" },
     { value = "light" },
+    { value = "nulcear" },
+    { value = "surveillance" },
+    { value = "unmanned" },
+    { value = "commerce raiding", suffixible = false },
+    { value = "ground-effect", prefixable = false, suffixible = false },
+    { value = "over-the-horizon" },
+    { value = "Aegis" },
 ]
 ship_noun = [
+    { value = "flagship" },
+    { value = "ship" },
+    { value = "boat" },
     { value = "destroyer" },
-    { value = "frigate" },
     { value = "cruiser" },
     { value = "battleship" },
     { value = "carrier" },
-    { value = "fleet carrier", prefixable = false, suffixible = false },
     { value = "submarine" },
-    { value = "attack submarine", prefixable = false, suffixible = false },
-    { value = "ballistic missile submarine", prefixable = false, suffixible = false },
+    { value = "submarine hunter", prefixable = false, suffixible = false },
+    { value = "tracking ship", prefixable = false, suffixible = false },
+    { value = "frigate" },
     { value = "corvette" },
+    { value = "gunboat" },
     { value = "amphibious assault ship", prefixable = false, suffixible = false },
+    { value = "ekranoplan" },
+    { value = "hospital ship", prefixable = false, suffixible = false },
+]
+specific_warship = [
 ]
 rank = [
     { value = "captain" },
@@ -29,19 +44,78 @@ rank = [
     { value = "lieutenant" },
     { value = "ensign" },
 ]
-
-ship_suf = [
+entity = [
+    { value = "Chester W. Nimitz", sticky = false, proper_noun = true },
+    { value = "William Halsey Jr.", sticky = false, proper_noun = true },
+    { value = "Raymond A. Spruance", sticky = false, proper_noun = true },
+    { value = "Frank F. Fletcher", sticky = false, proper_noun = true },
+    { value = "Sullivan brothers", sticky = false, proper_noun = true },
+    { value = "Horatio Nelson", sticky = false, proper_noun = true },
+    { value = "Andrew Browne Cunningham", sticky = false, proper_noun = true },
+    { value = "James Somerville", sticky = false, proper_noun = true },
+    { value = "Karl Dönitz", sticky = false, proper_noun = true },
+    { value = "Isoroku Yamamoto", sticky = false, proper_noun = true },
+    { value = "Jisaburō Ozawa", sticky = false, proper_noun = true },
 ]
+
+[[place]]
+value = "Newport News"
+article = ""
+proper_noun = true
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "Ingalls Shipbuilding"
+article = ""
+proper_noun = true
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "Bath Iron Works"
+article = ""
+proper_noun = true
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "Dalian Shipbuilding Industry Company"
+article = ""
+proper_noun = true
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "Bohai Shipyard"
+article = ""
+proper_noun = true
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "Jiangnan Shipyard"
+article = ""
+proper_noun = true
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "Hudong-Zhonghua"
+article = ""
+proper_noun = true
+prefixable = false
+suffixible = false
 
 [[noun]]
 patterns = [
-    "{ship_adj} {ship_noun}",
+    "{adj} {ship_noun}",
 ]
 
 [[expose]]
 slot = "adj"
 from = [
-    "ship_adj",
+    "adj",
 ]
 
 [[expose]]
@@ -49,6 +123,13 @@ slot = "noun"
 from = [
     "ship_noun",
     "noun",
+    "specific_warship",
+]
+
+[[expose]]
+slot = "place"
+from = [
+    "place",
 ]
 
 [[expose]]
@@ -56,8 +137,9 @@ slot = "rank"
 from = [
     "rank",
 ]
+
 [[expose]]
-slot = "suffix"
+slot = "entity"
 from = [
-    "ship_suf",
+    "entity",
 ]

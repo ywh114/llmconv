@@ -1,0 +1,113 @@
+adj = [
+    { value = "{digit_ordinal}-gen", prefixable = false, suffixible = false },
+    { value = "{digit_ordinal}-generation", prefixable = false, suffixible = false },
+    { value = "jet" },
+    { value = "propeller" },
+    { value = "fixed-wing", suffixible = false },
+    { value = "rotary-wing", suffixible = false },
+    { value = "subsonic" },
+    { value = "supersonic" },
+    { value = "stealth" },
+    { value = "strike" },
+    { value = "heavy" },
+    { value = "light" },
+    { value = "nulcear" },
+    { value = "strategic" },
+    { value = "tactical" },
+    { value = "carrier-based", suffixible = false },
+    { value = "single engine", prefixable = false, suffixible = false },
+    { value = "twin-engine", prefixable = false, suffixible = false },
+    { value = "tri-engine", prefixable = false, suffixible = false },
+    { value = "{digit}-engine", prefixable = false, suffixible = false },
+    { value = "flying" },
+    { value = "armed" },
+    { value = "attack" },
+    { value = "thrust-vectoring", suffixible = false },
+    { value = "reconnaissance" },
+    { value = "unmanned" },
+    { value = "unmanned aerial", prefixable = false, suffixible = false },
+    { value = "ground-effect", prefixable = false, suffixible = false },
+    { value = "electronic warfare" },
+    { value = "BVR" },
+    { value = "suicide" },
+    { value = "collaborative combat" },
+]
+plane_noun = [
+    { value = "helicoptor" },
+    { value = "aircraft" },
+    { value = "fighter" },
+    { value = "bomber" },
+    { value = "interceptor" },
+    { value = "transport aircraft", prefixable = false, suffixible = false  },
+    { value = "gunship" },
+    { value = "drone" },
+    { value = "biplane" },
+    { value = "monoplane" },
+    { value = "flying boat", prefixable = false, suffixible = false },
+    { value = "seaplane" },
+    { value = "airship" },
+    { value = "ekranoplan" },
+    { value = "AEW&C" },
+    { value = "drone" },
+    { value = "loyal wingman", prefixable = false, suffixible = false },
+    { value = "turbojet" },
+    { value = "turboprop" },
+]
+specific_warplane = [
+]
+rank = [
+    { value = "captain" },
+    { value = "colonel" },
+    { value = "major" },
+    { value = "lieutenant" },
+    { value = "commander" },
+    { value = "general" },
+    { value = "ace" },
+    { value = "wing commander", prefixable = false, suffixible = false },
+]
+entity = [
+    { value = "McDonnell Douglas", sticky = false, proper_noun = true },
+    { value = "Lockheed Martin", sticky = false, proper_noun = true },
+    { value = "Boeing", sticky = false, proper_noun = true },
+    { value = "William E. Boeing", sticky = false, proper_noun = true },
+    { value = "Northrop Grumman", sticky = false, proper_noun = true },
+    { value = "General Dynamics", sticky = false, proper_noun = true },
+    { value = "Messerschmitt AG", sticky = false, proper_noun = true },
+    { value = "Dassault Group", sticky = false, proper_noun = true },
+    { value = "Oleg Antonov", sticky = false, proper_noun = true },
+    { value = "Sukhoi", sticky = false, proper_noun = true },
+    { value = "Mikoyan", sticky = false, proper_noun = true },
+    { value = "Chengdu Aircraft Corporation", sticky = false, proper_noun = true },
+    { value = "Shenyang Aircraft Corporation", sticky = false, proper_noun = true },
+]
+
+[[noun]]
+patterns = [
+    "{adj} {plane_noun}",
+]
+
+[[expose]]
+slot = "adj"
+from = [
+    "adj",
+]
+
+[[expose]]
+slot = "noun"
+from = [
+    "plane_noun",
+    "noun",
+    "specific_warplane",
+]
+
+[[expose]]
+slot = "rank"
+from = [
+    "rank",
+]
+
+[[expose]]
+slot = "entity"
+from = [
+    "entity",
+]
