@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 import tempfile
 import uuid
 from pathlib import Path
@@ -11,12 +10,11 @@ from unittest.mock import MagicMock
 import pytest
 
 from ara.config import AraSettings
-from ara.llm.client import LLMClient
 from ara.memory.chroma import ChromaStore
 from ara.memory.knowledge import CharacterMemory, NullMemory, Scratchpad
-from ara.llm.models import GameRole, StreamResult
+from ara.llm.models import StreamResult
 from ara.world.character import Importance
-from ara.world.character import Character, create_anonymous_character, load_character
+from ara.world.character import Character, create_anonymous_character
 from ara.world.engine import Engine
 from ara.world.orchestrator import TurnDecision
 from ara.world.scene import Location, Scene, SceneChoice

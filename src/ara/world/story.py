@@ -20,6 +20,7 @@ from ara.llm.client import LLMClient
 from ara.llm.context import ConversationContext
 from ara.llm.tools import ToolRegistry, tool
 from ara.memory.chroma import ChromaStore
+from ara.memory.wiki import WikiStore
 from ara.memory.story_memory import StoryMemory
 from ara.llm.models import GameRole
 from ara.world.character import Importance, create_anonymous_character
@@ -32,7 +33,7 @@ from ara.world.engine import Engine
 from ara.world.registry import AssetRegistry
 from ara.world.scene import Location, Scene
 from ara.world.i18n import normalize_language
-from ara.world.setting import WorldSetting, load_world_setting, resolve_world_setting_path
+from ara.world.setting import resolve_world_setting_path
 from ara.world.summarizer import Summarizer, SceneStateModifiers
 
 logger = get_logger(__name__)
@@ -342,6 +343,7 @@ class Story:
         self.config = config
         self.db = db
         self.client = client
+        self.wiki = WikiStore(db)
         self.engine = Engine(client, db=db)
         self.initial_scene_path = initial_scene_path
         self._scene_history: list[str] = []
@@ -582,13 +584,7 @@ class Story:
 
     def _wiki_has_content(self) -> bool:
         """Return ``True`` if the orchestrator wiki collection has documents."""
-        if self.db is None:
-            return False
-        try:
-            return self.db.collection("orchestrator_wiki").count() > 0
-        except Exception as exc:
-            logger.debug(f"Could not check orchestrator_wiki content: {exc}")
-            return False
+        return self.wiki.has_content()
 
     def _query_characters(self, query: str) -> list[str]:
         """Search available character cards for names matching *query*.
@@ -625,35 +621,7 @@ class Story:
 
     def _upsert_setting_file(self, path: Path | None, label: str = "setting") -> None:
         """Load a single world-setting TOML and upsert its entries into the wiki."""
-        if not path or not path.exists():
-            logger.debug(f"No {label} found at {path}; skipping wiki upsert.")
-            return
-
-        try:
-            setting = load_world_setting(path)
-        except Exception as exc:
-            logger.warning(f"Failed to load {label} from {path}: {exc}")
-            return
-
-        if self.db is None:
-            return
-
-        entries = setting.wiki_entries()
-        if not entries:
-            logger.debug(f"{label} '{setting.id}' has no wiki entries; skipping upsert.")
-            return
-
-        ids = list(entries.keys())
-        docs = [entries[i] for i in ids]
-        metadatas = [
-            {"topic": topic, "importance": "critical", "world": setting.id}
-            for topic in ids
-        ]
-        try:
-            self.db.upsert("orchestrator_wiki", ids=ids, documents=docs, metadatas=metadatas)
-            logger.info(f"Loaded {label} '{setting.id}' with {len(ids)} wiki entries")
-        except Exception as exc:
-            logger.warning(f"Failed to upsert {label} into wiki: {exc}")
+        self.wiki.ingest_setting_file(path, label=label)
 
     def _load_scene(self) -> StoryStep:
         """Load the scene at :attr:`_current_path` and start the engine."""
@@ -1174,44 +1142,11 @@ class Story:
 
     def _upsert_narrative_state(self) -> None:
         """Mirror the story-level narrative state into the orchestrator wiki."""
-        if self.db is None or not self._narrative_state:
-            return
-        try:
-            import json
-            self.db.upsert(
-                "orchestrator_wiki",
-                ids=["story:state"],
-                documents=[json.dumps(self._narrative_state, ensure_ascii=False)],
-                metadatas=[{"topic": "story:state", "importance": "critical", "trust": 1.0}],
-            )
-            logger.debug("Mirrored narrative state to orchestrator_wiki")
-        except Exception as exc:
-            logger.warning(f"Failed to mirror narrative state: {exc}")
+        self.wiki.ingest_narrative_state(self._narrative_state)
 
     def _upsert_invented_facts(self, facts: list[dict[str, Any]]) -> None:
         """Persist invented facts from the summarizer into the orchestrator wiki."""
-        if not facts or self.db is None:
-            return
-        for idx, fact in enumerate(facts):
-            statement = fact.get("fact", "").strip()
-            if not statement:
-                continue
-            trust = float(fact.get("trust", 0.0))
-            source = fact.get("source", "").strip()
-            topic = f"invented_fact_{idx:03d}"
-            content = statement
-            if source:
-                content += f"\nSource: {source}"
-            try:
-                self.db.upsert(
-                    "orchestrator_wiki",
-                    ids=[topic],
-                    documents=[content],
-                    metadatas=[{"topic": topic, "importance": "notable", "trust": trust}],
-                )
-                logger.info(f"Upserted invented fact '{topic}' with trust {trust}")
-            except Exception as exc:
-                logger.warning(f"Failed to upsert invented fact: {exc}")
+        self.wiki.ingest_invented_facts(facts)
 
     def _generate_finalize_turn(self, next_scene_id: str) -> None:
         """Generate an opening narrator beat that justifies state changes.

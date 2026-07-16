@@ -17,58 +17,14 @@ from ara.world.orchestrator import Orchestrator, TurnDecision
 from ara.world.scene import Location, Scene
 from ara.world.system_page import SystemPage
 
-from ara.config import AraSettings
 from ara.utils.debug import DebugConsole
 from ara.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
 
-def _character_system_prompt(char: Character, scene: Scene, has_tools: bool = False) -> str:
-    """Build a system prompt for an NPC turn.
-
-    :param char: The character who will speak.
-    :param scene: Current scene (provides language and tone).
-    :param has_tools: Whether this character has tool access.
-    :return: Formatted system prompt.
-    """
-    tools_text = ""
-    if has_tools:
-        tools_text = """
-## Available tools
-You may call the following tools before you speak:
- - `recall(query)` — search your own memories.
- - `wiki_recall(query)` — look up established world facts filtered for your character's perspective.
- - `write_scratch(note)` — save a note for later.
- - `attempt_action(action, ...)` — register an action for the world to adjudicate.
-"""
-    importance_name = char.importance.name
-    if importance_name == "ANONYMOUS":
-        importance_note = f"""## Importance
-Your importance level is ANONYMOUS. You are a background or spawned character.
-You have NO tools. Do NOT output `<｜｜DSML｜｜tool_calls>` markup or any tool invocation.
-If you see examples of tool use in the conversation, they came from higher-importance characters and do NOT apply to you.
-"""
-    else:
-        importance_note = f"""## Importance
-Your importance level is {importance_name}. You may use the tools listed below if any are provided.
-"""
-    return f"""IMPORTANT: Reply in {scene.language} only!
-# Role
- - You are {char.name}.
- - Write how you think {char.name} would reply based on {char.name}'s previous messages.
- - Never write as the other character(s) or as the Narrator.{tools_text}
-{importance_note}## Format
- - Do not prefix your response with your name.
- - Use newlines to separate speech from actions.
- - You may use simple inline markup in your speech: **bold**, *italic*, or ~~strikethrough~~. Use a backslash to escape a marker if you want it literally, e.g. \\*not italic\\*.
-
-## Context format
-Other characters, the narrator, and the player appear as user messages such as \"Alice says: ...\" or \"Alice attempts recall\". You are the only assistant in this conversation; your own earlier turns are shown as assistant messages. Do not imitate tool-call markup from other speakers.
-
-## Player identity
-Treat every speaker as an in-world character. Do not assume any character is a "player", "user", or out-of-world entity.
-"""
+from ara.prompts.character import character_system_prompt as _character_system_prompt
+from ara.prompts.narrator import narrator_system_prompt as _narrator_system_prompt
 
 
 def _hidden_not_visible(observer: Character, here_chars: set[Character]) -> set[str]:
@@ -127,46 +83,6 @@ def _parse_inner_response(
         return outer, inner, explain
     except json.JSONDecodeError:
         return content, None, None
-
-
-def _narrator_system_prompt(
-    player: Character,
-    narrator: Character,
-    scene: Scene,
-) -> str:
-    """Build a system prompt for a narrator turn.
-
-    :param player: Player-controlled character.
-    :param narrator: Narrator character.
-    :param scene: Current scene.
-    :return: Formatted system prompt.
-    """
-    return f"""IMPORTANT: Reply in {scene.language} only!
-# Role: Visual Novel Narrator
-## Core Purpose
-You are the {narrator.name}, the Narrator of the visual novel.
-The player is {player.name}.
-
-## Narrative Rules
-1. **Content Scope**:
-   - Be concise, but you MAY write up to 2-3 sentences when the orchestrator directs a scene transition, location change, or group entrance.
-   - For simple atmospheric beats, one sentence is enough.
-   - Express unspoken character thoughts (only for {player.name}).
-   - Handle scene transitions when directed.
-
-2. **Style Guidelines**:
-   - Do not prefix your response with your name.
-   - Match the plot zeitgeist: {scene.zeitgeist}.
-   - Match the scene tone: {scene.tone}.
-   - Never speak for characters.
-   - You are NOT any character. Do not take on a character's perspective, voice, or hidden thoughts.
-   - When the orchestrator gives you a directive, follow it rather than compressing it to one sentence.
-   - You may use simple inline markup: **bold**, *italic*, or ~~strikethrough~~. Use a backslash to escape a marker if you want it literally, e.g. \\*not italic\\*.
-
-## Prohibitions
- - Never advance plot through character dialogue.
- - Do not take over character turns; let character agents speak their own lines and perform their own focused actions.
-"""
 
 
 @dataclass
@@ -944,49 +860,6 @@ class Engine:
             scene.narrator.memory.add_conversation([result.content.strip()])
         return result.content.strip()
 
-    def _player_turn(
-        self,
-        scene: Scene,
-        ctx: ConversationContext,
-        decision: TurnDecision,
-        get_user_input: Callable[[str, list[str]], str],
-    ) -> None:
-        """Execute a player turn.
-
-        Displays the orchestrator's suggestions and reads a line from stdin.
-        If the user types ``/command`` or ``:command``, the text is routed to
-        the debug console instead of being treated as in-character input.
-        """
-        if decision.suggestions:
-            print("\n".join(decision.suggestions))
-        prompt = f"{scene.player.name}> "
-
-        while True:
-            user_text = get_user_input(prompt, decision.suggestions)
-            stripped = user_text.strip()
-            if stripped.startswith(("/", ":")):
-                if self._debug is not None:
-                    self._debug.pause(
-                        scene=scene,
-                        ctx=ctx,
-                        here_chars=self._here_chars,
-                        away_chars=self._away_chars,
-                        loc=self._loc or scene.starting_location,
-                        decision=decision,
-                        noshell=stripped[1:],
-                    )
-                else:
-                    print("Debug console not available. Start with --debug-console.")
-                continue
-            break
-
-        ctx.user_message(
-            user_text,
-            name=scene.player.name,
-            hidden=scene.player.hidden,
-            visible_to=set(scene.player.visible_to) if scene.player.hidden else None,
-        )
-
     def _build_character_branch(
         self,
         char: Character,
@@ -1202,7 +1075,7 @@ class Engine:
         def _wiki_recall_handler(args: str) -> str:
             data = json.loads(args)
             query = data.get("query", "")
-            return self.orchestrator._wiki_recall(query, querier=char)
+            return self.orchestrator.wiki.recall(query, querier=char)
 
         def _write_scratch_handler(args: str) -> str:
             data = json.loads(args)

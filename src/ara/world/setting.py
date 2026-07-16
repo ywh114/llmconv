@@ -119,16 +119,6 @@ def load_world_setting(path: Path) -> WorldSetting:
     )
 
 
-def default_world_path(data_dir: Path) -> Path | None:
-    """Return the first ``.toml`` in ``data_dir/assets/world/`` if any."""
-    world_dir = AraSettings(data_dir=data_dir).world_path()
-    if not world_dir.exists():
-        return None
-    for path in sorted(world_dir.glob("*.toml")):
-        return path
-    return None
-
-
 def resolve_world_setting_path(setting_id: str, config: AraSettings, story: str | None = None) -> Path:
     """Return the path for a world setting, preferring per-story overrides.
 

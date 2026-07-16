@@ -37,14 +37,3 @@ class AgentResponse:
     def to_json(self) -> str:
         """Serialize the response to a JSON line."""
         return json.dumps(asdict(self), default=str) + "\n"
-
-
-@dataclass
-class StepResult:
-    """Structured result of a single :meth:`Story.step` call."""
-
-    event: str
-    output: str = ""
-    scene: dict[str, Any] | None = None
-    suggestions: list[str] | None = None
-    next_scene: str | None = None

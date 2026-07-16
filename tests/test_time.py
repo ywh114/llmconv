@@ -3,13 +3,8 @@
 from __future__ import annotations
 
 import uuid
-from pathlib import Path
 from unittest.mock import MagicMock
 
-import pytest
-
-from ara.config import AraSettings
-from ara.memory.chroma import ChromaStore
 from ara.world.character import Character, Importance
 from ara.world.engine import Engine
 from ara.world.orchestrator import TurnDecision

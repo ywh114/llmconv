@@ -15,6 +15,7 @@ from ara.memory.chroma import ChromaStore
 from ara.memory.knowledge import CharacterMemory, NullMemory, Scratchpad
 from ara.llm.models import Context
 from ara.utils.logger import get_logger
+from ara.world.ids import stable_uuid as _stable_uuid_str
 from ara.world.system_page import pretty_print
 
 logger = get_logger(__name__)
@@ -41,12 +42,8 @@ class Importance(IntEnum):
 
 
 def _stable_uuid(name: str) -> uuid.UUID:
-    """Generate a deterministic UUID for *name*.
-
-    :param name: Character name.
-    :return: Stable UUID5 derived from a fixed namespace.
-    """
-    return uuid.uuid5(uuid.NAMESPACE_DNS, f"ara.character.{name}")
+    """Generate a deterministic UUID for *name*."""
+    return uuid.UUID(_stable_uuid_str("character", name))
 
 
 @dataclass

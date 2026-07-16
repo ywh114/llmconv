@@ -11,8 +11,8 @@ from typing import Any, Callable
 
 
 def parse_level(level: str | None) -> tuple[str | None, bool]:
-    from ara.world.title import _resolve_level
-    return _resolve_level(level)
+    from ara.fortune import resolve_level
+    return resolve_level(level)
 
 
 def build_parser(
@@ -227,7 +227,7 @@ def handle_slot_queries(
     story: str | None = None,
 ) -> None:
     """Print available sources for queried slots and exit."""
-    from ara.world.title import _load_toml, _apply_expose
+    from ara.fortune import apply_expose, load_toml
     primary, fallback = dirs_func(story)
     source_names = ["generic", "numbers"] + selected_flavors
 
@@ -235,7 +235,7 @@ def handle_slot_queries(
     categories: dict[str, str] = {}
     for s in source_names:
         try:
-            g = _load_toml(s, primary, fallback)
+            g = load_toml(s, primary, fallback)
             cat = g.get("category", "base" if s in ("generic", "numbers") else "other")
             categories[s] = cat
         except FileNotFoundError:
@@ -245,8 +245,8 @@ def handle_slot_queries(
         by_cat: dict[str, list[str]] = {}
         for s in source_names:
             try:
-                g = _load_toml(s, primary, fallback)
-                g = _apply_expose(g)
+                g = load_toml(s, primary, fallback)
+                g = apply_expose(g)
                 if slot in g and g[slot]:
                     cat = categories.get(s, "other")
                     by_cat.setdefault(cat, []).append(s)
@@ -268,9 +268,9 @@ def load_templates_raw(
     exact: bool,
 ) -> list[tuple[str, str]]:
     """Return a list of (template, level) tuples."""
-    from ara.world.title import _load_toml
+    from ara.fortune import load_toml
     primary, fallback = dirs_func(story)
-    td = _load_toml("templates", primary, fallback)
+    td = load_toml("templates", primary, fallback)
     levels = ["simple", "moderate", "complex", "insane"]
     if level_name:
         if exact:
@@ -364,9 +364,9 @@ def filter_templates(
 
 
 def list_templates(dirs_func, story):
-    from ara.world.title import _load_toml
+    from ara.fortune import load_toml
     primary, fallback = dirs_func(story)
-    td = _load_toml("templates", primary, fallback)
+    td = load_toml("templates", primary, fallback)
     levels = ["simple", "moderate", "complex", "insane"]
     print('Available templates:\n')
     template_list = []
@@ -392,9 +392,9 @@ def resolve_template_idx(
         return None
     if not template.lstrip('-').isdigit():
         return (template, None)
-    from ara.world.title import _load_toml
+    from ara.fortune import load_toml
     primary, fallback = dirs_func(story)
-    td = _load_toml("templates", primary, fallback)
+    td = load_toml("templates", primary, fallback)
     flat: list[tuple[str, str]] = []
     for lvl in ["simple", "moderate", "complex", "insane"]:
         for tmpl in td.get(lvl, []):

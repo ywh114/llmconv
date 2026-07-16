@@ -7,6 +7,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
+import ara.fortune as fortune_grammar
 from ara.llm.models import GameRole, StreamResult
 from ara.world import fortune
 from ara.world.orchestrator import Orchestrator, TurnDecision
@@ -101,7 +102,7 @@ def test_fortune_suite_has_all_fields() -> None:
 
 
 def test_list_title_flavors() -> None:
-    flavors = fortune.list_title_flavors()
+    flavors = fortune_grammar.list_title_flavors()
     assert isinstance(flavors, list)
     assert "generic" not in flavors
     assert "numbers" not in flavors
@@ -113,19 +114,19 @@ def test_list_title_flavors() -> None:
 
 
 def test_generate_title_returns_string() -> None:
-    title = fortune.generate_title()
+    title = fortune_grammar.generate_title()
     assert isinstance(title, str)
     assert title
 
 
 def test_generate_title_with_flavor() -> None:
-    title = fortune.generate_title(flavors="fantasy")
+    title = fortune_grammar.generate_title(flavors="fantasy")
     assert isinstance(title, str)
     assert title
 
 
 def test_generate_title_with_level() -> None:
-    title = fortune.generate_title(level="simple")
+    title = fortune_grammar.generate_title(level="simple")
     assert isinstance(title, str)
     assert title
 
@@ -208,7 +209,7 @@ def test_cull_grammar_caps_dominant_source() -> None:
             {'value': 'g', '_source': 'z'},
         ],
     }
-    culled = fortune.cull_grammar(grammar)
+    culled = fortune_grammar.cull_grammar(grammar)
     # total 7 * 0.4 = 2.8 -> cap 2. source x (5) capped to 2, y and z (1 each) kept.
     assert len(culled['noun']) == 4
     assert len([e for e in culled['noun'] if e['_source'] == 'x']) == 2
@@ -232,10 +233,10 @@ def test_cull_grammar_is_random_per_call() -> None:
             for i in range(50)
         ],
     }
-    first = {e['value'] for e in fortune.cull_grammar(grammar)['noun']}
+    first = {e['value'] for e in fortune_grammar.cull_grammar(grammar)['noun']}
     different = False
     for _ in range(10):
-        second = {e['value'] for e in fortune.cull_grammar(grammar)['noun']}
+        second = {e['value'] for e in fortune_grammar.cull_grammar(grammar)['noun']}
         if second != first:
             different = True
             break

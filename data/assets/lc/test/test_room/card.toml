@@ -1,5 +1,0 @@
-id = "test_room"
-name = "Test Room"
-description = "A small room used for integration testing."
-lore = "Originally a storage closet, now repurposed for automated tests."
-loading_background = "test_room_loading"

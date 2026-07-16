@@ -100,8 +100,8 @@ Assets are organised by type, then story:
 data/assets/
   cc/<story>/<character>/card.toml   # character definitions
   lc/<story>/<location>/card.toml    # location definitions
-  items/<story>/<item>.toml          # item definitions
-  world/<story>.toml                 # world wiki (realms, factions, places)
+  items/<item>.toml                  # item definitions
+  world/<story>/<story>.toml         # world wiki (realms, factions, places)
   plot/<story>/<scene>.toml          # scene scripts
 ```
 

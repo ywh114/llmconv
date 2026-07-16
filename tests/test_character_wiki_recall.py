@@ -153,7 +153,7 @@ def test_character_wiki_recall_uses_querier_filter() -> None:
 
     fake_client = _FakeClient()
     engine = Engine(fake_client, db=mock_db)  # type: ignore[arg-type]
-    engine.orchestrator._wiki_recall = MagicMock(return_value="Qingyun and Heavenly Sword.")
+    engine.orchestrator.wiki.recall = MagicMock(return_value="Qingyun and Heavenly Sword.")
     engine.orchestrator.decide_next_turn = MagicMock(return_value=TurnDecision(
         next_char=npc,
         directive="Recall something",
@@ -168,7 +168,7 @@ def test_character_wiki_recall_uses_querier_filter() -> None:
     engine.start(scene)
     engine.step()
 
-    engine.orchestrator._wiki_recall.assert_called_once()
-    call_args = engine.orchestrator._wiki_recall.call_args
+    engine.orchestrator.wiki.recall.assert_called_once()
+    call_args = engine.orchestrator.wiki.recall.call_args
     assert call_args.kwargs.get("querier") is npc
     assert call_args.args[0] == "major sects"

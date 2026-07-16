@@ -7,7 +7,7 @@ from unittest.mock import MagicMock
 import pytest
 
 from ara.llm.client import LLMClient
-from ara.world.orchestrator import Orchestrator, _NextRoundCapture
+from ara.world.orchestrator import Orchestrator, NextRoundCapture
 
 
 class TestOrchestratorScratch:
@@ -47,7 +47,7 @@ class TestNextRoundCapture:
 
     def test_end_scene_with_no_follow_up_completes_story(self) -> None:
         """If end_scene is true and there are no next scenes, accept empty next_scene."""
-        capture = _NextRoundCapture()
+        capture = NextRoundCapture()
         capture.hook('{"end_scene": true, "next_scene": ""}')
 
         scene = MagicMock()
@@ -60,7 +60,7 @@ class TestNextRoundCapture:
 
     def test_next_scene_auto_selected_when_empty_and_choices_exist(self) -> None:
         """If end_scene is true and next_scene is empty, auto-pick the first choice."""
-        capture = _NextRoundCapture()
+        capture = NextRoundCapture()
         capture.hook('{"end_scene": true, "next_scene": ""}')
 
         scene = MagicMock()
@@ -73,7 +73,7 @@ class TestNextRoundCapture:
 
     def test_invalid_next_scene_raises(self) -> None:
         """A non-empty next_scene must exist in scene.next_choices."""
-        capture = _NextRoundCapture()
+        capture = NextRoundCapture()
         capture.hook('{"end_scene": true, "next_scene": "missing"}')
 
         scene = MagicMock()

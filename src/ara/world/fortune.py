@@ -3,6 +3,10 @@
 These functions provide true randomness and curated random flavor that LLMs are
 poor at generating on their own. The orchestrator calls them and interprets the
 results; they do not automatically resolve scenes.
+
+The title/ability/name grammar cluster lives in :mod:`ara.fortune`; this
+module re-exports its narrow public API so existing ``ara.world.fortune``
+callers keep working.
 """
 
 from __future__ import annotations
@@ -14,9 +18,28 @@ from pathlib import Path
 from typing import Any
 
 from ara.config import AraSettings
-from ara.world import ability as _ability
-from ara.world import title as _title
-from ara.world import name as _name
+from ara.fortune import (
+    ABILITY_SLOTS,
+    TITLE_SLOTS,
+    ability_dirs,
+    categorized_ability_flavors,
+    categorized_title_flavors,
+    cull_grammar,
+    expand,
+    expand_traced,
+    generate_ability,
+    generate_name,
+    generate_title,
+    list_ability_flavors,
+    list_title_flavors,
+    load_ability_grammar,
+    load_ability_templates,
+    load_title_grammar,
+    load_title_templates,
+    resolve_level,
+    title_case,
+    title_dirs,
+)
 
 
 # --------------------------------------------------------------------------- #
@@ -257,64 +280,6 @@ def sample_distribution(distrib: str, params: dict[str, Any] | None = None) -> f
 # Suite
 # --------------------------------------------------------------------------- #
 
-def list_title_flavors(
-    story: str | None = None, config: AraSettings | None = None
-) -> list[str]:
-    """Return the available title grammar flavor names."""
-    return _title.list_title_flavors(story, config)
-
-
-def categorized_title_flavors(
-    story: str | None = None, config: AraSettings | None = None
-) -> dict[str, list[str]]:
-    """Return title flavors grouped by category."""
-    return _title.categorized_title_flavors(story, config)
-
-
-def cull_grammar(grammar: dict) -> dict:
-    """Return a source-capped copy of a title or ability grammar."""
-    return _title.cull_grammar(grammar)
-
-
-def load_title_grammar(
-    story: str | None = None,
-    config: AraSettings | None = None,
-    flavors: list[str] | str | None = None,
-    slot_sources: dict[str, list[str]] | None = None,
-    cull_sources: bool = True,
-) -> dict:
-    """Load and merge title flavor grammars.
-
-    Per-story title files take priority over global files.
-    """
-    return _title.load_title_grammar(
-        story, config, flavors, slot_sources, cull_sources=cull_sources
-    )
-
-
-def generate_title(
-    story: str | None = None,
-    config: AraSettings | None = None,
-    template: str | None = None,
-    flavors: list[str] | str | None = None,
-    level: str | int | None = "2",
-    slot_sources: dict[str, list[str]] | None = None,
-    required_slots: list[str] | set[str] | None = None,
-    cull_sources: bool = True,
-) -> str:
-    """Generate a random title from the title grammar."""
-    return _title.generate_title(
-        story,
-        config,
-        template,
-        flavors,
-        level,
-        slot_sources,
-        required_slots,
-        cull_sources=cull_sources,
-    )
-
-
 def fortune_suite(story: str | None = None, config: AraSettings | None = None) -> dict[str, Any]:
     """Return several independent random values at once.
 
@@ -326,65 +291,3 @@ def fortune_suite(story: str | None = None, config: AraSettings | None = None) -
         "iching": cast_iching(story, config=config),
         "inspiration": random_inspiration(story, config=config),
     }
-
-
-# --------------------------------------------------------------------------- #
-# Ability generation
-# --------------------------------------------------------------------------- #
-
-def list_ability_flavors(
-    story: str | None = None, config: AraSettings | None = None
-) -> list[str]:
-    """Return the available ability grammar flavor names."""
-    return _ability.list_ability_flavors(story, config)
-
-
-def categorized_ability_flavors(
-    story: str | None = None, config: AraSettings | None = None
-) -> dict[str, list[str]]:
-    """Return ability flavors grouped by category."""
-    return _ability.categorized_ability_flavors(story, config)
-
-
-def load_ability_grammar(
-    story: str | None = None,
-    config: AraSettings | None = None,
-    flavors: list[str] | str | None = None,
-    slot_sources: dict[str, list[str]] | None = None,
-    cull_sources: bool = True,
-) -> dict:
-    """Load and merge ability flavor grammars."""
-    return _ability.load_ability_grammar(
-        story, config, flavors, slot_sources, cull_sources=cull_sources
-    )
-
-
-def generate_ability(
-    story: str | None = None,
-    config: AraSettings | None = None,
-    template: str | None = None,
-    flavors: list[str] | str | None = None,
-    level: str | int | None = "2",
-    slot_sources: dict[str, list[str]] | None = None,
-    required_slots: list[str] | set[str] | None = None,
-    cull_sources: bool = True,
-) -> str:
-    """Generate a random ability name from the ability grammar."""
-    return _ability.generate_ability(
-        story,
-        config,
-        template,
-        flavors,
-        level,
-        slot_sources,
-        required_slots,
-        cull_sources=cull_sources,
-    )
-
-
-def generate_name(
-    style: str = "random",
-    n_parts: int | None = None,
-) -> str:
-    """Generate a random human name from the humannames dataset."""
-    return _name.generate_name(style=style, n_parts=n_parts)

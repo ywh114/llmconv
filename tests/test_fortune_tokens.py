@@ -1,6 +1,6 @@
 import pytest
 
-from ara.world import _fortune_tokens as tokens
+from ara.fortune import tokens
 
 
 def test_tokenize_literal() -> None:

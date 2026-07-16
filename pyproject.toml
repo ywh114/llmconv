@@ -15,7 +15,6 @@ dependencies = [
     "pydantic-settings",
     "sentence-transformers",
     "starlette>=1.2.1",
-    "torch",
 ]
 
 [project.scripts]
@@ -26,15 +25,12 @@ arawc = "ara.webclient.__main__:main"
 
 [dependency-groups]
 dev = [
-    "playwright>=1.60.0",
     "pytest>=8.0",
     "sphinx>=8.0",
-    "tomli-w>=1.2.0",
 ]
 
 [project.optional-dependencies]
 web = [
-    "starlette>=0.35",
     "uvicorn[standard]>=0.25",
 ]
 

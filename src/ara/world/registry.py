@@ -9,7 +9,6 @@ are intentionally not snapshotted by the save/load system.
 from __future__ import annotations
 
 import json
-import uuid
 from pathlib import Path
 from typing import Any
 
@@ -22,13 +21,11 @@ from ara.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
+from ara.world.ids import stable_uuid as _stable_uuid
+
+
 CHARACTER_COLLECTION = "ara_characters"
 LOCATION_COLLECTION = "ara_locations"
-
-
-def _stable_uuid(kind: str, name: str) -> str:
-    """Return a deterministic UUID string for a character or location."""
-    return str(uuid.uuid5(uuid.NAMESPACE_DNS, f"ara.{kind}.{name}"))
 
 
 def _card_names(card: dict[str, Any]) -> dict[str, str]:

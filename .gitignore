@@ -4,6 +4,7 @@ __pycache__/
 
 # Sphinx
 build_docs/build/
+docs/python/
 
 # Logs
 log
@@ -11,6 +12,7 @@ servlog
 
 # Testing/cache
 data/chroma/*
+data/tests/
 saves/
 sockets/
 

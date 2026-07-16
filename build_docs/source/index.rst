@@ -18,6 +18,7 @@ Welcome to Ara documentation.
 
    api/ara
    api/ara.world
+   api/ara.fortune
    api/ara.agent
    api/ara.llm
    api/ara.memory

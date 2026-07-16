@@ -9,7 +9,7 @@ internals.  It can be triggered automatically every turn or on-demand via
 from __future__ import annotations
 
 import pprint
-import sys
+
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:

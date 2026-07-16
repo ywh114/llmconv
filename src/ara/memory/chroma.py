@@ -12,9 +12,13 @@ from chromadb.utils.embedding_functions import (
 )
 
 from ara.config import AraSettings
+from ara.memory.wiki import WIKI_COLLECTION
 from ara.utils.logger import get_logger
 
 logger = get_logger(__name__)
+
+
+__all__ = ["ChromaStore", "WIKI_COLLECTION"]
 
 
 class ChromaStore:

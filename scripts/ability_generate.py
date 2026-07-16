@@ -23,8 +23,8 @@ from _grammar_cli import (
     resolve_template_idx,
 )
 
-from ara.world import ability
-from ara.world.title import (
+from ara.fortune import ability
+from ara.fortune.title import (
     cull_grammar,
     expand_traced,
     expand,
@@ -34,8 +34,8 @@ from ara.world.title import (
 
 STORY = "ability"
 DEFAULT_LEVEL = "complex"
-SLOTS = ability._SLOTS
-ALWAYS_LOAD = frozenset(ability._ALWAYS_LOAD)
+SLOTS = ability.SLOTS
+ALWAYS_LOAD = frozenset(ability.ALWAYS_LOAD)
 _SLOT_EXAMPLE = "--slot noun fire --slot verb:noun @melee --slot verb status"
 
 
@@ -96,15 +96,15 @@ def main() -> None:
 
     level_name, exact = parse_level(args.level)
     templates: list[tuple[str, str]] = filter_templates(
-        load_templates_raw(ability._ability_dirs, pre_args.story, level_name, exact),
+        load_templates_raw(ability.ability_dirs, pre_args.story, level_name, exact),
         args.required_slots,
     )
 
     if args.list_templates:
-        list_templates(ability._ability_dirs, pre_args.story)
+        list_templates(ability.ability_dirs, pre_args.story)
         sys.exit(0)
 
-    resolved_template = resolve_template_idx(args.template, ability._ability_dirs, pre_args.story)
+    resolved_template = resolve_template_idx(args.template, ability.ability_dirs, pre_args.story)
     args.template = resolved_template
 
     if args.enumerate_all:
@@ -129,7 +129,7 @@ def main() -> None:
 
     if args.slot_queries:
         handle_slot_queries(
-            args.slot_queries, selected, ability._ability_dirs,
+            args.slot_queries, selected, ability.ability_dirs,
             ALWAYS_LOAD, pre_args.story,
         )
 

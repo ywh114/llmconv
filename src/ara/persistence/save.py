@@ -7,7 +7,6 @@ that play can be resumed later from the exact same point.
 from __future__ import annotations
 
 import json
-import os
 import shutil
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -17,8 +16,8 @@ from typing import Any
 from ara.config import AraSettings
 from ara.memory.chroma import ChromaStore
 from ara.utils.logger import get_logger
-from ara.world.character import Character, CharacterMemory, Importance, NullMemory, Scratchpad, create_anonymous_character, load_character
-from ara.world.engine import Engine
+from ara.memory.knowledge import CharacterMemory
+from ara.world.character import Character, Importance, create_anonymous_character, load_character
 from ara.llm.context import ConversationContext
 
 from ara.world.i18n import normalize_language

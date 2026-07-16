@@ -23,11 +23,11 @@ from _grammar_cli import (
     resolve_template_idx,
 )
 
-from ara.world import title
+from ara.fortune import title
 
 STORY = "title"
 DEFAULT_LEVEL = "complex"
-SLOTS = title._GENERIC_SLOTS
+SLOTS = title.GENERIC_SLOTS
 _SLOT_EXAMPLE = "--slot noun:plural foss --slot prefix buzzword --slot place @astronomy"
 
 
@@ -95,17 +95,17 @@ def main() -> None:
         args.parsed_slot_sources.setdefault(slot, []).extend(groups)
 
     level_name, exact = parse_level(args.level)
-    primary, fallback = title._title_dirs(pre_args.story)
+    primary, fallback = title.title_dirs(pre_args.story)
     templates: list[tuple[str, str]] = filter_templates(
-        load_templates_raw(title._title_dirs, pre_args.story, level_name, exact),
+        load_templates_raw(title.title_dirs, pre_args.story, level_name, exact),
         args.required_slots,
     )
 
     if args.list_templates:
-        list_templates(title._title_dirs, pre_args.story)
+        list_templates(title.title_dirs, pre_args.story)
         sys.exit(0)
 
-    resolved_template = resolve_template_idx(args.template, title._title_dirs, pre_args.story)
+    resolved_template = resolve_template_idx(args.template, title.title_dirs, pre_args.story)
     args.template = resolved_template
 
     if args.enumerate_all:
@@ -125,8 +125,8 @@ def main() -> None:
 
     if args.slot_queries:
         handle_slot_queries(
-            args.slot_queries, selected, title._title_dirs,
-            frozenset(title._ALWAYS_LOAD), pre_args.story,
+            args.slot_queries, selected, title.title_dirs,
+            frozenset(title.ALWAYS_LOAD), pre_args.story,
         )
 
     grammar = title.build_grammar(

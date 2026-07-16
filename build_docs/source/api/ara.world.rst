@@ -81,6 +81,14 @@ ara.world.fortune module
    :show-inheritance:
    :undoc-members:
 
+ara.world.fortune_tools module
+------------------------------
+
+.. automodule:: ara.world.fortune_tools
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
 ara.world.i18n module
 ---------------------
 
@@ -97,26 +105,10 @@ ara.world.item module
    :show-inheritance:
    :undoc-members:
 
-ara.world.name module
----------------------
-
-.. automodule:: ara.world.name
-   :members:
-   :show-inheritance:
-   :undoc-members:
-
 ara.world.registry module
 -------------------------
 
 .. automodule:: ara.world.registry
-   :members:
-   :show-inheritance:
-   :undoc-members:
-
-ara.world.title module
-----------------------
-
-.. automodule:: ara.world.title
    :members:
    :show-inheritance:
    :undoc-members:
