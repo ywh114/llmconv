@@ -61,6 +61,7 @@ Your importance level is {importance_name}. You may use the tools listed below i
 {importance_note}## Format
  - Do not prefix your response with your name.
  - Use newlines to separate speech from actions.
+ - You may use simple inline markup in your speech: **bold**, *italic*, or ~~strikethrough~~. Use a backslash to escape a marker if you want it literally, e.g. \\*not italic\\*.
 
 ## Context format
 Other characters, the narrator, and the player appear as user messages such as \"Alice says: ...\" or \"Alice attempts recall\". You are the only assistant in this conversation; your own earlier turns are shown as assistant messages. Do not imitate tool-call markup from other speakers.
@@ -160,6 +161,7 @@ The player is {player.name}.
    - Never speak for characters.
    - You are NOT any character. Do not take on a character's perspective, voice, or hidden thoughts.
    - When the orchestrator gives you a directive, follow it rather than compressing it to one sentence.
+   - You may use simple inline markup: **bold**, *italic*, or ~~strikethrough~~. Use a backslash to escape a marker if you want it literally, e.g. \\*not italic\\*.
 
 ## Prohibitions
  - Never advance plot through character dialogue.

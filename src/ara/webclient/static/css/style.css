@@ -389,6 +389,18 @@ body.vn-hide-nametags .vn-nametag {
   animation: vn-blink 1s step-end infinite;
 }
 
+#vn-text .vn-bold {
+  font-weight: bold;
+}
+
+#vn-text .vn-italic {
+  font-style: italic;
+}
+
+#vn-text .vn-strikethrough {
+  text-decoration: line-through;
+}
+
 @keyframes vn-blink {
   50% { opacity: 0; }
 }

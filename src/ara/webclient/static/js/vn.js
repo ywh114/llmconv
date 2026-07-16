@@ -522,6 +522,87 @@
   }
 
   /* ------------------------------------------------------------------
+     Inline markdown (bold, italic, strikethrough)
+     ------------------------------------------------------------------ */
+  function parseInlineMarkdown(text) {
+    const runs = [];
+    const markers = [
+      { pattern: '***', classes: ['vn-bold', 'vn-italic'] },
+      { pattern: '**', classes: ['vn-bold'] },
+      { pattern: '*', classes: ['vn-italic'] },
+      { pattern: '_', classes: ['vn-italic'] },
+      { pattern: '~~', classes: ['vn-strikethrough'] },
+    ];
+
+    function appendPlain(str) {
+      const last = runs.length - 1;
+      if (last >= 0 && runs[last].classes.length === 0) {
+        runs[last].text += str;
+      } else {
+        runs.push({ text: str, classes: [] });
+      }
+    }
+
+    let i = 0;
+    while (i < text.length) {
+      // Escaped marker character: backslash + marker-start prints literally.
+      if (text[i] === '\\' && i + 1 < text.length) {
+        const next = text[i + 1];
+        const isMarkerStart = markers.some(m => m.pattern[0] === next);
+        if (isMarkerStart) {
+          appendPlain(next);
+          i += 2;
+          continue;
+        }
+      }
+
+      let matched = false;
+      let prefixMatched = false;
+      for (const marker of markers) {
+        const len = marker.pattern.length;
+        if (text.slice(i, i + len) !== marker.pattern) continue;
+        prefixMatched = true;
+        const close = text.indexOf(marker.pattern, i + len);
+        if (close === -1) continue;
+        const content = text.slice(i + len, close);
+        if (!content) continue;
+        runs.push({ text: content, classes: marker.classes });
+        i = close + len;
+        matched = true;
+        break;
+      }
+      if (matched) continue;
+      if (prefixMatched) {
+        // A marker prefix matched but had no valid closing; consume the
+        // longest matching prefix as plain text so shorter markers don't
+        // misparse the remainder.
+        let maxPrefixLen = 0;
+        for (const marker of markers) {
+          const len = marker.pattern.length;
+          if (text.slice(i, i + len) === marker.pattern) {
+            maxPrefixLen = Math.max(maxPrefixLen, len);
+          }
+        }
+        appendPlain(text.slice(i, i + maxPrefixLen));
+        i += maxPrefixLen;
+      } else {
+        appendPlain(text[i]);
+        i++;
+      }
+    }
+    return runs;
+  }
+
+  function appendRunsToText(runs) {
+    runs.forEach(run => {
+      const span = document.createElement('span');
+      if (run.classes.length) span.className = run.classes.join(' ');
+      span.textContent = run.text;
+      $text.insertBefore(span, $text.lastElementChild);
+    });
+  }
+
+  /* ------------------------------------------------------------------
      Text typing
      ------------------------------------------------------------------ */
   async function typeText(speaker, text, speakerTitle) {
@@ -540,9 +621,16 @@
         return;
       }
       _fullText = pages[p];
+      const runs = parseInlineMarkdown(pages[p]);
+      // Flatten runs into typed characters carrying their style.
+      const chars = [];
+      runs.forEach(run => {
+        for (let j = 0; j < run.text.length; j++) {
+          chars.push({ char: run.text[j], classes: run.classes });
+        }
+      });
       $text.innerHTML = '<span class="vn-cursor"></span>';
       let i = 0;
-      const chars = pages[p].split('');
 
       await new Promise(resolve => {
         _typingResolve = resolve;
@@ -559,8 +647,10 @@
             resolve();
             return;
           }
+          const item = chars[i];
           const span = document.createElement('span');
-          span.textContent = chars[i];
+          if (item.classes.length) span.className = item.classes.join(' ');
+          span.textContent = item.char;
           $text.insertBefore(span, $text.lastElementChild);
           i++;
           _typingTimer = setTimeout(tick, STATE.textSpeed);
@@ -581,8 +671,9 @@
       _typingTimer = null;
     }
     if (_fullText) {
-      $text.textContent = _fullText;
-      $text.innerHTML += '<span class="vn-cursor"></span>';
+      const runs = parseInlineMarkdown(_fullText);
+      $text.innerHTML = '<span class="vn-cursor"></span>';
+      appendRunsToText(runs);
     }
     if (_typingResolve) {
       _typingResolve();
