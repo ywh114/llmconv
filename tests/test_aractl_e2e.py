@@ -10,7 +10,6 @@ import sys
 import tempfile
 import threading
 import time
-import uuid
 from pathlib import Path
 from unittest.mock import MagicMock
 
@@ -18,68 +17,12 @@ import pytest
 
 from ara.agent.server import AgentServer
 from ara.config import AraSettings
-from ara.llm.models import GameRole, StreamResult
+from ara.llm.models import StreamResult
 from ara.memory.chroma import ChromaStore
-from ara.world.character import Character, Importance
-from ara.world.engine import Engine
 from ara.world.orchestrator import TurnDecision
-from ara.world.scene import Location, Scene, SceneChoice
 from ara.world.story import Story
 
-
-class MockLLMClient:
-    """Fake LLM client that returns pre-canned responses."""
-
-    def __init__(self, responses: list[StreamResult]) -> None:
-        self.responses = responses
-        self._index = 0
-        self.calls: list[dict] = []
-
-    def complete(
-        self,
-        role: GameRole,
-        system_prompt: str = "",
-        messages: list | None = None,
-        tools: list[dict] | None = None,
-        tool_choice: str | None = None,
-        stream: bool = True,
-        print_stream: bool = False,
-        name: str | None = None,
-    ) -> StreamResult:
-        self.calls.append({"role": role, "tools": tools, "tool_choice": tool_choice})
-        result = self.responses[self._index]
-        self._index += 1
-        if print_stream:
-            print(result.content, end="")
-        return result
-
-    def complete_subagent(
-        self, task: str, context: str, system_prompt: str = "", max_tokens: int = 512
-    ) -> str:
-        return ""
-
-
-def _stable_cid(name: str) -> uuid.UUID:
-    return uuid.uuid5(uuid.NAMESPACE_DNS, f"test.{name}")
-
-
-def _make_char(name: str, mock_db: ChromaStore) -> Character:
-    return Character(
-        id=_stable_cid(name),
-        canonical_name=name,
-        name=name,
-        card_fields={
-            "name": name,
-            "summary": f"{name} summary",
-            "personality": f"{name} personality",
-            "scenario": f"{name} scenario",
-            "greeting_message": f"Hi, I'm {name}",
-            "example_messages": "",
-        },
-        importance=Importance.IMPORTANT,
-        memory=MagicMock(),
-        scratch=MagicMock(),
-    )
+from tests.helpers import ScriptedLLMClient as MockLLMClient
 
 
 def _write_assets(tmp: Path) -> Path:
@@ -228,7 +171,7 @@ def aractl_server():
             ),
             StreamResult(content="The scene fades."),
         ]
-        mock_client = MockLLMClient(responses)
+        mock_client = MockLLMClient(responses, subagent_answer="")
         story = Story(settings, db, mock_client, scene_path)
 
         # Mock orchestrator decisions once the scene is loaded.

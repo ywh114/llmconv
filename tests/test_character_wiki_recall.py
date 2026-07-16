@@ -3,84 +3,20 @@
 from __future__ import annotations
 
 import json
-import uuid
 from unittest.mock import MagicMock
 
-from ara.config import AraSettings
 from ara.llm.models import StreamResult
 from ara.memory.chroma import ChromaStore
-from ara.memory.knowledge import CharacterMemory, Scratchpad
 from ara.world.character import Character, Importance
 from ara.world.engine import Engine
 from ara.world.orchestrator import TurnDecision
-from ara.world.scene import Location, Scene
+
+from tests.helpers import make_char as _make_char_impl
+from tests.helpers import make_scene_with_chars as _make_scene_with_chars
 
 
 def _make_char(name: str, importance: Importance, mock_db: ChromaStore) -> Character:
-    cid = uuid.uuid5(uuid.NAMESPACE_DNS, f"test.{name}")
-    return Character(
-        id=cid,
-        canonical_name=name,
-        name=name,
-        card_fields={
-            "name": name,
-            "summary": f"{name} summary",
-            "personality": f"{name} personality",
-            "scenario": f"{name} scenario",
-            "greeting_message": f"Hi, I'm {name}",
-            "example_messages": "",
-        },
-        importance=importance,
-        memory=CharacterMemory(character_id=cid, db=mock_db),
-        scratch=Scratchpad(),
-    )
-
-
-def _make_scene_with_chars(chars: list[Character]) -> Scene:
-    player = next(c for c in chars if c.name == "Player")
-    narrator = next(c for c in chars if c.name == "Player")
-    loc = Location(canonical_name="room", name="room", desc="A room.")
-    return Scene(
-        id="test",
-        language="English",
-        zeitgeist="test",
-        tone="neutral",
-        scene_type="normal",
-        character_pool=set(chars),
-        starting_characters=set(chars),
-        player=player,
-        narrator=narrator,
-        location_pool={loc},
-        starting_location=loc,
-        plot_considerations="",
-        plot_story="Test scene",
-        next_choices={},
-    )
-
-
-def _next_round_result(next_char: str) -> StreamResult:
-    return StreamResult(
-        content="",
-        tool_calls=[{
-            "id": "call_next",
-            "type": "function",
-            "function": {
-                "name": "next_round",
-                "arguments": json.dumps({
-                    "next_character": next_char,
-                    "directive": "",
-                    "suggestions": [],
-                    "enter_characters": [],
-                    "exit_characters": [],
-                    "switch_location": "",
-                    "edit_location": "",
-                    "end_scene": False,
-                    "next_scene": "",
-                    "response_mode": "outer",
-                }),
-            },
-        }],
-    )
+    return _make_char_impl(name, mock_db, importance=importance)
 
 
 def test_character_wiki_recall_tool_exists() -> None:

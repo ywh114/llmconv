@@ -4,64 +4,31 @@ from __future__ import annotations
 
 import json
 import tempfile
-import uuid
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 from ara.config import AraSettings
 from ara.llm.client import LLMClient
 from ara.llm.context import ConversationContext
-from ara.llm.models import GameRole, StreamResult
+from ara.llm.models import StreamResult
 from ara.memory.chroma import ChromaStore
-from ara.memory.knowledge import CharacterMemory, Scratchpad
-from ara.world.character import Character, Importance
 from ara.world.engine import Engine
 from ara.world.orchestrator import TurnDecision
-from ara.world.scene import Location, Scene, SceneChoice
+from ara.world.scene import Scene, SceneChoice
 from ara.world.story import Story, _finalize_character
 from ara.world.summarizer import Summarizer
 
-
-def _make_char(name: str, mock_db: ChromaStore) -> Character:
-    cid = uuid.uuid5(uuid.NAMESPACE_DNS, f"test.{name}")
-    return Character(
-        id=cid,
-        canonical_name=name,
-        name=name,
-        card_fields={
-            "name": name,
-            "summary": f"{name} summary",
-            "personality": f"{name} personality",
-            "scenario": f"{name} scenario",
-            "greeting_message": f"Hi, I'm {name}",
-            "example_messages": "",
-        },
-        importance=Importance.IMPORTANT,
-        memory=CharacterMemory(character_id=cid, db=mock_db),
-        scratch=Scratchpad(),
-    )
+from tests.helpers import ScriptedLLMClient as MockLLMClient
+from tests.helpers import make_scene
 
 
 def _make_scene(scene_id: str, next_choices: dict, mock_db: ChromaStore, char_names: list[str]) -> Scene:
-    chars = {_make_char(name, mock_db) for name in char_names}
-    player = next(c for c in chars if c.name == "Player")
-    narrator = next(c for c in chars if c.name == "Narrator")
-    loc = Location(canonical_name="lab", name="lab", desc="A lab.")
-    return Scene(
-        id=scene_id,
-        language="English",
-        zeitgeist="test",
-        tone="neutral",
-        scene_type="normal",
-        character_pool=chars,
-        starting_characters=chars,
-        player=player,
-        narrator=narrator,
-        location_pool={loc},
-        starting_location=loc,
-        plot_considerations="",
-        plot_story=f"Test {scene_id}",
+    return make_scene(
+        scene_id,
+        mock_db,
+        char_names=tuple(char_names),
         next_choices=next_choices,
+        location_name="lab",
     )
 
 
@@ -121,26 +88,7 @@ def test_finalize_turn_emitted_on_location_change() -> None:
 
 
 def _make_scene_for_smoke(mock_db: ChromaStore) -> Scene:
-    player = _make_char("Player", mock_db)
-    narrator = _make_char("Narrator", mock_db)
-    npc = _make_char("NPC", mock_db)
-    loc = Location(canonical_name="room", name="room", desc="A room.")
-    return Scene(
-        id="test",
-        language="English",
-        zeitgeist="test",
-        tone="neutral",
-        scene_type="normal",
-        character_pool={player, narrator, npc},
-        starting_characters={player, narrator, npc},
-        player=player,
-        narrator=narrator,
-        location_pool={loc},
-        starting_location=loc,
-        plot_considerations="",
-        plot_story="Test scene",
-        next_choices={},
-    )
+    return make_scene("test", mock_db)
 
 
 def test_state_machine_story_with_next_choice() -> None:
@@ -290,40 +238,6 @@ def test_scratchpad_archived_and_carried_between_scenes() -> None:
     alice_b = next(c for c in scene_b.character_pool if c.name == "Alice")
     assert alice_b.scratch.prev_text == "[Thought]: I should look for the key."
     assert alice_b.scratch.text == "Nothing yet!"
-
-
-class MockLLMClient:
-    """Fake LLM client that returns pre-canned responses."""
-
-    def __init__(self, responses: list[StreamResult]) -> None:
-        self.responses = responses
-        self._index = 0
-        self.calls: list[dict] = []
-
-    def complete(
-        self,
-        role: GameRole,
-        system_prompt: str,
-        messages: list,
-        tools: list[dict] | None = None,
-        tool_choice: str | None = None,
-        stream: bool = True,
-        print_stream: bool = False,
-        name: str | None = None,
-    ) -> StreamResult:
-        self.calls.append({
-            "role": role,
-            "tools": tools,
-            "tool_choice": tool_choice,
-        })
-        result = self.responses[self._index]
-        self._index += 1
-        return result
-
-    def complete_subagent(
-        self, task: str, context: str, system_prompt: str = "", max_tokens: int = 512
-    ) -> str:
-        return f"[sub-agent summary for: {task}]"
 
 
 def test_system_state_persists_across_scene_transition() -> None:

@@ -7,59 +7,22 @@ import tempfile
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-import pytest
 
 from ara.config import AraSettings
-from ara.llm.client import LLMClient
 from ara.memory.chroma import ChromaStore
 from ara.llm.models import GameRole, StreamResult
-from ara.world.character import Importance
 from ara.world.character import Character
 from ara.world.engine import Engine
 from ara.world.orchestrator import TurnDecision
 from ara.world.scene import Location, Scene, SceneChoice, load_location
 from ara.world.story import Story
-from ara.memory.knowledge import CharacterMemory, Scratchpad
 from ara.world.orchestrator import Orchestrator
 from ara.world.summarizer import Summarizer, SceneStateModifiers
 from ara.world.character import load_character
 from ara.persistence.save import SaveManager
 
-
-class MockLLMClient:
-    """Fake LLM client that returns pre-canned responses."""
-
-    def __init__(self, responses: list[StreamResult]) -> None:
-        self.responses = responses
-        self._index = 0
-        self.calls: list[dict] = []
-
-    def complete(
-        self,
-        role: GameRole,
-        system_prompt: str,
-        messages: list,
-        tools: list[dict] | None = None,
-        tool_choice: str | None = None,
-        stream: bool = True,
-        print_stream: bool = False,
-        name: str | None = None,
-    ) -> StreamResult:
-        self.calls.append({
-            "role": role,
-            "tools": tools,
-            "tool_choice": tool_choice,
-            "system_prompt": system_prompt,
-            "messages": messages,
-        })
-        result = self.responses[self._index]
-        self._index += 1
-        return result
-
-    def complete_subagent(
-        self, task: str, context: str, system_prompt: str = "", max_tokens: int = 512
-    ) -> str:
-        return f"[sub-agent summary for: {task}]"
+from tests.helpers import ScriptedLLMClient as MockLLMClient
+from tests.helpers import make_scene
 
 
 def _make_scene(
@@ -68,49 +31,7 @@ def _make_scene(
     mock_db: ChromaStore,
 ) -> Scene:
     """Build a minimal scene programmatically."""
-    import uuid
-
-    def make_char(name: str) -> Character:
-        cid = uuid.uuid5(uuid.NAMESPACE_DNS, f"test.{name}")
-        return Character(
-            id=cid,
-            canonical_name=name,
-            name=name,
-            card_fields={
-                "name": name,
-                "summary": f"{name} summary",
-                "personality": f"{name} personality",
-                "scenario": f"{name} scenario",
-                "greeting_message": f"Hi, I'm {name}",
-                "example_messages": "",
-            },
-            importance=Importance.IMPORTANT,
-            memory=CharacterMemory(character_id=cid, db=mock_db),
-            scratch=Scratchpad(),
-        )
-
-    player = make_char("Player")
-    narrator = make_char("Narrator")
-    npc = make_char("NPC")
-
-    loc = Location(canonical_name="room", name="room", desc="A room.")
-
-    return Scene(
-        id=scene_id,
-        language="English",
-        zeitgeist="test",
-        tone="neutral",
-        scene_type="normal",
-        character_pool={player, narrator, npc},
-        starting_characters={player, narrator, npc},
-        player=player,
-        narrator=narrator,
-        location_pool={loc},
-        starting_location=loc,
-        plot_considerations="",
-        plot_story=f"Test scene {scene_id}",
-        next_choices=next_choices,
-    )
+    return make_scene(scene_id, mock_db, next_choices=next_choices)
 
 
 class TestMultiSceneFlow:
@@ -813,48 +734,12 @@ def _make_scene_with_chars(
     char_names: list[str],
 ) -> Scene:
     """Build a scene with specific character names."""
-    import uuid
-
-    def make_char(name: str) -> Character:
-        cid = uuid.uuid5(uuid.NAMESPACE_DNS, f"test.{name}")
-        return Character(
-            id=cid,
-            canonical_name=name,
-            name=name,
-            card_fields={
-                "name": name,
-                "summary": f"{name} summary",
-                "personality": f"{name} personality",
-                "scenario": f"{name} scenario",
-                "greeting_message": f"Hi, I'm {name}",
-                "example_messages": "",
-            },
-            importance=Importance.IMPORTANT,
-            memory=CharacterMemory(character_id=cid, db=mock_db),
-            scratch=Scratchpad(),
-        )
-
-    chars = {make_char(name) for name in char_names}
-    player = next(c for c in chars if c.name == "Player")
-    narrator = next(c for c in chars if c.name == "Narrator")
-
-    loc = Location(canonical_name="lab", name="lab", desc="A lab.")
-
-    return Scene(
-        id=scene_id,
-        language="English",
-        zeitgeist="test",
-        tone="neutral",
-        scene_type="normal",
-        character_pool=chars,
-        starting_characters=chars,
-        player=player,
-        narrator=narrator,
-        location_pool={loc},
-        starting_location=loc,
-        plot_considerations="",
-        plot_story=f"Test scene {scene_id}",
+    return make_scene(
+        scene_id,
+        mock_db,
+        char_names=tuple(char_names),
         next_choices=next_choices,
+        location_name="lab",
     )
 class _FakeCollection:
     """Minimal in-memory ChromaDB collection for save/load tests."""

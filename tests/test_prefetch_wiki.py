@@ -2,44 +2,18 @@
 
 from __future__ import annotations
 
-import json
 from unittest.mock import MagicMock, patch
-
-import pytest
 
 from ara.llm.client import LLMClient
 from ara.llm.context import ConversationContext
-from ara.llm.models import GameRole, StreamResult
+from ara.llm.models import GameRole
 from ara.memory.chroma import ChromaStore
 from ara.world.orchestrator import Orchestrator
 from ara.world.story import Story
 from ara.world.summarizer import Summarizer
-from tests.test_items import _make_char, _make_scene
 
-
-def _make_next_round_result(next_char: str, response_mode: str = "outer") -> StreamResult:
-    return StreamResult(
-        content="",
-        tool_calls=[{
-            "id": "call_next",
-            "type": "function",
-            "function": {
-                "name": "next_round",
-                "arguments": json.dumps({
-                    "next_character": next_char,
-                    "directive": "",
-                    "suggestions": [],
-                    "enter_characters": [],
-                    "exit_characters": [],
-                    "switch_location": "",
-                    "edit_location": "",
-                    "end_scene": False,
-                    "next_scene": "",
-                    "response_mode": response_mode,
-                }),
-            },
-        }],
-    )
+from tests.helpers import make_next_round_result as _make_next_round_result
+from tests.helpers import make_scene
 
 
 def _make_story(tmp_path, db=None):
@@ -208,7 +182,7 @@ class TestOrchestratorPrefetchWiki:
         orch = Orchestrator(client, db=mock_db)
         orch.prefetched_wiki = "Prefetched lore about vampires."
 
-        scene = _make_scene("prefetch_scene", mock_db)
+        scene = make_scene("prefetch_scene", mock_db, char_names=("Player", "Narrator", "Alice"))
         char = next(c for c in scene.character_pool if c.name == "Alice")
         ctx = ConversationContext("Player", "Narrator", "Alice")
 
@@ -239,7 +213,7 @@ class TestOrchestratorPrefetchWiki:
         client.complete.return_value = _make_next_round_result("Alice", response_mode="outer_and_inner")
 
         orch = Orchestrator(client, db=mock_db)
-        scene = _make_scene("log_scene", mock_db)
+        scene = make_scene("log_scene", mock_db, char_names=("Player", "Narrator", "Alice"))
         ctx = ConversationContext("Player", "Narrator", "Alice")
         attempts = [
             {"source": "Player", "action": "sneak past the guard"},

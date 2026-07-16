@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pytest
 
 from ara.config import AraSettings
 from ara.world.scene import Location, load_location

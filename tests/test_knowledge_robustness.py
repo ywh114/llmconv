@@ -25,7 +25,6 @@ from __future__ import annotations
 import uuid
 from unittest.mock import MagicMock
 
-import pytest
 
 from ara.memory.knowledge import Scratchpad
 

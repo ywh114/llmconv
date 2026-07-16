@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import json
 import tempfile
-import uuid
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
@@ -13,54 +12,18 @@ import pytest
 from ara.config import AraSettings
 from ara.llm.client import LLMClient
 from ara.memory.chroma import ChromaStore
-from ara.memory.knowledge import CharacterMemory, Scratchpad
 from ara.persistence.save import SaveManager, SAVE_VERSION
-from ara.world.character import Character, Importance, create_anonymous_character
-from ara.world.scene import Location, Scene
+from ara.world.character import create_anonymous_character
+from ara.world.scene import Scene
 from ara.world.story import Story
 
+from tests.helpers import make_scene
 
-def _make_char(name: str, mock_db: ChromaStore) -> Character:
-    cid = uuid.uuid5(uuid.NAMESPACE_DNS, f"test.{name}")
-    return Character(
-        id=cid,
-        canonical_name=name,
-        name=name,
-        card_fields={
-            "name": name,
-            "summary": f"{name} summary",
-            "personality": f"{name} personality",
-            "scenario": f"{name} scenario",
-            "greeting_message": f"Hi, I'm {name}",
-            "example_messages": "",
-        },
-        importance=Importance.IMPORTANT,
-        memory=CharacterMemory(character_id=cid, db=mock_db),
-        scratch=Scratchpad(),
-    )
+_CHARS = ("Player", "Narrator", "Alice", "Bob")
 
 
 def _make_scene(scene_id: str, mock_db: ChromaStore) -> Scene:
-    chars = {_make_char(name, mock_db) for name in ["Player", "Narrator", "Alice", "Bob"]}
-    player = next(c for c in chars if c.name == "Player")
-    narrator = next(c for c in chars if c.name == "Narrator")
-    loc = Location(canonical_name="room", name="room", desc="A room.")
-    return Scene(
-        id=scene_id,
-        language="English",
-        zeitgeist="test",
-        tone="neutral",
-        scene_type="normal",
-        character_pool=chars,
-        starting_characters=chars,
-        player=player,
-        narrator=narrator,
-        location_pool={loc},
-        starting_location=loc,
-        plot_considerations="",
-        plot_story=f"Test {scene_id}",
-        next_choices={},
-    )
+    return make_scene(scene_id, mock_db, char_names=_CHARS)
 
 
 def test_save_load_round_trip_preserves_new_state() -> None:

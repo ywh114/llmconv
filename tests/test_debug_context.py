@@ -7,13 +7,16 @@ from unittest.mock import MagicMock
 from ara.agent.debug_bridge import StructuredDebugBridge
 from ara.llm.client import LLMClient
 from ara.world.engine import Engine
-from tests.test_items import _make_scene
+
+from tests.helpers import make_scene
 
 
 def _make_engine_and_state(scene_id: str = "debug_scene"):
     """Create a started engine and a debug state for it."""
     mock_db = MagicMock()
-    scene = _make_scene(scene_id, mock_db)
+    scene = make_scene(
+        scene_id, mock_db, char_names=("Player", "Narrator", "Alice", "Bob")
+    )
     client = MagicMock(spec=LLMClient)
     engine = Engine(client, db=mock_db)
     engine.start(scene)

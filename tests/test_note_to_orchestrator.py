@@ -4,69 +4,28 @@ from __future__ import annotations
 
 import json
 import tempfile
-import uuid
 from pathlib import Path
 from unittest.mock import MagicMock, patch
-
-import pytest
 
 from ara.agent.client import AgentClient
 from ara.agent.server import AgentServer
 from ara.config import AraSettings
 from ara.llm.client import LLMClient
-from ara.llm.models import GameRole, StreamResult
+from ara.llm.models import StreamResult
 from ara.memory.chroma import ChromaStore
-from ara.memory.knowledge import CharacterMemory, Scratchpad
 from ara.persistence.save import SaveManager
-from ara.world.character import Character, Importance
 from ara.world.engine import Engine
 from ara.world.orchestrator import TurnDecision
-from ara.world.scene import Location, Scene, SceneChoice
+from ara.world.scene import Scene
 from ara.world.story import Story, StoryStep
 
+from tests.helpers import make_scene
 from tests.settings import TEST_SETTINGS
 
 
-def _make_char(name: str, mock_db: ChromaStore) -> Character:
-    cid = uuid.uuid5(uuid.NAMESPACE_DNS, f"test.{name}")
-    return Character(
-        id=cid,
-        canonical_name=name,
-        name=name,
-        card_fields={
-            "name": name,
-            "summary": f"{name} summary",
-            "personality": f"{name} personality",
-            "scenario": f"{name} scenario",
-            "greeting_message": f"Hi, I'm {name}",
-            "example_messages": "",
-        },
-        importance=Importance.IMPORTANT,
-        memory=CharacterMemory(character_id=cid, db=mock_db),
-        scratch=Scratchpad(),
-    )
-
-
 def _make_scene(mock_db: ChromaStore) -> Scene:
-    chars = {_make_char(name, mock_db) for name in ["Player", "Narrator", "Alice"]}
-    player = next(c for c in chars if c.name == "Player")
-    narrator = next(c for c in chars if c.name == "Narrator")
-    loc = Location(canonical_name="room", name="room", desc="A room.")
-    return Scene(
-        id="note_scene",
-        language="English",
-        zeitgeist="test",
-        tone="neutral",
-        scene_type="normal",
-        character_pool=chars,
-        starting_characters=chars,
-        player=player,
-        narrator=narrator,
-        location_pool={loc},
-        starting_location=loc,
-        plot_considerations="",
-        plot_story="Test note tool",
-        next_choices={},
+    return make_scene(
+        "note_scene", mock_db, char_names=("Player", "Narrator", "Alice")
     )
 
 

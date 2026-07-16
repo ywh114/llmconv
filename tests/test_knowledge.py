@@ -1,67 +1,20 @@
 from __future__ import annotations
 
 import tempfile
-import uuid
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-import pytest
-
 from ara.config import AraSettings
 from ara.llm.client import LLMClient
-from ara.llm.models import StreamResult
 from ara.memory.chroma import ChromaStore
-from ara.memory.knowledge import CharacterMemory, Scratchpad
-from ara.world.character import Character, Importance
 from ara.world.engine import Engine
-from ara.world.orchestrator import Orchestrator, TurnDecision
-from ara.world.scene import Location, Scene, SceneChoice
-from ara.world.setting import WorldSetting, load_world_setting
+from ara.world.orchestrator import TurnDecision
+from ara.world.scene import SceneChoice
+from ara.world.setting import load_world_setting
 from ara.world.story import Story
 from ara.world.summarizer import Summarizer
 
-
-def _make_char(name: str, mock_db: ChromaStore) -> Character:
-    cid = uuid.uuid5(uuid.NAMESPACE_DNS, f"test.{name}")
-    return Character(
-        id=cid,
-        canonical_name=name,
-        name=name,
-        card_fields={
-            "name": name,
-            "summary": f"{name} summary",
-            "personality": f"{name} personality",
-            "scenario": f"{name} scenario",
-            "greeting_message": f"Hi, I'm {name}",
-            "example_messages": "",
-        },
-        importance=Importance.IMPORTANT,
-        memory=CharacterMemory(character_id=cid, db=mock_db),
-        scratch=Scratchpad(),
-    )
-
-
-def _make_scene(scene_id: str, next_choices: dict, mock_db: ChromaStore) -> Scene:
-    chars = {_make_char(name, mock_db) for name in ["Player", "Narrator", "NPC"]}
-    player = next(c for c in chars if c.name == "Player")
-    narrator = next(c for c in chars if c.name == "Narrator")
-    loc = Location(canonical_name="room", name="room", desc="A room.")
-    return Scene(
-        id=scene_id,
-        language="English",
-        zeitgeist="test",
-        tone="neutral",
-        scene_type="normal",
-        character_pool=chars,
-        starting_characters=chars,
-        player=player,
-        narrator=narrator,
-        location_pool={loc},
-        starting_location=loc,
-        plot_considerations="",
-        plot_story=f"Test {scene_id}",
-        next_choices=next_choices,
-    )
+from tests.helpers import make_scene as _make_scene
 
 
 class TestWorldSetting:
@@ -104,8 +57,8 @@ fact = "Shipgirls manifest as humans."
 
         scene = _make_scene(
             "scene1",
-            {"scene2": SceneChoice(id="scene2", desc="Next")},
             mock_db,
+            next_choices={"scene2": SceneChoice(id="scene2", desc="Next")},
         )
         scene.world = "azur_lane"
 
@@ -167,8 +120,8 @@ description = "A maritime federation."
 
         scene = _make_scene(
             "scene1",
-            {"scene2": SceneChoice(id="scene2", desc="Next")},
             mock_db,
+            next_choices={"scene2": SceneChoice(id="scene2", desc="Next")},
         )
         # Intentionally leave scene.world blank.
         assert not scene.world
@@ -227,8 +180,8 @@ summary = "Another fantasy setting."
 
         scene = _make_scene(
             "scene1",
-            {"scene2": SceneChoice(id="scene2", desc="Next")},
             mock_db,
+            next_choices={"scene2": SceneChoice(id="scene2", desc="Next")},
         )
         scene.world = "azur_lane"
         scene.settings = ["zombie_apocalypse"]
@@ -298,15 +251,11 @@ description = "Former port personnel; hostile and contagious."
         mock_db = MagicMock(spec=ChromaStore)
         scene1 = _make_scene(
             "scene1",
-            {"scene2": SceneChoice(id="scene2", desc="Next")},
             mock_db,
+            next_choices={"scene2": SceneChoice(id="scene2", desc="Next")},
         )
         scene1.world = "azur_lane"
-        scene2 = _make_scene(
-            "scene2",
-            {},
-            mock_db,
-        )
+        scene2 = _make_scene("scene2", mock_db)
         # scene2 has no explicit world; it inherits the already-loaded one.
 
         mock_client = MagicMock(spec=LLMClient)
@@ -352,15 +301,11 @@ summary = "Alternate WWII with shipgirls."
         mock_db = MagicMock(spec=ChromaStore)
         scene1 = _make_scene(
             "scene1",
-            {"scene2": SceneChoice(id="scene2", desc="Next")},
             mock_db,
+            next_choices={"scene2": SceneChoice(id="scene2", desc="Next")},
         )
         scene1.world = "azur_lane"
-        scene2 = _make_scene(
-            "scene2",
-            {},
-            mock_db,
-        )
+        scene2 = _make_scene("scene2", mock_db)
         scene2.world = "zombie_apocalypse"
 
         mock_client = MagicMock(spec=LLMClient)
@@ -417,15 +362,11 @@ summary = "A synthetic pathogen has turned port staff into undead."
         mock_db = MagicMock(spec=ChromaStore)
         scene1 = _make_scene(
             "scene1",
-            {"scene2": SceneChoice(id="scene2", desc="Next")},
             mock_db,
+            next_choices={"scene2": SceneChoice(id="scene2", desc="Next")},
         )
         scene1.settings = ["zombie_apocalypse"]
-        scene2 = _make_scene(
-            "scene2",
-            {},
-            mock_db,
-        )
+        scene2 = _make_scene("scene2", mock_db)
         scene2.settings = ["zombie_apocalypse"]
 
         mock_client = MagicMock(spec=LLMClient)
@@ -465,32 +406,6 @@ summary = "A synthetic pathogen has turned port staff into undead."
                     if call.args[0] == "orchestrator_wiki"
                 ]
                 assert len(upsert_calls) == 1
-
-
-class TestWikiTrustAndFiltering:
-    """Tests for trust metadata and knowledge filtering."""
-
-    def test_wiki_write_includes_trust_metadata(self) -> None:
-        mock_db = MagicMock(spec=ChromaStore)
-        client = MagicMock(spec=LLMClient)
-        orch = Orchestrator(client, db=mock_db)
-        orch._wiki_write("topic", "content", importance="important", trust=0.8)
-        mock_db.upsert.assert_called_once()
-        call = mock_db.upsert.call_args
-        metadatas = call.kwargs.get("metadatas", [{}])
-        assert metadatas[0].get("trust") == 0.8
-
-    def test_wiki_recall_returns_trust_annotations(self) -> None:
-        mock_db = MagicMock(spec=ChromaStore)
-        mock_db.query.return_value = {
-            "documents": [["doc1", "doc2"]],
-            "metadatas": [[{"topic": "t1", "trust": 0.5}, {"topic": "t2", "trust": -1.0}]],
-        }
-        client = MagicMock(spec=LLMClient)
-        orch = Orchestrator(client, db=mock_db)
-        result = orch._wiki_recall("q", annotate_trust=True)
-        assert "(trust: 0.5)" in result
-        assert "(trust: -1.0)" in result
 
 
 class TestSummarizerFactsAndLocations:

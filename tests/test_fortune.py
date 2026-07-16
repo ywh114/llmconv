@@ -2,15 +2,16 @@
 
 from __future__ import annotations
 
-import json
 from unittest.mock import MagicMock
 
 import pytest
 
 import ara.fortune as fortune_grammar
-from ara.llm.models import GameRole, StreamResult
 from ara.world import fortune
-from ara.world.orchestrator import Orchestrator, TurnDecision
+from ara.world.orchestrator import Orchestrator
+
+from tests.helpers import make_next_round_result as _make_next_round_result
+from tests.helpers import make_scene as _make_scene
 
 
 def test_load_hexagrams() -> None:
@@ -131,41 +132,16 @@ def test_generate_title_with_level() -> None:
     assert title
 
 
-def _make_next_round_result(next_char: str, response_mode: str = "outer") -> StreamResult:
-    return StreamResult(
-        content="",
-        tool_calls=[{
-            "id": "call_next",
-            "type": "function",
-            "function": {
-                "name": "next_round",
-                "arguments": json.dumps({
-                    "next_character": next_char,
-                    "directive": "",
-                    "suggestions": [],
-                    "enter_characters": [],
-                    "exit_characters": [],
-                    "switch_location": "",
-                    "edit_location": "",
-                    "end_scene": False,
-                    "next_scene": "",
-                    "response_mode": response_mode,
-                }),
-            },
-        }],
-    )
-
-
 def test_orchestrator_registers_fortune_tools() -> None:
     mock_client = MagicMock()
     orch = Orchestrator(mock_client, db=None)
 
     # The orchestrator builds tools inside decide_next_turn, so we run a minimal
     # turn to populate the registry.
-    from tests.test_items import _make_char, _make_scene
-    from unittest.mock import MagicMock as MM
-    mock_db = MM(spec="ara.memory.chroma.ChromaStore")
-    scene = _make_scene("fortune_scene", mock_db)
+    mock_db = MagicMock(spec="ara.memory.chroma.ChromaStore")
+    scene = _make_scene(
+        "fortune_scene", mock_db, char_names=("Player", "Narrator", "Alice")
+    )
     char = next(c for c in scene.character_pool if c.name == "Alice")
     ctx = MagicMock()
     ctx.branch.return_value = ctx
@@ -241,3 +217,106 @@ def test_cull_grammar_is_random_per_call() -> None:
             different = True
             break
     assert different
+
+
+class TestFortunePackageSurface:
+    """The ara.fortune package re-exports its whole public API."""
+
+    def test_all_exports_resolve(self) -> None:
+        for name in fortune_grammar.__all__:
+            assert hasattr(fortune_grammar, name), f"ara.fortune missing {name}"
+
+    def test_tokens_module_exposed(self) -> None:
+        assert fortune_grammar.tokens is not None
+        assert callable(fortune_grammar.tokens.expand)
+
+
+class TestResolveLevel:
+    """Level parsing shared by title and ability generation."""
+
+    def test_none_and_all_mean_no_level(self) -> None:
+        assert fortune_grammar.resolve_level(None) == (None, False)
+        assert fortune_grammar.resolve_level("all") == (None, False)
+
+    def test_named_and_indexed_levels(self) -> None:
+        assert fortune_grammar.resolve_level("simple") == ("simple", False)
+        assert fortune_grammar.resolve_level(2) == ("complex", False)
+        assert fortune_grammar.resolve_level("2") == ("complex", False)
+
+    def test_bang_marks_exact(self) -> None:
+        assert fortune_grammar.resolve_level("simple!") == ("simple", True)
+        assert fortune_grammar.resolve_level("1!") == ("moderate", True)
+
+    def test_invalid_levels_raise(self) -> None:
+        with pytest.raises(ValueError):
+            fortune_grammar.resolve_level(9)
+        with pytest.raises(ValueError):
+            fortune_grammar.resolve_level("bogus")
+
+
+class TestAbilityGeneration:
+    """Public ability-grammar API of the fortune package."""
+
+    def test_list_ability_flavors(self) -> None:
+        flavors = fortune_grammar.list_ability_flavors()
+        assert isinstance(flavors, list)
+        assert flavors == sorted(flavors)
+        assert "generic" not in flavors
+        assert "numbers" not in flavors
+        assert "templates" not in flavors
+        # A few expected flavors from the global ability directory.
+        assert "fire" in flavors
+        assert "melee" in flavors
+        assert "corporate" in flavors
+
+    def test_generate_ability_returns_string(self) -> None:
+        ability = fortune_grammar.generate_ability()
+        assert isinstance(ability, str)
+        assert ability
+
+    def test_generate_ability_with_flavor(self) -> None:
+        ability = fortune_grammar.generate_ability(flavors="fire")
+        assert isinstance(ability, str)
+        assert ability
+
+    def test_generate_ability_unknown_flavor_raises(self) -> None:
+        with pytest.raises(ValueError, match="Unknown ability flavor"):
+            fortune_grammar.generate_ability(flavors="no_such_flavor")
+
+
+class TestCategorizedFlavors:
+    """Flavors are grouped by the category key of their TOML files."""
+
+    def test_categorized_title_flavors_cover_all_flavors(self) -> None:
+        categorized = fortune_grammar.categorized_title_flavors()
+        assert categorized
+        grouped = {f for flavors in categorized.values() for f in flavors}
+        assert grouped == set(fortune_grammar.list_title_flavors())
+        for flavors in categorized.values():
+            assert flavors == sorted(flavors)
+
+    def test_categorized_ability_flavors_cover_all_flavors(self) -> None:
+        categorized = fortune_grammar.categorized_ability_flavors()
+        assert categorized
+        grouped = {f for flavors in categorized.values() for f in flavors}
+        assert grouped == set(fortune_grammar.list_ability_flavors())
+        for flavors in categorized.values():
+            assert flavors == sorted(flavors)
+
+
+class TestGenerateName:
+    """Human-name generation from the bundled names dataset."""
+
+    def test_generate_name_default(self) -> None:
+        name = fortune_grammar.generate_name()
+        assert isinstance(name, str)
+        assert len(name.split()) >= 2
+
+    def test_generate_name_simple_style_has_two_parts(self) -> None:
+        assert len(fortune_grammar.generate_name(style="simple").split()) == 2
+
+    def test_generate_name_middle_style_has_three_parts(self) -> None:
+        assert len(fortune_grammar.generate_name(style="middle").split()) == 3
+
+    def test_generate_name_n_parts_overrides_style(self) -> None:
+        assert len(fortune_grammar.generate_name(style="simple", n_parts=4).split()) == 4

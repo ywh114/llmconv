@@ -11,58 +11,22 @@ import pytest
 
 from ara.config import AraSettings
 from ara.memory.chroma import ChromaStore
-from ara.memory.knowledge import CharacterMemory, NullMemory, Scratchpad
+from ara.memory.knowledge import NullMemory
 from ara.llm.models import StreamResult
 from ara.world.character import Importance
 from ara.world.character import Character, create_anonymous_character
 from ara.world.engine import Engine
 from ara.world.orchestrator import TurnDecision
-from ara.world.scene import Location, Scene, SceneChoice
+from ara.world.scene import Location, Scene
 from ara.world.story import _merge_characters
+
+from tests.helpers import make_char as _make_char_impl
+from tests.helpers import make_scene_with_chars as _make_scene_with_chars
 
 
 def _make_char(name: str, importance: Importance, mock_db: ChromaStore) -> Character:
     """Build a Character with the given importance."""
-    cid = uuid.uuid5(uuid.NAMESPACE_DNS, f"test.{name}")
-    return Character(
-        id=cid,
-        canonical_name=name,
-        name=name,
-        card_fields={
-            "name": name,
-            "summary": f"{name} summary",
-            "personality": f"{name} personality",
-            "scenario": f"{name} scenario",
-            "greeting_message": f"Hi, I'm {name}",
-            "example_messages": "",
-        },
-        importance=importance,
-        memory=CharacterMemory(character_id=cid, db=mock_db),
-        scratch=Scratchpad(),
-    )
-
-
-def _make_scene_with_chars(chars: list[Character]) -> Scene:
-    """Build a minimal scene containing the given characters."""
-    player = next(c for c in chars if c.name == "Player")
-    narrator = next(c for c in chars if c.name == "Narrator")
-    loc = Location(canonical_name="room", name="room", desc="A room.")
-    return Scene(
-        id="test",
-        language="English",
-        zeitgeist="test",
-        tone="neutral",
-        scene_type="normal",
-        character_pool=set(chars),
-        starting_characters=set(chars),
-        player=player,
-        narrator=narrator,
-        location_pool={loc},
-        starting_location=loc,
-        plot_considerations="",
-        plot_story="Test scene",
-        next_choices={},
-    )
+    return _make_char_impl(name, mock_db, importance=importance)
 
 
 class TestAnonymousCharacterCreation:

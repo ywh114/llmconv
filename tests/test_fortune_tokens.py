@@ -1,4 +1,3 @@
-import pytest
 
 from ara.fortune import tokens
 

@@ -6,7 +6,6 @@ import tempfile
 from pathlib import Path
 from unittest.mock import MagicMock
 
-import pytest
 
 from ara.agent.state import story_to_dict
 from ara.config import AraSettings
