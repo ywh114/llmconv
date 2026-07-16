@@ -72,7 +72,7 @@ html, body {
   object-fit: contain;
 }
 
-.vn-sprite.vn-hidden {
+.vn-sprite.vn-sprite-hidden {
   opacity: 0;
   transform: translate(var(--sprite-translate-x), calc(-100% + 20px + 3vh));
 }
@@ -130,7 +130,7 @@ html, body {
               height var(--vn-slide-duration) ease-out;
 }
 
-.vn-sprite-crop.vn-hidden {
+.vn-sprite-crop.vn-sprite-hidden {
   opacity: 0;
   transform: translate(var(--sprite-translate-x), calc(-100% + 20px + 3vh));
 }

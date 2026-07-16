@@ -309,7 +309,7 @@
           clearSpriteAndTimer(el);
           el.remove();
         } else {
-          el.classList.add('vn-hidden');
+          el.classList.add('vn-sprite-hidden');
           setTimeout(() => {
             if (el.parentNode) {
               clearSpriteAndTimer(el);
@@ -357,7 +357,7 @@
 
         if (isZoom) {
           const wrapper = document.createElement('div');
-          wrapper.className = 'vn-sprite-crop vn-zoom vn-hidden';
+          wrapper.className = 'vn-sprite-crop vn-zoom vn-sprite-hidden';
           wrapper.dataset.name = c.name;
           wrapper.dataset.sprite = spriteName;
           wrapper._crop = crop || {};
@@ -368,7 +368,7 @@
           wrapper.appendChild(img);
 
           img.onload = () => {
-            wrapper.classList.remove('vn-hidden');
+            wrapper.classList.remove('vn-sprite-hidden');
             applyZoomFocus(wrapper, img);
           };
           img.onerror = () => {
@@ -380,7 +380,7 @@
           el = wrapper;
         } else if (crop && crop.topleft && crop.bottomright) {
           const wrapper = document.createElement('div');
-          wrapper.className = 'vn-sprite-crop vn-hidden';
+          wrapper.className = 'vn-sprite-crop vn-sprite-hidden';
           wrapper.dataset.name = c.name;
           wrapper.dataset.sprite = spriteName;
           wrapper._crop = crop;
@@ -397,7 +397,7 @@
 
           img.onload = () => {
             applyCropStyles(wrapper, img);
-            wrapper.classList.remove('vn-hidden');
+            wrapper.classList.remove('vn-sprite-hidden');
           };
           img.onerror = () => {
             clearSpriteAndTimer(wrapper);
@@ -407,7 +407,7 @@
           el = wrapper;
         } else {
           const wrapper = document.createElement('div');
-          wrapper.className = 'vn-sprite vn-hidden';
+          wrapper.className = 'vn-sprite vn-sprite-hidden';
           wrapper.dataset.name = c.name;
           wrapper.dataset.sprite = spriteName;
           $sprites.appendChild(wrapper);
@@ -423,7 +423,7 @@
           wrapper.appendChild(tag);
 
           const tempImg = new Image();
-          tempImg.onload = () => wrapper.classList.remove('vn-hidden');
+          tempImg.onload = () => wrapper.classList.remove('vn-sprite-hidden');
           tempImg.onerror = () => {
             clearSpriteAndTimer(wrapper);
             wrapper.remove();
@@ -445,7 +445,7 @@
         el.style.zIndex = isSpeaking ? '999' : String(baseZ);
       }
       el.classList.toggle('vn-speaking', isSpeaking);
-      el.classList.remove('vn-hidden');
+      el.classList.remove('vn-sprite-hidden');
 
       if (!isZoom && el._crop) {
         const img = el.querySelector('img');
@@ -696,10 +696,14 @@
     STATE.history.push({ speaker, text });
     const entry = document.createElement('div');
     entry.className = 'vn-history-entry';
-    entry.innerHTML = `
-      <div class="vn-history-name">${speaker || 'Narrator'}</div>
-      <div class="vn-history-text">${text}</div>
-    `;
+    const nameEl = document.createElement('div');
+    nameEl.className = 'vn-history-name';
+    nameEl.textContent = speaker || 'Narrator';
+    const textEl = document.createElement('div');
+    textEl.className = 'vn-history-text';
+    textEl.textContent = text;
+    entry.appendChild(nameEl);
+    entry.appendChild(textEl);
     $historyList.appendChild(entry);
   }
 
@@ -1144,31 +1148,46 @@
      ------------------------------------------------------------------ */
   async function submitInput(text) {
     hideChoices();
-    addToHistory('Player', text);
-    await typeText('Player', text);
-    await waitForClick();
-    await postInput(text);
-    gameLoop();
+    try {
+      addToHistory('Player', text);
+      await typeText('Player', text);
+      await waitForClick();
+      await postInput(text);
+      gameLoop();
+    } catch (err) {
+      console.error('Input failed:', err);
+      showChoices([text]);
+    }
   }
 
   async function generateAndSubmit(suggestion) {
     hideChoices();
-    const data = await postGenerate(suggestion);
-    const text = data.text || suggestion;
-    addToHistory('Player', text);
-    await typeText('Player', text);
-    await waitForClick();
-    await postInput(text);
-    gameLoop();
+    try {
+      const data = await postGenerate(suggestion);
+      const text = data.text || suggestion;
+      addToHistory('Player', text);
+      await typeText('Player', text);
+      await waitForClick();
+      await postInput(text);
+      gameLoop();
+    } catch (err) {
+      console.error('Generate failed:', err);
+      showChoices([suggestion]);
+    }
   }
 
   async function submitCustom(text, attempt) {
     hideChoices();
-    addToHistory('Player', text);
-    await typeText('Player', text);
-    await waitForClick();
-    await postInput(text, attempt);
-    gameLoop();
+    try {
+      addToHistory('Player', text);
+      await typeText('Player', text);
+      await waitForClick();
+      await postInput(text, attempt);
+      gameLoop();
+    } catch (err) {
+      console.error('Custom input failed:', err);
+      showChoices([text]);
+    }
   }
 
   /* ------------------------------------------------------------------
@@ -1209,10 +1228,14 @@
       STATE.history.push(entry);
       const div = document.createElement('div');
       div.className = 'vn-history-entry';
-      div.innerHTML = `
-        <div class="vn-history-name">${entry.speaker || 'Narrator'}</div>
-        <div class="vn-history-text">${entry.text}</div>
-      `;
+      const nameEl = document.createElement('div');
+      nameEl.className = 'vn-history-name';
+      nameEl.textContent = entry.speaker || 'Narrator';
+      const textEl = document.createElement('div');
+      textEl.className = 'vn-history-text';
+      textEl.textContent = entry.text;
+      div.appendChild(nameEl);
+      div.appendChild(textEl);
       $historyList.appendChild(div);
     });
 
@@ -1359,6 +1382,7 @@
     if (e.code === 'Space') {
       if (isTyping()) {
         e.preventDefault();
+        e.stopImmediatePropagation();
         skipTyping();
       }
       return;

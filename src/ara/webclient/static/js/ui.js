@@ -34,14 +34,27 @@
       items.forEach(item => {
         const max = item.max || 100;
         const pct = Math.max(0, Math.min(100, (Number(item.value) / max) * 100));
-        const color = item.color ? ` style="background:${escapeHtml(item.color)}"` : '';
-        el.innerHTML += `
-          <div class="vn-system-bar">
-            <label>${escapeHtml(item.label || '')}</label>
-            <div class="vn-system-bar-track">
-              <div class="vn-system-bar-fill"${color} style="width:${pct}%"></div>
-            </div>
-          </div>`;
+
+        const bar = document.createElement('div');
+        bar.className = 'vn-system-bar';
+
+        const label = document.createElement('label');
+        label.textContent = item.label || '';
+
+        const track = document.createElement('div');
+        track.className = 'vn-system-bar-track';
+
+        const fill = document.createElement('div');
+        fill.className = 'vn-system-bar-fill';
+        fill.style.width = pct + '%';
+        if (item.color && /^#[0-9a-fA-F]{3,8}$|^rgb\(/i.test(String(item.color))) {
+          fill.style.background = String(item.color);
+        }
+
+        track.appendChild(fill);
+        bar.appendChild(label);
+        bar.appendChild(track);
+        el.appendChild(bar);
       });
       return el;
     }

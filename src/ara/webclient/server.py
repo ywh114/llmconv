@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Any
 
 from starlette.applications import Starlette
+from starlette.exceptions import HTTPException
 from starlette.requests import Request
 from starlette.responses import FileResponse, JSONResponse
 from starlette.routing import Mount, Route
@@ -94,6 +95,17 @@ async def _proxy_call(proxy: AgentProxy, method: str, **kwargs: Any) -> Any:
     return await loop.run_in_executor(None, fn)
 
 
+async def _parse_json(request: Request) -> dict[str, Any]:
+    """Parse a JSON request body, rejecting non-JSON content types."""
+    content_type = request.headers.get("content-type", "")
+    if "application/json" not in content_type.lower():
+        raise HTTPException(status_code=415, detail="Unsupported Media Type")
+    try:
+        return await request.json()
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail=f"Invalid JSON: {exc}")
+
+
 def _switch_story(proxy: AgentProxy, story_id: str | None, settings: AraSettings | None = None) -> bool:
     """Switch a DirectProxy to *story_id* if it differs from the current story.
 
@@ -123,7 +135,7 @@ def _switch_story(proxy: AgentProxy, story_id: str | None, settings: AraSettings
 
 
 async def _post_start(request: Request) -> JSONResponse:
-    data = await request.json()
+    data = await _parse_json(request)
     scene_id = data.get("scene_id")
     story_id = data.get("story_id")
     proxy = request.app.state.proxy
@@ -155,7 +167,7 @@ async def _post_next(request: Request) -> JSONResponse:
 
 
 async def _post_input(request: Request) -> JSONResponse:
-    data = await request.json()
+    data = await _parse_json(request)
     text = data.get("text", "")
     attempt = data.get("attempt")
     proxy: AgentProxy = request.app.state.proxy
@@ -168,7 +180,7 @@ async def _post_input(request: Request) -> JSONResponse:
 
 
 async def _post_generate(request: Request) -> JSONResponse:
-    data = await request.json()
+    data = await _parse_json(request)
     suggestion = data.get("suggestion", "")
     proxy: AgentProxy = request.app.state.proxy
     try:
@@ -190,7 +202,7 @@ async def _post_step(request: Request) -> JSONResponse:
 
 
 async def _post_skip(request: Request) -> JSONResponse:
-    data = await request.json()
+    data = await _parse_json(request)
     scene_id = data.get("scene_id", "")
     proxy: AgentProxy = request.app.state.proxy
     try:
@@ -202,7 +214,7 @@ async def _post_skip(request: Request) -> JSONResponse:
 
 
 async def _post_debug(request: Request) -> JSONResponse:
-    data = await request.json()
+    data = await _parse_json(request)
     command = data.get("command", "")
     args = data.get("args", [])
     proxy = request.app.state.proxy
@@ -225,7 +237,7 @@ async def _get_state(request: Request) -> JSONResponse:
 
 
 async def _post_save(request: Request) -> JSONResponse:
-    data = await request.json()
+    data = await _parse_json(request)
     slot = int(data.get("slot", 1))
     proxy = request.app.state.proxy
     try:
@@ -237,7 +249,7 @@ async def _post_save(request: Request) -> JSONResponse:
 
 
 async def _post_load(request: Request) -> JSONResponse:
-    data = await request.json()
+    data = await _parse_json(request)
     slot = int(data.get("slot", 1))
     story_id = data.get("story_id", "")
     proxy = request.app.state.proxy
@@ -265,7 +277,7 @@ async def _get_saves(request: Request) -> JSONResponse:
 
 
 async def _post_delete_save(request: Request) -> JSONResponse:
-    data = await request.json()
+    data = await _parse_json(request)
     slot = int(data.get("slot", 1))
     story_id = data.get("story_id", "")
     proxy = request.app.state.proxy
