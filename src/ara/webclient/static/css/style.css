@@ -328,19 +328,23 @@ body.vn-hide-nametags .vn-nametag {
 
 #vn-collapse-btn {
   position: absolute;
-  top: -1.5rem;
-  right: 0.5rem;
+  top: 0.4rem;
+  right: 0.6rem;
   width: 2rem;
   height: 1.5rem;
-  background: rgba(0, 0, 0, 0.5);
+  background: transparent;
   border: 1px solid var(--vn-gold-dark);
-  border-bottom: none;
-  border-radius: 6px 6px 0 0;
-  color: var(--vn-text);
+  border-radius: 6px;
+  color: var(--vn-text-muted);
   font-size: 0.8rem;
   line-height: 1;
   cursor: pointer;
-  backdrop-filter: blur(4px);
+  opacity: 0.8;
+}
+
+#vn-collapse-btn:hover {
+  opacity: 1;
+  color: var(--vn-text);
 }
 
 #vn-dialogue::before {
@@ -356,6 +360,7 @@ body.vn-hide-nametags .vn-nametag {
   font-size: var(--vn-font-size-name);
   color: var(--vn-name);
   margin-bottom: 0.1rem;
+  padding-right: 2.5rem;
   text-shadow: 0 1px 4px rgba(0,0,0,0.6);
   min-height: 1.5em;
 }

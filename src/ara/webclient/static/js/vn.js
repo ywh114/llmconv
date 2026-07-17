@@ -1435,6 +1435,36 @@
   });
 
   /* ------------------------------------------------------------------
+     Click / tap to skip typing (mirrors the Space key handler above).
+     waitForClick() only listens after typing finishes, so without this
+     a click during the typewriter effect did nothing.
+     ------------------------------------------------------------------ */
+  document.addEventListener('click', (e) => {
+    if (!isTyping()) return;
+    if (e.target.closest('.vn-choice') ||
+        e.target.closest('.vn-title-btn') ||
+        e.target.closest('.vn-control-btn') ||
+        e.target.closest('#vn-controls') ||
+        e.target.closest('#vn-settings') ||
+        e.target.closest('#vn-history') ||
+        e.target.closest('#vn-keybinds') ||
+        e.target.closest('#vn-saveload') ||
+        e.target.closest('#vn-debug') ||
+        e.target.closest('#vn-system') ||
+        e.target.closest('#vn-menu-btn') ||
+        e.target.closest('#vn-eye-btn') ||
+        e.target.closest('#vn-collapse-btn') ||
+        e.target.closest('#vn-menu') ||
+        e.target.closest('input') ||
+        e.target.closest('textarea')) {
+      return;
+    }
+    // Collapsed: restoreIfCollapsed() restores instead of skipping.
+    if (window.VN.isDialogueCollapsed()) return;
+    skipTyping();
+  });
+
+  /* ------------------------------------------------------------------
      Mobile tap-to-skip-typing on the dialogue box
      ------------------------------------------------------------------ */
   if ($dialogue) {
