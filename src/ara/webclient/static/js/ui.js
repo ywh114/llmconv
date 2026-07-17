@@ -636,7 +636,8 @@
   // -------------------------------------------------------------------
   const $eyeBtn = document.getElementById('vn-eye-btn');
   if ($eyeBtn) {
-    let eyeMode = 0; // 0 = show nametags, 1 = hide nametags
+    // 0 = show nametags, 1 = hide nametags. Default: hidden (see <body> class).
+    let eyeMode = 1;
     $eyeBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       eyeMode = eyeMode === 0 ? 1 : 0;
