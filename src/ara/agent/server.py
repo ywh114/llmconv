@@ -100,33 +100,51 @@ class AgentServer:
         self._last_state: dict[str, Any] | None = None
         self._last_save_snapshot: dict[str, Any] | None = None
         self._last_visual_state: dict[str, Any] | None = None
+        # Everything the step handler needs to serve from cache: whether the
+        # engine waits for input, and the data for a synthetic input event.
+        self._last_input_state: dict[str, Any] | None = None
 
         # Worker lifecycle
         self._worker_alive = False
         self._worker_running = False
+        # Incremented on every spawn; a worker exits when its captured
+        # generation no longer matches, so zombies from timed-out kills can
+        # never resume or inject stale events after a respawn.
+        self._worker_generation = 0
         self._worker_thread: threading.Thread | None = None
 
     # ------------------------------------------------------------------ #
     # Worker
     # ------------------------------------------------------------------ #
 
-    def _worker_loop(self) -> None:
-        """Background worker: advance the story and enqueue events."""
+    def _worker_loop(self, generation: int) -> None:
+        """Background worker: advance the story and enqueue events.
+
+        Exits as soon as its *generation* no longer matches the server's
+        current one (or the alive flag drops), so a worker orphaned by a
+        timed-out kill can never resume after a respawn.
+        """
+        def _stale() -> bool:
+            return (
+                not self._worker_alive
+                or generation != self._worker_generation
+            )
+
         while True:
             with self._queue_lock:
-                if not self._worker_alive:
+                if _stale():
                     return
                 if not self._worker_running:
                     self._queue_condition.wait()
                     continue
                 # Double-check after waking
-                if not self._worker_alive:
+                if _stale():
                     return
 
             # Step the story (holds story lock for the duration of the call)
             try:
                 with self._story_lock:
-                    if not self._worker_alive:
+                    if _stale():
                         return
                     step = self.story.step()
             except RuntimeError:
@@ -146,6 +164,9 @@ class AgentServer:
             event = _step_to_dict(step)
 
             with self._queue_lock:
+                if _stale():
+                    # A newer worker owns the story; drop the stale event.
+                    return
                 self._event_queue.append(event)
                 self._queue_condition.notify_all()
 
@@ -153,7 +174,7 @@ class AgentServer:
             # new event.  State is between turns, so it is consistent.
             try:
                 with self._story_lock:
-                    if not self._worker_alive:
+                    if _stale():
                         return
                     self._publish_snapshots()
             except Exception:
@@ -181,7 +202,11 @@ class AgentServer:
         with self._queue_lock:
             self._worker_alive = True
             self._worker_running = True
-            self._worker_thread = threading.Thread(target=self._worker_loop, daemon=True)
+            self._worker_generation += 1
+            generation = self._worker_generation
+            self._worker_thread = threading.Thread(
+                target=self._worker_loop, args=(generation,), daemon=True
+            )
             self._worker_thread.start()
             self._queue_condition.notify_all()
 
@@ -230,12 +255,27 @@ class AgentServer:
         )
         save_snapshot["archived_scene_snapshots"] = self.story._archived_scene_snapshots
         visual_snapshot = build_visual_state(self.story)
+        engine = self.story.engine
+        last_dec = engine.last_decision
+        input_state = {
+            "needs_input": bool(engine.needs_player_input),
+            "finished": self.story.finished,
+            "suggestions": list(last_dec.suggestions) if last_dec else [],
+            "speaker": (
+                engine.scene.player.name
+                if engine.scene and engine.scene.player
+                else None
+            ),
+            "scene": scene_to_dict(engine.scene) if engine.scene else None,
+            "location": location_to_dict(engine.loc) if engine.loc else None,
+        }
         with self._queue_lock:
             state_snapshot["queue"] = list(self._event_queue)
             save_snapshot["queue"] = list(self._event_queue)
             self._last_state = state_snapshot
             self._last_save_snapshot = save_snapshot
             self._last_visual_state = visual_snapshot
+            self._last_input_state = input_state
 
     # ------------------------------------------------------------------ #
     # Request dispatch
@@ -265,6 +305,7 @@ class AgentServer:
                 self._last_state = None
                 self._last_save_snapshot = None
                 self._last_visual_state = None
+                self._last_input_state = None
                 # Always clear persisted character/story memory on a fresh start
                 # so previous runs cannot pollute the new session.
                 self.story.start(scene_id=scene_id, clear_history=True)
@@ -272,89 +313,51 @@ class AgentServer:
             return story_to_dict(self.story)
 
         if method == "step":
+            # Fully snapshot-driven: never touches _story_lock, so /step can
+            # neither deadlock against story->queue handlers nor stall behind
+            # an in-flight LLM turn.
             with self._queue_lock:
                 while not self._event_queue:
-                    with self._story_lock:
-                        needs_input = self.story.engine.needs_player_input
-
-                    if needs_input:
+                    istate = self._last_input_state
+                    if istate is not None and istate["needs_input"]:
                         # Engine is waiting for input but the queue is empty
                         # (client already consumed the needs_player_input event).
                         # Return a synthetic event so the client UX is consistent.
-                        engine = self.story.engine
-                        last_dec = engine.last_decision
-                        suggestions = last_dec.suggestions if last_dec else []
-                        speaker = (
-                            engine.scene.player.name
-                            if engine.scene and engine.scene.player
-                            else None
-                        )
                         logger.info(
                             f"[STEP_DEBUG] synthetic needs_player_input, "
-                            f"last_decision_next={last_dec.next_char.name if last_dec else None}, "
-                            f"suggestions={suggestions}"
+                            f"suggestions={istate['suggestions']}"
                         )
                         return {
                             "event": "needs_player_input",
                             "output": "",
-                            "scene": scene_to_dict(engine.scene)
-                            if engine.scene
-                            else None,
-                            "suggestions": suggestions,
+                            "scene": istate["scene"],
+                            "suggestions": istate["suggestions"],
                             "next_scene": None,
-                            "speaker": speaker,
+                            "speaker": istate["speaker"],
                             "enter": [],
                             "exit": [],
                             "sprite_changes": {},
-                            "location": location_to_dict(engine.loc)
-                            if engine.loc
-                            else None,
+                            "location": istate["location"],
                         }
 
                     # Worker crashed or paused while engine is ready — restart it.
-                    if not self._worker_running and self._worker_alive:
-                        with self._story_lock:
-                            if not self.story.engine.needs_player_input and not self.story.finished:
-                                logger.warning("Worker appears dead; restarting.")
-                                self._worker_running = True
-                                self._queue_condition.notify_all()
+                    if (
+                        not self._worker_running
+                        and self._worker_alive
+                        and istate is not None
+                        and not istate["needs_input"]
+                        and not istate["finished"]
+                    ):
+                        logger.warning("Worker appears dead; restarting.")
+                        self._worker_running = True
+                        self._queue_condition.notify_all()
 
                     self._queue_condition.wait(timeout=0.5)
-
-                if not self._event_queue:
-                    with self._story_lock:
-                        if self.story.engine.needs_player_input:
-                            engine = self.story.engine
-                            last_dec = engine.last_decision
-                            suggestions = last_dec.suggestions if last_dec else []
-                            speaker = (
-                                engine.scene.player.name
-                                if engine.scene and engine.scene.player
-                                else None
-                            )
-                            return {
-                                "event": "needs_player_input",
-                                "output": "",
-                                "scene": scene_to_dict(engine.scene)
-                                if engine.scene
-                                else None,
-                                "suggestions": suggestions,
-                                "next_scene": None,
-                                "speaker": speaker,
-                                "enter": [],
-                                "exit": [],
-                                "sprite_changes": {},
-                                "location": location_to_dict(engine.loc)
-                                if engine.loc
-                                else None,
-                            }
-                    raise RuntimeError("No events available")
 
                 event = self._event_queue[0]
                 logger.info(
                     f"[STEP_DEBUG] popping event={event.get('event')}, "
-                    f"speaker={event.get('speaker')}, queue_len={len(self._event_queue)}, "
-                    f"engine_needs_input={self.story.engine.needs_player_input}"
+                    f"speaker={event.get('speaker')}, queue_len={len(self._event_queue)}"
                 )
 
                 # story_complete is the terminal event. Once the story is
@@ -370,10 +373,12 @@ class AgentServer:
                     and not self._worker_running
                     and self._worker_alive
                 ):
-                    with self._story_lock:
-                        needs_input = self.story.engine.needs_player_input
-                        finished = self.story.finished
-                    if not needs_input and not finished:
+                    istate = self._last_input_state
+                    if (
+                        istate is not None
+                        and not istate["needs_input"]
+                        and not istate["finished"]
+                    ):
                         self._worker_running = True
                         self._queue_condition.notify()
 
@@ -550,6 +555,7 @@ class AgentServer:
                 self._last_state = None
                 self._last_save_snapshot = None
                 self._last_visual_state = None
+                self._last_input_state = None
                 step = self.story.jump_to(scene_id)
             self._spawn_worker()
             return _step_to_dict(step)

@@ -180,6 +180,55 @@ class TestContinue:
         assert snap["archived_scene_snapshots"] is story._archived_scene_snapshots
 
 
+class TestWorkerConcurrency:
+    """Worker generation tokens and snapshot-driven step handler."""
+
+    def test_stale_generation_exits_without_stepping(self) -> None:
+        """A worker orphaned by a timed-out kill must exit immediately once
+        a newer generation owns the story (no dual workers, no stale events)."""
+        story, _ = _make_story(MockLLMClient([StreamResult(content="")]))
+        server = AgentServer(story, socket_path="")
+        server._worker_alive = True
+        server._worker_running = True
+        server._worker_generation = 2  # a newer worker owns the story
+        t = threading.Thread(target=server._worker_loop, args=(1,), daemon=True)
+        t.start()
+        t.join(timeout=5.0)
+        assert not t.is_alive(), "stale-generation worker did not exit"
+        assert not server._event_queue
+
+    def test_step_synthetic_event_served_without_story_lock(self) -> None:
+        """With an empty queue, /step builds the synthetic needs_player_input
+        event from the published input state — never touching _story_lock."""
+        story, _ = _make_story(MockLLMClient([StreamResult(content="")]))
+        server = AgentServer(story, socket_path="")
+        server._last_input_state = {
+            "needs_input": True,
+            "finished": False,
+            "suggestions": ["Say hi"],
+            "speaker": "Commander",
+            "scene": {"id": "intro"},
+            "location": None,
+        }
+        server._story_lock.acquire()
+        try:
+            box: dict[str, Any] = {}
+            t = threading.Thread(
+                target=lambda: box.setdefault("result", server._dispatch("step", {})),
+                daemon=True,
+            )
+            t.start()
+            t.join(timeout=5.0)
+            assert not t.is_alive(), "step blocked on _story_lock"
+        finally:
+            server._story_lock.release()
+        result = box["result"]
+        assert result["event"] == "needs_player_input"
+        assert result["suggestions"] == ["Say hi"]
+        assert result["speaker"] == "Commander"
+        assert result["scene"] == {"id": "intro"}
+
+
 class TestAgentAPI:
     def test_client_step_limits_queue(self) -> None:
         """With client_step=1 the worker pauses after each event."""
