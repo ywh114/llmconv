@@ -99,6 +99,7 @@ class AgentServer:
         # Cached snapshots for non-blocking reads
         self._last_state: dict[str, Any] | None = None
         self._last_save_snapshot: dict[str, Any] | None = None
+        self._last_visual_state: dict[str, Any] | None = None
 
         # Worker lifecycle
         self._worker_alive = False
@@ -137,6 +138,7 @@ class AgentServer:
                     save_snapshot = SaveManager(self.story.config)._build_snapshot(
                         self.story
                     )
+                    visual_snapshot = build_visual_state(self.story)
             except RuntimeError:
                 # Engine errors (e.g. story complete, waiting for input)
                 # Stop the worker and let the client deal with it.
@@ -162,6 +164,7 @@ class AgentServer:
                 save_snapshot["queue"] = list(self._event_queue)
                 self._last_state = state_snapshot
                 self._last_save_snapshot = save_snapshot
+                self._last_visual_state = visual_snapshot
 
                 # Stop conditions
                 if step.event == "needs_player_input":
@@ -231,6 +234,10 @@ class AgentServer:
             with self._story_lock:
                 with self._queue_lock:
                     self._event_queue.clear()
+                # Invalidate snapshots so reads never see the previous run.
+                self._last_state = None
+                self._last_save_snapshot = None
+                self._last_visual_state = None
                 # Always clear persisted character/story memory on a fresh start
                 # so previous runs cannot pollute the new session.
                 self.story.start(scene_id=scene_id, clear_history=True)
@@ -362,6 +369,9 @@ class AgentServer:
                     f"last_decision_next={self.story.engine.last_decision.next_char.name if self.story.engine.last_decision else None}"
                 )
                 self.story.submit_player_input(text, attempt=attempt)
+                # Keep the visual snapshot fresh so a client reattaching
+                # right after submitting still sees this line in its backlog.
+                self._last_visual_state = build_visual_state(self.story)
                 with self._queue_lock:
                     # If the client called /input before popping the
                     # needs_player_input event, drain it now.
@@ -520,18 +530,29 @@ class AgentServer:
                 with self._queue_lock:
                     self._event_queue.clear()
                     self._event_queue.extend(queue)
+                self._last_state = None
+                self._last_save_snapshot = None
+                self._last_visual_state = build_visual_state(self.story)
             self._spawn_worker()
-            return build_visual_state(self.story)
+            return dict(self._last_visual_state)
 
         if method == "continue":
             # Reattach a client (e.g. after a browser reload) without touching
-            # engine state: the worker and event queue are left exactly as-is.
-            with self._story_lock:
-                if self.story.current_scene is None or self.story.finished:
-                    return {"active": False}
-                state = build_visual_state(self.story)
-                state["active"] = True
-                return state
+            # engine state: serve the worker-published snapshot so this never
+            # waits on an in-flight LLM turn.
+            with self._queue_lock:
+                snapshot = self._last_visual_state
+            if snapshot is None:
+                # No event processed yet (right after /start): compute live.
+                with self._story_lock:
+                    if self.story.current_scene is None or self.story.finished:
+                        return {"active": False}
+                    snapshot = build_visual_state(self.story)
+            if snapshot.get("scene") is None or snapshot.get("finished", False):
+                return {"active": False}
+            result = dict(snapshot)  # copy; don't mutate the cache
+            result["active"] = True
+            return result
 
         if method == "list_saves":
             story_id = params.get("story_id") or self.story._story_dir.name
@@ -561,8 +582,11 @@ class AgentServer:
                 with self._queue_lock:
                     self._event_queue.clear()
                 self.story.start(clear_history=True)
+                self._last_state = None
+                self._last_save_snapshot = None
+                self._last_visual_state = build_visual_state(self.story)
             self._spawn_worker()
-            return build_visual_state(self.story)
+            return dict(self._last_visual_state)
 
         if method == "skip":
             scene_id = params.get("scene_id", "")
@@ -570,6 +594,9 @@ class AgentServer:
             with self._story_lock:
                 with self._queue_lock:
                     self._event_queue.clear()
+                self._last_state = None
+                self._last_save_snapshot = None
+                self._last_visual_state = None
                 step = self.story.jump_to(scene_id)
             self._spawn_worker()
             return _step_to_dict(step)

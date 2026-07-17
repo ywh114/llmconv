@@ -136,6 +136,36 @@ class TestContinue:
         assert "history" in result
         assert "here" in result
 
+    def test_serves_snapshot_without_story_lock(self) -> None:
+        """With a worker-published snapshot, 'continue' must not wait on
+        _story_lock (which a generating worker holds for whole turns)."""
+        story, _ = _make_story(MockLLMClient([StreamResult(content="")]))
+        server = AgentServer(story, socket_path="")
+        server._last_visual_state = {
+            "finished": False,
+            "scene": {"id": "sentinel"},
+            "history": [],
+        }
+        server._story_lock.acquire()
+        try:
+            box: dict[str, Any] = {}
+            t = threading.Thread(
+                target=lambda: box.setdefault(
+                    "result", server._dispatch("continue", {})
+                ),
+                daemon=True,
+            )
+            t.start()
+            t.join(timeout=5.0)
+            assert not t.is_alive(), "continue blocked on _story_lock"
+        finally:
+            server._story_lock.release()
+        result = box["result"]
+        assert result["active"] is True
+        assert result["scene"]["id"] == "sentinel"
+        # The cache itself must not be mutated by the response.
+        assert "active" not in server._last_visual_state
+
 
 class TestAgentAPI:
     def test_client_step_limits_queue(self) -> None:
