@@ -718,6 +718,29 @@
   /* ------------------------------------------------------------------
      History
      ------------------------------------------------------------------ */
+  function appendRunsTo(el, runs) {
+    runs.forEach(run => {
+      const span = document.createElement('span');
+      if (run.classes.length) span.className = run.classes.join(' ');
+      span.textContent = run.text;
+      el.appendChild(span);
+    });
+  }
+
+  function renderHistoryEntry(speaker, text) {
+    const entry = document.createElement('div');
+    entry.className = 'vn-history-entry';
+    const nameEl = document.createElement('div');
+    nameEl.className = 'vn-history-name';
+    nameEl.textContent = speaker || 'Narrator';
+    const textEl = document.createElement('div');
+    textEl.className = 'vn-history-text';
+    appendRunsTo(textEl, parseInlineMarkdown(text));
+    entry.appendChild(nameEl);
+    entry.appendChild(textEl);
+    return entry;
+  }
+
   function addToHistory(speaker, text) {
     const last = STATE.history[STATE.history.length - 1];
     if (last && last.speaker === speaker && last.text === text) {
@@ -728,17 +751,7 @@
       STATE.history.shift();
       if ($historyList.firstChild) $historyList.removeChild($historyList.firstChild);
     }
-    const entry = document.createElement('div');
-    entry.className = 'vn-history-entry';
-    const nameEl = document.createElement('div');
-    nameEl.className = 'vn-history-name';
-    nameEl.textContent = speaker || 'Narrator';
-    const textEl = document.createElement('div');
-    textEl.className = 'vn-history-text';
-    textEl.textContent = text;
-    entry.appendChild(nameEl);
-    entry.appendChild(textEl);
-    $historyList.appendChild(entry);
+    $historyList.appendChild(renderHistoryEntry(speaker, text));
   }
 
   /* ------------------------------------------------------------------
@@ -1283,17 +1296,7 @@
     const history = data.history || [];
     history.forEach(entry => {
       STATE.history.push(entry);
-      const div = document.createElement('div');
-      div.className = 'vn-history-entry';
-      const nameEl = document.createElement('div');
-      nameEl.className = 'vn-history-name';
-      nameEl.textContent = entry.speaker || 'Narrator';
-      const textEl = document.createElement('div');
-      textEl.className = 'vn-history-text';
-      textEl.textContent = entry.text;
-      div.appendChild(nameEl);
-      div.appendChild(textEl);
-      $historyList.appendChild(div);
+      $historyList.appendChild(renderHistoryEntry(entry.speaker, entry.text));
     });
 
     // Leave the text box empty; gameLoop will drive typing from the queue.
