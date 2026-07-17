@@ -25,6 +25,8 @@ _METHOD_TIMEOUTS: dict[str, float] = {
     "generate": 300.0,
     "run_until_input": 300.0,
     "load": 300.0,
+    # Blocks on the story lock, which a generating worker may hold.
+    "continue": 300.0,
 }
 
 
@@ -83,6 +85,9 @@ class BaseProxy:
 
     def load(self, slot: int = 1) -> dict[str, Any]:
         return self._call("load", slot=slot)
+
+    def continue_session(self) -> dict[str, Any]:
+        return self._call("continue")
 
     def list_saves(self, story_id: str | None = None) -> list[dict[str, Any]]:
         params: dict[str, Any] = {}

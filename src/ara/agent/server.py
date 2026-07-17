@@ -523,6 +523,16 @@ class AgentServer:
             self._spawn_worker()
             return build_visual_state(self.story)
 
+        if method == "continue":
+            # Reattach a client (e.g. after a browser reload) without touching
+            # engine state: the worker and event queue are left exactly as-is.
+            with self._story_lock:
+                if self.story.current_scene is None or self.story.finished:
+                    return {"active": False}
+                state = build_visual_state(self.story)
+                state["active"] = True
+                return state
+
         if method == "list_saves":
             story_id = params.get("story_id") or self.story._story_dir.name
             manager = SaveManager(self.story.config)

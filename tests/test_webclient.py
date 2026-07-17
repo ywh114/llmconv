@@ -91,3 +91,47 @@ class TestWebGateway:
         ):
             resp = client.get("/state")
             assert resp.status_code == 200
+
+    def test_session_endpoint_inactive(self, client: TestClient) -> None:
+        with patch.object(
+            client.app.state.proxy, "continue_session", return_value={"active": False}
+        ):
+            resp = client.get("/session")
+            assert resp.status_code == 200
+            assert resp.json()["active"] is False
+
+    def test_session_endpoint_active(self, client: TestClient) -> None:
+        with patch.object(
+            client.app.state.proxy,
+            "continue_session",
+            return_value={"active": True, "scene": {"asset_story_name": "demo"}},
+        ):
+            resp = client.get("/session")
+            assert resp.status_code == 200
+            assert resp.json() == {"active": True, "story_id": "demo"}
+
+    def test_continue_endpoint_no_session(self, client: TestClient) -> None:
+        with patch.object(
+            client.app.state.proxy, "continue_session", return_value={"active": False}
+        ):
+            resp = client.post("/continue")
+            assert resp.status_code == 409
+            assert resp.json()["active"] is False
+
+    def test_continue_endpoint_establishes_session(self, client: TestClient) -> None:
+        visual = {"active": True, "scene": {"asset_story_name": "demo"}, "history": []}
+        with patch.object(
+            client.app.state.proxy, "continue_session", return_value=visual
+        ):
+            resp = client.post("/continue")
+            assert resp.status_code == 200
+            token = resp.json().get("session_token")
+            assert token
+        # The fresh token unlocks mutating endpoints.
+        with patch.object(
+            client.app.state.proxy, "input", return_value={"ok": True}
+        ):
+            resp = client.post(
+                "/input", json={"text": "hi"}, headers={"x-session-token": token}
+            )
+            assert resp.status_code == 200

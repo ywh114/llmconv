@@ -1184,6 +1184,19 @@
     return data;
   }
 
+  async function postContinue() {
+    const resp = await fetch('/continue', {
+      method: 'POST',
+      headers: sessionHeaders(),
+    });
+    // 409: no live session on the server (nothing to continue).
+    if (resp.status === 409) return null;
+    if (!resp.ok) throw new Error('Continue failed');
+    const data = await resp.json();
+    if (data.session_token) STATE.session_token = data.session_token;
+    return data;
+  }
+
   async function getSaves(storyId) {
     const url = storyId ? `/saves?story_id=${encodeURIComponent(storyId)}` : '/saves';
     const resp = await fetch(url);
@@ -1396,6 +1409,34 @@
       let data;
       try {
         data = await postLoad(slot, storyId);
+        _running = true;
+      } finally {
+        hideLoading();
+      }
+      if (data) {
+        await initVisualState(data);
+        gameLoop();
+      }
+      return data;
+    },
+    async continueGame() {
+      showLoading('Continuing…');
+      // Same loop-stopping preamble as load().
+      _running = false;
+      if (_abortController) {
+        _abortController.abort();
+        _abortController = null;
+      }
+      _typeGen++;
+      skipTyping();
+      if (_waitResolve) _waitResolve();
+      while (_loopActive) {
+        if (_waitResolve) _waitResolve();
+        await sleep(50);
+      }
+      let data;
+      try {
+        data = await postContinue();
         _running = true;
       } finally {
         hideLoading();

@@ -258,6 +258,27 @@
     window.VN.start(null, storyId);
   });
 
+  // Continue: shown only when the server still holds a live session
+  // (e.g. the page was reloaded mid-story while the server stayed up).
+  const $continueBtn = document.getElementById('btn-continue');
+  if ($continueBtn) {
+    $continueBtn.addEventListener('click', () => {
+      $title.classList.add('vn-hidden');
+      window.VN.continueGame()
+        .then(data => { if (!data) throw new Error('no live session'); })
+        .catch(() => {
+          $continueBtn.classList.add('vn-hidden');
+          $title.classList.remove('vn-hidden');
+        });
+    });
+    fetch('/session')
+      .then(resp => (resp.ok ? resp.json() : null))
+      .then(data => {
+        if (data && data.active) $continueBtn.classList.remove('vn-hidden');
+      })
+      .catch(() => { /* no session info — button stays hidden */ });
+  }
+
   document.getElementById('btn-load').addEventListener('click', () => {
     console.log('[UI] Load button clicked');
     openSaveload().catch(err => console.error('[UI] openSaveload failed:', err));

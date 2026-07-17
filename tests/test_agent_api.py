@@ -117,6 +117,26 @@ def agent_server():
     shutil.rmtree(TEST_SETTINGS.data_dir, ignore_errors=True)
 
 
+class TestContinue:
+    """The 'continue' method reattaches a client to the live session."""
+
+    def test_inactive_before_start(self) -> None:
+        story, _ = _make_story(MockLLMClient([StreamResult(content="")]))
+        server = AgentServer(story, socket_path="")
+        assert server._dispatch("continue", {}) == {"active": False}
+
+    def test_active_after_start(self) -> None:
+        story, scene = _make_story(MockLLMClient([StreamResult(content="")]))
+        server = AgentServer(story, socket_path="")
+        story.start(clear_history=True)
+        story.step()  # loads the scene (patched _load_scene, no LLM)
+        result = server._dispatch("continue", {})
+        assert result["active"] is True
+        assert result["scene"]["id"] == scene.id
+        assert "history" in result
+        assert "here" in result
+
+
 class TestAgentAPI:
     def test_client_step_limits_queue(self) -> None:
         """With client_step=1 the worker pauses after each event."""

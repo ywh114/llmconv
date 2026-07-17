@@ -267,6 +267,39 @@ async def _post_load(request: Request) -> JSONResponse:
         return _handle_error(exc, "/load")
 
 
+async def _get_session(request: Request) -> JSONResponse:
+    """Report whether the agent server holds a resumable in-memory session."""
+    proxy = request.app.state.proxy
+    try:
+        result = await _proxy_call(proxy, "continue_session")
+        scene = result.get("scene") or {}
+        return JSONResponse({
+            "active": bool(result.get("active")),
+            "story_id": scene.get("asset_story_name", ""),
+        })
+    except Exception as exc:
+        return _handle_error(exc, "/session")
+
+
+async def _post_continue(request: Request) -> JSONResponse:
+    """Reattach to the in-memory session after a browser reload.
+
+    The agent server keeps the engine, history, and event queue as-is; we
+    only mint a fresh session token, since the old one died with the page.
+    """
+    proxy = request.app.state.proxy
+    try:
+        result = await _proxy_call(proxy, "continue_session")
+        if not result.get("active"):
+            return JSONResponse({"active": False}, status_code=409)
+        import secrets
+        request.app.state.session_token = secrets.token_hex(16)
+        result["session_token"] = request.app.state.session_token
+        return JSONResponse(result)
+    except Exception as exc:
+        return _handle_error(exc, "/continue")
+
+
 async def _get_saves(request: Request) -> JSONResponse:
     story_id = request.query_params.get("story_id", "")
     proxy = request.app.state.proxy
@@ -335,6 +368,8 @@ def create_app(
             Route("/state", _get_state),
             Route("/save", _post_save, methods=["POST"]),
             Route("/load", _post_load, methods=["POST"]),
+            Route("/session", _get_session),
+            Route("/continue", _post_continue, methods=["POST"]),
             Route("/saves", _get_saves),
             Route("/delete-save", _post_delete_save, methods=["POST"]),
             Route("/stories", _get_stories),
