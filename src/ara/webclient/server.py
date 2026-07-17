@@ -249,7 +249,6 @@ async def _post_save(request: Request) -> JSONResponse:
 
 async def _post_load(request: Request) -> JSONResponse:
     data = await _parse_json(request)
-    _require_session(request)
     slot = int(data.get("slot", 1))
     story_id = data.get("story_id", "")
     proxy = request.app.state.proxy
@@ -259,6 +258,10 @@ async def _post_load(request: Request) -> JSONResponse:
             None, _switch_story, proxy, story_id, settings
         )
         result = await _proxy_call(proxy, "load", slot=slot)
+        # Loading a save starts a fresh session.
+        import secrets
+        request.app.state.session_token = secrets.token_hex(16)
+        result["session_token"] = request.app.state.session_token
         return JSONResponse(result)
     except Exception as exc:
         return _handle_error(exc, "/load")

@@ -39,6 +39,7 @@
     history: [],
     textSpeed: 30,
     autoDelay: 2500,
+    session_token: '',
   };
 
   let _running = false;
@@ -1081,6 +1082,13 @@
   /* ------------------------------------------------------------------
      Network
      ------------------------------------------------------------------ */
+  function sessionHeaders() {
+    return {
+      'Content-Type': 'application/json',
+      'X-Session-Token': STATE.session_token,
+    };
+  }
+
   async function postStart(sceneId, storyId) {
     const params = {};
     if (sceneId) params.scene_id = sceneId;
@@ -1091,7 +1099,9 @@
       body: JSON.stringify(params),
     });
     if (!resp.ok) throw new Error('Start failed');
-    return resp.json();
+    const data = await resp.json();
+    if (data.session_token) STATE.session_token = data.session_token;
+    return data;
   }
 
   async function postInput(text, attempt) {
@@ -1099,7 +1109,7 @@
     if (attempt) body.attempt = attempt;
     const resp = await fetch('/input', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: sessionHeaders(),
       body: JSON.stringify(body),
     });
     if (!resp.ok) throw new Error('Input failed');
@@ -1109,7 +1119,7 @@
   async function postGenerate(suggestion) {
     const resp = await fetch('/generate', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: sessionHeaders(),
       body: JSON.stringify({ suggestion }),
     });
     if (!resp.ok) throw new Error('Generate failed');
@@ -1119,7 +1129,7 @@
   async function postSave(slot) {
     const resp = await fetch('/save', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: sessionHeaders(),
       body: JSON.stringify({ slot }),
     });
     if (!resp.ok) throw new Error('Save failed');
@@ -1131,11 +1141,13 @@
     if (storyId) body.story_id = storyId;
     const resp = await fetch('/load', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: sessionHeaders(),
       body: JSON.stringify(body),
     });
     if (!resp.ok) throw new Error('Load failed');
-    return resp.json();
+    const data = await resp.json();
+    if (data.session_token) STATE.session_token = data.session_token;
+    return data;
   }
 
   async function getSaves(storyId) {
@@ -1150,7 +1162,7 @@
     if (storyId) body.story_id = storyId;
     const resp = await fetch('/delete-save', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: sessionHeaders(),
       body: JSON.stringify(body),
     });
     if (!resp.ok) throw new Error('Delete failed');
@@ -1160,7 +1172,7 @@
   async function postDebug(command, args) {
     const resp = await fetch('/debug', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: sessionHeaders(),
       body: JSON.stringify({ command, args }),
     });
     if (!resp.ok) throw new Error('Debug failed');
