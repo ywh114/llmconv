@@ -46,7 +46,7 @@
   let _loopActive = false;
   let _typingTimer = null;
   let _typingResolve = null;
-  let _fullText = '';
+  let _fullRuns = null;
   let _autoMode = false;
   let _typeGen = 0;
   let _waitResolve = null;
@@ -614,9 +614,23 @@
   /* ------------------------------------------------------------------
      Text typing
      ------------------------------------------------------------------ */
+  // Coalesce typed characters back into runs for skipTyping() to render.
+  // classes arrays are shared references, so identity comparison is enough.
+  function charsToRuns(chars) {
+    const runs = [];
+    chars.forEach(c => {
+      const last = runs[runs.length - 1];
+      if (last && last.classes === c.classes) {
+        last.text += c.char;
+      } else {
+        runs.push({ text: c.char, classes: c.classes });
+      }
+    });
+    return runs;
+  }
+
   async function typeText(speaker, text, speakerTitle) {
     const myGen = ++_typeGen;
-    const pages = splitIntoPages(text);
     $name.textContent = speaker || '';
     let title = speakerTitle || '';
     if (!title && speaker) {
@@ -625,19 +639,27 @@
     }
     $title.textContent = title;
 
+    // Parse styling before paginating: markers are resolved on the full
+    // text, and pages are sliced from the styled characters, so a page
+    // boundary can never split a marker or leave one unmatched.
+    const runs = parseInlineMarkdown(text);
+    const allChars = [];
+    runs.forEach(run => {
+      for (let j = 0; j < run.text.length; j++) {
+        allChars.push({ char: run.text[j], classes: run.classes });
+      }
+    });
+    const plainText = allChars.map(c => c.char).join('');
+    const pages = splitIntoPages(plainText);
+
+    let offset = 0;
     for (let p = 0; p < pages.length; p++) {
       if (myGen !== _typeGen) {
         return;
       }
-      _fullText = pages[p];
-      const runs = parseInlineMarkdown(pages[p]);
-      // Flatten runs into typed characters carrying their style.
-      const chars = [];
-      runs.forEach(run => {
-        for (let j = 0; j < run.text.length; j++) {
-          chars.push({ char: run.text[j], classes: run.classes });
-        }
-      });
+      const chars = allChars.slice(offset, offset + pages[p].length);
+      offset += pages[p].length;
+      _fullRuns = charsToRuns(chars);
       $text.innerHTML = '<span class="vn-cursor"></span>';
       let i = 0;
 
@@ -679,10 +701,9 @@
       clearTimeout(_typingTimer);
       _typingTimer = null;
     }
-    if (_fullText) {
-      const runs = parseInlineMarkdown(_fullText);
+    if (_fullRuns) {
       $text.innerHTML = '<span class="vn-cursor"></span>';
-      appendRunsToText(runs);
+      appendRunsToText(_fullRuns);
     }
     if (_typingResolve) {
       _typingResolve();
@@ -1185,8 +1206,8 @@
   async function submitInput(text) {
     hideChoices();
     try {
-      addToHistory('Player', text);
-      await typeText('Player', text);
+      addToHistory(STATE.player || 'Player', text);
+      await typeText(STATE.player || 'Player', text);
       await waitForClick();
       await postInput(text);
       gameLoop();
@@ -1201,8 +1222,8 @@
     try {
       const data = await postGenerate(suggestion);
       const text = data.text || suggestion;
-      addToHistory('Player', text);
-      await typeText('Player', text);
+      addToHistory(STATE.player || 'Player', text);
+      await typeText(STATE.player || 'Player', text);
       await waitForClick();
       await postInput(text);
       gameLoop();
@@ -1215,8 +1236,8 @@
   async function submitCustom(text, attempt) {
     hideChoices();
     try {
-      addToHistory('Player', text);
-      await typeText('Player', text);
+      addToHistory(STATE.player || 'Player', text);
+      await typeText(STATE.player || 'Player', text);
       await waitForClick();
       await postInput(text, attempt);
       gameLoop();
