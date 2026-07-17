@@ -173,6 +173,29 @@ def _empty_db() -> MagicMock:
     return mock_db
 
 
+def test_build_snapshot_include_archive_flag() -> None:
+    """include_archive=False omits the telescope; the default keeps it."""
+    mock_db = _empty_db()
+    mock_client = MagicMock(spec=LLMClient)
+    scene = _make_scene("scene_a", mock_db)
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmp = Path(tmpdir)
+        config = AraSettings(data_dir=tmp, api_key="", api_endpoint="", api_model="")
+        (tmp / "scene_a.toml").write_text('id = "scene_a"\n')
+        story = Story(config, mock_db, mock_client, tmp / "scene_a.toml")
+        story._current_scene = scene
+        archive = [{"scene_id": "prev", "data": "x"}]
+        story._archived_scene_snapshots = archive
+
+        manager = SaveManager(config)
+        full = manager._build_snapshot(story)
+        assert full["archived_scene_snapshots"] == archive
+
+        light = manager._build_snapshot(story, include_archive=False)
+        assert "archived_scene_snapshots" not in light
+
+
 def test_save_load_preserves_canonical_progress() -> None:
     """Canonical-script index and pending choices survive a save/load cycle."""
     mock_db = _empty_db()

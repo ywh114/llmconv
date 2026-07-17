@@ -110,13 +110,6 @@ class AgentClient:
         """Get a full state snapshot (story + engine)."""
         return self._call("state")
 
-    def run_until_input(self) -> dict[str, Any]:
-        """Auto-step until player input is required or the story ends.
-
-        Returns a dict with keys: ``events``, ``output``.
-        """
-        return self._call("run_until_input")
-
     def reset(self) -> dict[str, Any]:
         """Reset the story to the beginning."""
         return self._call("reset")

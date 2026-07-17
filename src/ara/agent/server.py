@@ -129,16 +129,6 @@ class AgentServer:
                     if not self._worker_alive:
                         return
                     step = self.story.step()
-
-                    # Build read-only snapshots while state is consistent
-                    state_snapshot = {
-                        "story": story_to_dict(self.story),
-                        "engine": engine_to_dict(self.story.engine),
-                    }
-                    save_snapshot = SaveManager(self.story.config)._build_snapshot(
-                        self.story
-                    )
-                    visual_snapshot = build_visual_state(self.story)
             except RuntimeError:
                 # Engine errors (e.g. story complete, waiting for input)
                 # Stop the worker and let the client deal with it.
@@ -159,13 +149,17 @@ class AgentServer:
                 self._event_queue.append(event)
                 self._queue_condition.notify_all()
 
-                # Capture queue into snapshots for consistent non-blocking reads
-                state_snapshot["queue"] = list(self._event_queue)
-                save_snapshot["queue"] = list(self._event_queue)
-                self._last_state = state_snapshot
-                self._last_save_snapshot = save_snapshot
-                self._last_visual_state = visual_snapshot
+            # Publish read-model snapshots with the queue now containing the
+            # new event.  State is between turns, so it is consistent.
+            try:
+                with self._story_lock:
+                    if not self._worker_alive:
+                        return
+                    self._publish_snapshots()
+            except Exception:
+                logger.exception('Snapshot publish failed; continuing with stale snapshots')
 
+            with self._queue_lock:
                 # Stop conditions
                 if step.event == "needs_player_input":
                     self._worker_running = False
@@ -209,6 +203,39 @@ class AgentServer:
 
         if self._worker_thread is not None and self._worker_thread.is_alive():
             self._worker_thread.join(timeout=30.0)
+
+    # ------------------------------------------------------------------ #
+    # Read-model snapshots
+    # ------------------------------------------------------------------ #
+
+    def _publish_snapshots(self) -> None:
+        """Rebuild and publish all read-model snapshots.
+
+        Requires ``_story_lock`` (state must be consistent, i.e. between
+        turns).  Stores under ``_queue_lock`` so readers never wait on
+        in-flight LLM turns.  Called by the worker after each event, by
+        ``input`` after applying player text, and by ``load``/``reset``/
+        ``save`` after state changes.
+
+        The archived-scene telescope is append-only and its entries are
+        never mutated, so the save snapshot carries the live list by
+        reference; it is only serialized when a save is written to disk.
+        """
+        state_snapshot = {
+            "story": story_to_dict(self.story),
+            "engine": engine_to_dict(self.story.engine),
+        }
+        save_snapshot = SaveManager(self.story.config)._build_snapshot(
+            self.story, include_archive=False
+        )
+        save_snapshot["archived_scene_snapshots"] = self.story._archived_scene_snapshots
+        visual_snapshot = build_visual_state(self.story)
+        with self._queue_lock:
+            state_snapshot["queue"] = list(self._event_queue)
+            save_snapshot["queue"] = list(self._event_queue)
+            self._last_state = state_snapshot
+            self._last_save_snapshot = save_snapshot
+            self._last_visual_state = visual_snapshot
 
     # ------------------------------------------------------------------ #
     # Request dispatch
@@ -369,9 +396,9 @@ class AgentServer:
                     f"last_decision_next={self.story.engine.last_decision.next_char.name if self.story.engine.last_decision else None}"
                 )
                 self.story.submit_player_input(text, attempt=attempt)
-                # Keep the visual snapshot fresh so a client reattaching
-                # right after submitting still sees this line in its backlog.
-                self._last_visual_state = build_visual_state(self.story)
+                # Keep snapshots fresh so readers (incl. a reattaching
+                # client) see this line immediately.
+                self._publish_snapshots()
                 with self._queue_lock:
                     # If the client called /input before popping the
                     # needs_player_input event, drain it now.
@@ -421,74 +448,6 @@ class AgentServer:
                 self._last_state = state
                 return state
 
-        if method == "run_until_input":
-            # Deprecated: drain the queue until a stopping event.
-            events: list[dict[str, Any]] = []
-            outputs: list[str] = []
-            while True:
-                with self._queue_lock:
-                    if not self._event_queue:
-                        with self._story_lock:
-                            finished = self.story.finished
-                            needs_input = self.story.engine.needs_player_input
-                        if finished:
-                            break
-                        if needs_input:
-                            engine = self.story.engine
-                            last_dec = engine.last_decision
-                            suggestions = last_dec.suggestions if last_dec else []
-                            speaker = (
-                                engine.scene.player.name
-                                if engine.scene and engine.scene.player
-                                else None
-                            )
-                            events.append({
-                                "event": "needs_player_input",
-                                "output": "",
-                                "scene": scene_to_dict(engine.scene)
-                                if engine.scene
-                                else None,
-                                "suggestions": suggestions,
-                                "next_scene": None,
-                                "speaker": speaker,
-                                "enter": [],
-                                "exit": [],
-                                "sprite_changes": {},
-                            })
-                            break
-                        self._queue_condition.wait(timeout=0.5)
-                        continue
-
-                    event = self._event_queue.popleft()
-                    events.append(event)
-                    outputs.append(event.get("output", ""))
-
-                    # Wake worker if capacity freed up
-                    if (
-                        self.client_step > 0
-                        and len(self._event_queue) < self.client_step
-                        and not self._worker_running
-                        and self._worker_alive
-                    ):
-                        with self._story_lock:
-                            needs_input = self.story.engine.needs_player_input
-                            finished = self.story.finished
-                        if not needs_input and not finished:
-                            self._worker_running = True
-                            self._queue_condition.notify()
-
-                    if event["event"] in (
-                        "needs_player_input",
-                        "transition",
-                        "story_complete",
-                    ):
-                        break
-
-            return {
-                "events": events,
-                "output": "".join(outputs),
-            }
-
         if method == "save":
             slot = int(params.get("slot", 1))
             acquired = self._story_lock.acquire(blocking=False)
@@ -498,9 +457,7 @@ class AgentServer:
                         queue = list(self._event_queue)
                     manager = SaveManager(self.story.config)
                     path = manager.save(self.story, slot, queue=queue)
-                    self._last_save_snapshot = manager._build_snapshot(
-                        self.story, queue=queue
-                    )
+                    self._publish_snapshots()
                     return {"slot": slot, "path": str(path)}
                 finally:
                     self._story_lock.release()
@@ -530,9 +487,7 @@ class AgentServer:
                 with self._queue_lock:
                     self._event_queue.clear()
                     self._event_queue.extend(queue)
-                self._last_state = None
-                self._last_save_snapshot = None
-                self._last_visual_state = build_visual_state(self.story)
+                self._publish_snapshots()
             self._spawn_worker()
             return dict(self._last_visual_state)
 
@@ -582,9 +537,7 @@ class AgentServer:
                 with self._queue_lock:
                     self._event_queue.clear()
                 self.story.start(clear_history=True)
-                self._last_state = None
-                self._last_save_snapshot = None
-                self._last_visual_state = build_visual_state(self.story)
+                self._publish_snapshots()
             self._spawn_worker()
             return dict(self._last_visual_state)
 

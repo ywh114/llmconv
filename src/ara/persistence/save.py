@@ -317,7 +317,19 @@ class SaveManager:
         logger.info(f"Saved slot {slot} for {story_id} → {path}")
         return path
 
-    def _build_snapshot(self, story: Story, queue: list[dict[str, Any]] | None = None) -> dict[str, Any]:
+    def _build_snapshot(
+        self,
+        story: Story,
+        queue: list[dict[str, Any]] | None = None,
+        include_archive: bool = True,
+    ) -> dict[str, Any]:
+        """Build a serialisable snapshot of *story*.
+
+        :param include_archive: When ``False``, omit the append-only
+            ``archived_scene_snapshots`` telescope.  Callers that rebuild
+            snapshots frequently can skip it and carry the live list by
+            reference; it is only needed when a save is written to disk.
+        """
         engine = story.engine
         scene = story.current_scene
         db = story.db
@@ -468,8 +480,9 @@ class SaveManager:
             "story_history": story_history_docs,
             "orchestrator_wiki": wiki_docs,
             "queue": queue if queue is not None else [],
-            "archived_scene_snapshots": list(story._archived_scene_snapshots),
         }
+        if include_archive:
+            snapshot["archived_scene_snapshots"] = list(story._archived_scene_snapshots)
         return snapshot
 
     # ------------------------------------------------------------------ #

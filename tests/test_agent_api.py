@@ -166,6 +166,19 @@ class TestContinue:
         # The cache itself must not be mutated by the response.
         assert "active" not in server._last_visual_state
 
+    def test_publish_carries_archive_by_reference(self) -> None:
+        """The save snapshot shares the append-only telescope list instead
+        of copying it; it is only serialized when written to disk."""
+        story, _ = _make_story(MockLLMClient([StreamResult(content="")]))
+        server = AgentServer(story, socket_path="")
+        story.start(clear_history=True)
+        story.step()
+        story._archived_scene_snapshots.append({"scene_id": "prev"})
+        server._publish_snapshots()
+        snap = server._last_save_snapshot
+        assert snap is not None
+        assert snap["archived_scene_snapshots"] is story._archived_scene_snapshots
+
 
 class TestAgentAPI:
     def test_client_step_limits_queue(self) -> None:
@@ -305,17 +318,6 @@ class TestAgentAPI:
             # Skip to a non-existent scene should raise an error
             with pytest.raises(RuntimeError, match="not found"):
                 client.skip("nonexistent")
-
-    def test_run_until_input(self, agent_server: AgentServer) -> None:
-        socket_path = str(TEST_SETTINGS.sockets_path / "ara_agent_test.sock")
-        with AgentClient(socket_path) as client:
-            client.start()
-            client.step()  # scene_loaded
-
-            # run_until_input should advance straight to the player prompt
-            result = client.run_until_input()
-            assert len(result["events"]) == 1
-            assert result["events"][0]["event"] == "needs_player_input"
 
     def test_debug_commands(self, agent_server: AgentServer) -> None:
         socket_path = str(TEST_SETTINGS.sockets_path / "ara_agent_test.sock")

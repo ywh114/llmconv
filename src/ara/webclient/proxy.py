@@ -23,7 +23,6 @@ _METHOD_TIMEOUTS: dict[str, float] = {
     "step": 300.0,
     "input": 300.0,
     "generate": 300.0,
-    "run_until_input": 300.0,
     "load": 300.0,
     # Blocks on the story lock, which a generating worker may hold.
     "continue": 300.0,
@@ -65,9 +64,6 @@ class BaseProxy:
 
     def generate(self, suggestion: str) -> dict[str, Any]:
         return self._call("generate", suggestion=suggestion)
-
-    def run_until_input(self) -> dict[str, Any]:
-        return self._call("run_until_input")
 
     def state(self) -> dict[str, Any]:
         return self._call("state")
