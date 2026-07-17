@@ -18,7 +18,6 @@ html, body {
   font-family: var(--vn-font-body);
   background: var(--vn-bg-base);
   color: var(--vn-text);
-  user-select: none;
 }
 
 /* -------------------------------------------------------------------
@@ -1015,7 +1014,8 @@ body.vn-hide-nametags .vn-nametag {
   gap: 0.5rem;
   padding: 0.5rem;
 }
-.vn-saveload-cell:hover .vn-saveload-overlay {
+.vn-saveload-cell:hover .vn-saveload-overlay,
+.vn-saveload-cell:focus-within .vn-saveload-overlay {
   display: flex;
 }
 .vn-saveload-overlay .vn-title-btn {
@@ -1354,5 +1354,15 @@ body.vn-hide-nametags .vn-nametag {
 
   #vn-saveload-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

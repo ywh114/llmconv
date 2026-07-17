@@ -46,16 +46,21 @@
   let _typingTimer = null;
   let _typingResolve = null;
   let _fullText = '';
-  let _pendingClick = null;
   let _autoMode = false;
-  let _abortTyping = false;
   let _typeGen = 0;
   let _waitResolve = null;
+  let _autoWaiter = null;
   let _abortController = null;
   let _transitioning = false;
   let _transitionStartTime = 0;
   let _initialLoad = false;
+  let _consecutiveFailures = 0;
+  let _lastHereChars = null;
+  let _lastSpeakerName = null;
+  let _resizeTimer = null;
   const MIN_TRANSITION_MS = 3000;
+  const MAX_STEP_FAILURES = 5;
+  const MAX_HISTORY = 1000;
 
   /* ------------------------------------------------------------------
      Helpers
@@ -76,16 +81,10 @@
      Background
      ------------------------------------------------------------------ */
   function setBackground(loc) {
-    if (!loc) return;
-    let url;
-    if (typeof loc === 'object' && loc.background_url) {
-      url = assetUrl('', loc.background_url);
-    } else if (typeof loc === 'string') {
-      url = assetUrl('bg', loc + '.png');
-    } else if (typeof loc === 'object' && loc.name) {
-      url = assetUrl('bg', loc.name + '.png');
-    }
-    if (url) $bg.style.backgroundImage = `url('${url}')`;
+    // Backgrounds always come from the location dict; there is no bare-name
+    // fallback (the old /assets/bg/ path does not exist on the server).
+    if (!loc || typeof loc !== 'object' || !loc.background_url) return;
+    $bg.style.backgroundImage = `url('${assetUrl('', loc.background_url)}')`;
   }
 
   /* ------------------------------------------------------------------
@@ -281,7 +280,11 @@
     return bottom.concat(middle).concat(top); // 8
   }
 
-  function updateSprites(hereChars, speakerName) {
+  function updateSprites(hereChars, speakerName, forceRecrop) {
+    // Remember the latest cast/speaker so the resize handler can re-run the
+    // layout without waiting for the next server event.
+    _lastHereChars = hereChars;
+    _lastSpeakerName = speakerName;
     const playerName = STATE.player;
     const visibleChars = hereChars.filter(c => {
       if (c.name === STATE.narrator) return false;
@@ -447,13 +450,15 @@
       el.classList.toggle('vn-speaking', isSpeaking);
       el.classList.remove('vn-sprite-hidden');
 
-      if (!isZoom && el._crop) {
-        const img = el.querySelector('img');
-        if (img) applyCropStyles(el, img);
-      }
-      if (isZoom && el._crop) {
-        const img = el.querySelector('img');
-        if (img) applyZoomFocus(el, img);
+      if (forceRecrop) {
+        if (!isZoom && el._crop) {
+          const img = el.querySelector('img');
+          if (img) applyCropStyles(el, img);
+        }
+        if (isZoom && el._crop) {
+          const img = el.querySelector('img');
+          if (img) applyZoomFocus(el, img);
+        }
       }
     });
 
@@ -471,21 +476,25 @@
   /* ------------------------------------------------------------------
      Text paging
      ------------------------------------------------------------------ */
+  let _measurer = null;
+
   function splitIntoPages(text) {
     const style = getComputedStyle($text);
     const maxHeight = parseFloat(style.maxHeight);
     if (!maxHeight || !text) return [text];
 
-    const measurer = document.createElement('div');
-    measurer.style.position = 'absolute';
-    measurer.style.visibility = 'hidden';
-    measurer.style.left = '-9999px';
-    measurer.style.width = $text.clientWidth + 'px';
-    measurer.style.font = style.font;
-    measurer.style.lineHeight = style.lineHeight;
-    measurer.style.whiteSpace = 'pre-wrap';
-    measurer.style.wordBreak = 'break-word';
-    document.body.appendChild(measurer);
+    if (!_measurer) {
+      _measurer = document.createElement('div');
+      _measurer.style.position = 'absolute';
+      _measurer.style.visibility = 'hidden';
+      _measurer.style.left = '-9999px';
+      _measurer.style.whiteSpace = 'pre-wrap';
+      _measurer.style.wordBreak = 'break-word';
+      document.body.appendChild(_measurer);
+    }
+    _measurer.style.width = $text.clientWidth + 'px';
+    _measurer.style.font = style.font;
+    _measurer.style.lineHeight = style.lineHeight;
 
     const pages = [];
     let remaining = text;
@@ -494,8 +503,8 @@
       let low = 1, high = remaining.length, best = 1;
       while (low <= high) {
         const mid = Math.floor((low + high) / 2);
-        measurer.textContent = remaining.slice(0, mid);
-        if (measurer.offsetHeight <= maxHeight) {
+        _measurer.textContent = remaining.slice(0, mid);
+        if (_measurer.offsetHeight <= maxHeight) {
           best = mid;
           low = mid + 1;
         } else {
@@ -517,7 +526,6 @@
       remaining = remaining.slice(split);
     }
 
-    document.body.removeChild(measurer);
     return pages.length ? pages : [text];
   }
 
@@ -694,6 +702,10 @@
       return;
     }
     STATE.history.push({ speaker, text });
+    if (STATE.history.length > MAX_HISTORY) {
+      STATE.history.shift();
+      if ($historyList.firstChild) $historyList.removeChild($historyList.firstChild);
+    }
     const entry = document.createElement('div');
     entry.className = 'vn-history-entry';
     const nameEl = document.createElement('div');
@@ -845,7 +857,7 @@
       applyEnterExit(ev.enter, ev.exit, ev.spawn);
       if (ev.sprite_changes) {
         Object.entries(ev.sprite_changes).forEach(([name, sprite]) => {
-          const char = STATE.here.find(c => c.name === name);
+          const char = STATE.pool.find(c => c.name === name);
           if (char) char.current_sprite = sprite;
         });
       }
@@ -868,7 +880,7 @@
       applyEnterExit(ev.enter, ev.exit, ev.spawn);
       if (ev.sprite_changes) {
         Object.entries(ev.sprite_changes).forEach(([name, sprite]) => {
-          const char = STATE.here.find(c => c.name === name);
+          const char = STATE.pool.find(c => c.name === name);
           if (char) char.current_sprite = sprite;
         });
       }
@@ -920,7 +932,6 @@
   function waitForClick() {
     return new Promise(resolve => {
       let autoTimer = null;
-      let pollInterval = null;
       let finished = false;
       _waitResolve = resolve;
 
@@ -932,9 +943,8 @@
           clearTimeout(autoTimer);
           autoTimer = null;
         }
-        if (pollInterval) {
-          clearInterval(pollInterval);
-          pollInterval = null;
+        if (_autoWaiter === maybeStartAuto) {
+          _autoWaiter = null;
         }
         cleanup();
         resolve();
@@ -1000,8 +1010,9 @@
         }
       }
 
+      // Event-driven auto mode: toggleAuto() calls the active waiter directly.
+      _autoWaiter = maybeStartAuto;
       maybeStartAuto();
-      pollInterval = setInterval(maybeStartAuto, 200);
     });
   }
 
@@ -1026,12 +1037,19 @@
         });
         _abortController = null;
         if (!resp.ok) {
+          _consecutiveFailures++;
           console.error('/step failed', await resp.text());
+          if (_consecutiveFailures >= MAX_STEP_FAILURES) {
+            $text.innerHTML = '<span style="color:#f55">Connection lost. Refresh to reconnect.</span>';
+            _running = false;
+            break;
+          }
           await sleep(1000);
           continue;
         }
         const ev = await resp.json();
         console.log('Step event:', ev);
+        _consecutiveFailures = 0;
 
         const result = await processEvent(ev);
         if (result === 'wait') {
@@ -1047,7 +1065,13 @@
           // Fetch was cancelled by load/start/reset – exit cleanly.
           break;
         }
+        _consecutiveFailures++;
         console.error('Game loop error', err);
+        if (_consecutiveFailures >= MAX_STEP_FAILURES) {
+          $text.innerHTML = '<span style="color:#f55">Connection lost. Refresh to reconnect.</span>';
+          _running = false;
+          break;
+        }
         await sleep(1000);
       }
     }
@@ -1301,6 +1325,9 @@
       if (indicator) {
         indicator.style.display = _autoMode ? 'block' : 'none';
       }
+      if (_autoWaiter) {
+        _autoWaiter();
+      }
       return _autoMode;
     },
     showLoading,
@@ -1431,4 +1458,13 @@
   }
   document.addEventListener('click', restoreIfCollapsed);
   document.addEventListener('touchstart', restoreIfCollapsed, { passive: false });
+
+  // Recalculate sprite layout when the viewport changes.
+  window.addEventListener('resize', () => {
+    if (_resizeTimer) clearTimeout(_resizeTimer);
+    _resizeTimer = setTimeout(() => {
+      _resizeTimer = null;
+      if (_lastHereChars) updateSprites(_lastHereChars, _lastSpeakerName, true);
+    }, 150);
+  });
 })();

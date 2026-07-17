@@ -285,6 +285,7 @@
       for (let slot = 1; slot <= 20; slot++) {
         const cell = document.createElement('div');
         cell.className = 'vn-saveload-cell';
+        cell.tabIndex = 0;
         const saved = saveMap.get(slot);
 
         const slotInfo = saved
@@ -407,27 +408,22 @@
 
   const $textSpeed = document.getElementById('setting-text-speed');
   $textSpeed.addEventListener('input', (e) => {
-    // Invert: slider high = fast speed = low delay
-    const val = parseInt(e.target.value, 10);
-    const delay = Math.max(5, 105 - val);
-    window.VN.setTextSpeed(delay);
+    window.VN.setTextSpeed(parseInt(e.target.value, 10));
   });
+  $textSpeed.value = '30'; // matches STATE.textSpeed default in vn.js
 
   const $autoDelay = document.getElementById('setting-auto-delay');
   $autoDelay.addEventListener('input', (e) => {
     window.VN.setAutoDelay(e.target.value);
   });
 
-  // -------------------------------------------------------------------
-  // Panel close helpers (mobile-friendly: buttons + tap outside)
-  // -------------------------------------------------------------------
+  const panelIds = ['vn-history', 'vn-keybinds', 'vn-saveload', 'vn-debug', 'vn-settings', 'vn-system'];
+
   function closeAllPanels() {
-    $history.classList.remove('vn-visible');
-    $keybinds.classList.remove('vn-visible');
-    $saveload.classList.remove('vn-visible');
-    $debug.classList.remove('vn-visible');
-    $settings.classList.remove('vn-visible');
-    $system.classList.remove('vn-visible');
+    panelIds.forEach(id => {
+      const panel = document.getElementById(id);
+      if (panel) panel.classList.remove('vn-visible');
+    });
   }
 
   document.querySelectorAll('.vn-panel-close').forEach(btn => {
@@ -439,7 +435,6 @@
     });
   });
 
-  const panelIds = ['vn-history', 'vn-keybinds', 'vn-saveload', 'vn-debug', 'vn-settings', 'vn-system'];
   panelIds.forEach(id => {
     const panel = document.getElementById(id);
     if (!panel) return;
@@ -519,12 +514,7 @@
     }
     // Escape closes overlays
     if (e.code === 'Escape') {
-      $settings.classList.remove('vn-visible');
-      $history.classList.remove('vn-visible');
-      $keybinds.classList.remove('vn-visible');
-      $saveload.classList.remove('vn-visible');
-      $debug.classList.remove('vn-visible');
-      $system.classList.remove('vn-visible');
+      closeAllPanels();
     }
   });
 

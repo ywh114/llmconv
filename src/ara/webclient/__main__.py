@@ -66,7 +66,26 @@ def main(argv: list[str] | None = None) -> int:
         default=0,
         help="Max queue depth: 0 = unlimited, 1 = old single-step bottleneck, N = pre-compute N events (only with --internal)",
     )
+    parser.add_argument(
+        "--debug",
+        action="store_true",
+        help="Enable Starlette debug mode (traceback pages on errors)",
+    )
     args = parser.parse_args(argv)
+
+    if args.api_key:
+        print(
+            "WARNING: --api-key is visible in process listings. "
+            "Prefer setting DEEPSEEK_API_KEY in the environment instead.",
+            file=os.sys.stderr,
+        )
+
+    if args.expose:
+        print(
+            "WARNING: --expose binds to 0.0.0.0 with NO authentication. "
+            "Anyone on the network can overwrite saves, delete saves, and run debug commands.",
+            file=os.sys.stderr,
+        )
 
     if args.internal:
         settings = AraSettings()
@@ -79,10 +98,10 @@ def main(argv: list[str] | None = None) -> int:
         story = Story(settings, db, client, args.scene)
         agent_server = AgentServer(story, socket_path=args.agent_socket, client_step=args.client_step)
         proxy = DirectProxy(agent_server)
-        app = create_app(proxy=proxy)
+        app = create_app(proxy=proxy, debug=args.debug)
         app.state.settings = settings
     else:
-        app = create_app(socket_path=args.agent_socket)
+        app = create_app(socket_path=args.agent_socket, debug=args.debug)
 
     host = "0.0.0.0" if args.expose else args.host
     uvicorn.run(app, host=host, port=args.port, log_level="info")

@@ -90,7 +90,7 @@ def _normalise_event(agent_result: dict[str, Any]) -> dict[str, Any]:
 
 async def _proxy_call(proxy: AgentProxy, method: str, **kwargs: Any) -> Any:
     """Run a synchronous proxy call in a thread pool."""
-    loop = asyncio.get_event_loop()
+    loop = asyncio.get_running_loop()
     fn = functools.partial(getattr(proxy, method), **kwargs)
     return await loop.run_in_executor(None, fn)
 
@@ -104,6 +104,12 @@ async def _parse_json(request: Request) -> dict[str, Any]:
         return await request.json()
     except Exception as exc:
         raise HTTPException(status_code=400, detail=f"Invalid JSON: {exc}")
+
+
+def _handle_error(exc: Exception, context: str) -> JSONResponse:
+    """Log the full exception and return a safe generic error to the client."""
+    logger.exception(f"{context} failed")
+    return JSONResponse({"error": "Internal error"}, status_code=500)
 
 
 def _switch_story(proxy: AgentProxy, story_id: str | None, settings: AraSettings | None = None) -> bool:
@@ -125,8 +131,26 @@ def _switch_story(proxy: AgentProxy, story_id: str | None, settings: AraSettings
     client = LLMClient(settings)
     new_story = Story(settings, db, client, Path(story_info["path"]))
     new_server = AgentServer(new_story, socket_path="")
+
+    # Shut down the old server before replacing it.
+    old_server = proxy.server
+    try:
+        old_server.shutdown()
+    except Exception:
+        logger.warning("Old agent server shutdown failed", exc_info=True)
+
     proxy.server = new_server
     return True
+
+
+def _require_session(request: Request) -> None:
+    """Reject mutating calls from a session that did not start the story."""
+    session = getattr(request.app.state, "session_token", None)
+    if session is None:
+        return
+    token = request.headers.get("x-session-token")
+    if token != session:
+        raise HTTPException(status_code=409, detail="Session conflict")
 
 
 # --------------------------------------------------------------------------- #
@@ -141,33 +165,23 @@ async def _post_start(request: Request) -> JSONResponse:
     proxy = request.app.state.proxy
     try:
         settings = getattr(request.app.state, 'settings', None)
-        _switch_story(proxy, story_id, settings)
+        # Run story switch in a thread so Chroma/LLM init does not block the loop.
+        await asyncio.get_running_loop().run_in_executor(
+            None, _switch_story, proxy, story_id, settings
+        )
         result = await _proxy_call(proxy, "start", scene_id=scene_id)
+        # Establish a new session token for this story run.
+        import secrets
+        request.app.state.session_token = secrets.token_hex(16)
+        result["session_token"] = request.app.state.session_token
         return JSONResponse(result)
     except Exception as exc:
-        logger.warning(f"/start failed: {exc}")
-        return JSONResponse({"error": str(exc)}, status_code=500)
-
-
-async def _post_next(request: Request) -> JSONResponse:
-    """Advance until player input is needed, scene ends, or story completes."""
-    proxy: AgentProxy = request.app.state.proxy
-    try:
-        result = await _proxy_call(proxy, "run_until_input")
-        events = result.get("events", [])
-        return JSONResponse(
-            {
-                "events": [_normalise_event(ev) for ev in events],
-                "output": result.get("output", ""),
-            }
-        )
-    except Exception as exc:
-        logger.warning(f"/next failed: {exc}")
-        return JSONResponse({"error": str(exc)}, status_code=500)
+        return _handle_error(exc, "/start")
 
 
 async def _post_input(request: Request) -> JSONResponse:
     data = await _parse_json(request)
+    _require_session(request)
     text = data.get("text", "")
     attempt = data.get("attempt")
     proxy: AgentProxy = request.app.state.proxy
@@ -175,20 +189,19 @@ async def _post_input(request: Request) -> JSONResponse:
         result = await _proxy_call(proxy, "input", text=text, attempt=attempt)
         return JSONResponse(result)
     except Exception as exc:
-        logger.warning(f"/input failed: {exc}")
-        return JSONResponse({"error": str(exc)}, status_code=500)
+        return _handle_error(exc, "/input")
 
 
 async def _post_generate(request: Request) -> JSONResponse:
     data = await _parse_json(request)
+    _require_session(request)
     suggestion = data.get("suggestion", "")
     proxy: AgentProxy = request.app.state.proxy
     try:
         result = await _proxy_call(proxy, "generate", suggestion=suggestion)
         return JSONResponse(result)
     except Exception as exc:
-        logger.warning(f"/generate failed: {exc}")
-        return JSONResponse({"error": str(exc)}, status_code=500)
+        return _handle_error(exc, "/generate")
 
 
 async def _post_step(request: Request) -> JSONResponse:
@@ -197,24 +210,12 @@ async def _post_step(request: Request) -> JSONResponse:
         result = await _proxy_call(proxy, "step")
         return JSONResponse(_normalise_event(result))
     except Exception as exc:
-        logger.warning(f"/step failed: {exc}")
-        return JSONResponse({"error": str(exc)}, status_code=500)
-
-
-async def _post_skip(request: Request) -> JSONResponse:
-    data = await _parse_json(request)
-    scene_id = data.get("scene_id", "")
-    proxy: AgentProxy = request.app.state.proxy
-    try:
-        result = await _proxy_call(proxy, "skip", scene_id=scene_id)
-        return JSONResponse(_normalise_event(result))
-    except Exception as exc:
-        logger.warning(f"/skip failed: {exc}")
-        return JSONResponse({"error": str(exc)}, status_code=500)
+        return _handle_error(exc, "/step")
 
 
 async def _post_debug(request: Request) -> JSONResponse:
     data = await _parse_json(request)
+    _require_session(request)
     command = data.get("command", "")
     args = data.get("args", [])
     proxy = request.app.state.proxy
@@ -222,8 +223,7 @@ async def _post_debug(request: Request) -> JSONResponse:
         result = await _proxy_call(proxy, "debug", command=command, args=args)
         return JSONResponse(result)
     except Exception as exc:
-        logger.warning(f"/debug failed: {exc}")
-        return JSONResponse({"error": str(exc)}, status_code=500)
+        return _handle_error(exc, "/debug")
 
 
 async def _get_state(request: Request) -> JSONResponse:
@@ -232,35 +232,36 @@ async def _get_state(request: Request) -> JSONResponse:
         result = await _proxy_call(proxy, "state")
         return JSONResponse(result)
     except Exception as exc:
-        logger.warning(f"/state failed: {exc}")
-        return JSONResponse({"error": str(exc)}, status_code=500)
+        return _handle_error(exc, "/state")
 
 
 async def _post_save(request: Request) -> JSONResponse:
     data = await _parse_json(request)
+    _require_session(request)
     slot = int(data.get("slot", 1))
     proxy = request.app.state.proxy
     try:
         result = await _proxy_call(proxy, "save", slot=slot)
         return JSONResponse(result)
     except Exception as exc:
-        logger.warning(f"/save failed: {exc}")
-        return JSONResponse({"error": str(exc)}, status_code=500)
+        return _handle_error(exc, "/save")
 
 
 async def _post_load(request: Request) -> JSONResponse:
     data = await _parse_json(request)
+    _require_session(request)
     slot = int(data.get("slot", 1))
     story_id = data.get("story_id", "")
     proxy = request.app.state.proxy
     try:
         settings = getattr(request.app.state, 'settings', None)
-        _switch_story(proxy, story_id, settings)
+        await asyncio.get_running_loop().run_in_executor(
+            None, _switch_story, proxy, story_id, settings
+        )
         result = await _proxy_call(proxy, "load", slot=slot)
         return JSONResponse(result)
     except Exception as exc:
-        logger.warning(f"/load failed: {exc}")
-        return JSONResponse({"error": str(exc)}, status_code=500)
+        return _handle_error(exc, "/load")
 
 
 async def _get_saves(request: Request) -> JSONResponse:
@@ -272,12 +273,12 @@ async def _get_saves(request: Request) -> JSONResponse:
         )
         return JSONResponse({"saves": result})
     except Exception as exc:
-        logger.warning(f"/saves failed: {exc}")
-        return JSONResponse({"error": str(exc)}, status_code=500)
+        return _handle_error(exc, "/saves")
 
 
 async def _post_delete_save(request: Request) -> JSONResponse:
     data = await _parse_json(request)
+    _require_session(request)
     slot = int(data.get("slot", 1))
     story_id = data.get("story_id", "")
     proxy = request.app.state.proxy
@@ -287,8 +288,7 @@ async def _post_delete_save(request: Request) -> JSONResponse:
         )
         return JSONResponse(result)
     except Exception as exc:
-        logger.warning(f"/delete-save failed: {exc}")
-        return JSONResponse({"error": str(exc)}, status_code=500)
+        return _handle_error(exc, "/delete-save")
 
 
 async def _get_stories(request: Request) -> JSONResponse:
@@ -296,8 +296,7 @@ async def _get_stories(request: Request) -> JSONResponse:
         stories = discover_stories()
         return JSONResponse({"stories": stories})
     except Exception as exc:
-        logger.warning(f"/stories failed: {exc}")
-        return JSONResponse({"error": str(exc)}, status_code=500)
+        return _handle_error(exc, "/stories")
 
 
 async def _index(request: Request) -> FileResponse:
@@ -312,23 +311,23 @@ async def _index(request: Request) -> FileResponse:
 def create_app(
     socket_path: str | None = None,
     proxy: AgentProxy | DirectProxy | None = None,
+    debug: bool = False,
 ) -> Starlette:
     """Create and configure the Starlette gateway application.
 
     :param socket_path: UNIX socket path when using standalone agent server.
     :param proxy: Optional pre-built proxy (e.g. :class:`DirectProxy` for
         internal-server mode).  If given, *socket_path* is ignored.
+    :param debug: Enable Starlette debug mode (traceback pages).
     """
     app = Starlette(
-        debug=True,
+        debug=debug,
         routes=[
             Route("/", _index),
             Route("/start", _post_start, methods=["POST"]),
-            Route("/next", _post_next, methods=["POST"]),
             Route("/input", _post_input, methods=["POST"]),
             Route("/generate", _post_generate, methods=["POST"]),
             Route("/step", _post_step, methods=["POST"]),
-            Route("/skip", _post_skip, methods=["POST"]),
             Route("/debug", _post_debug, methods=["POST"]),
             Route("/state", _get_state),
             Route("/save", _post_save, methods=["POST"]),

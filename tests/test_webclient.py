@@ -60,24 +60,6 @@ class TestWebGateway:
             assert resp.status_code == 200
             mock_start.assert_called_once_with(scene_id="tea_scene")
 
-    def test_next_endpoint(self, client: TestClient) -> None:
-        with patch.object(
-            client.app.state.proxy,
-            "run_until_input",
-            return_value={
-                "events": [
-                    {"event": "turn", "output": "hi", "speaker": "A"},
-                    {"event": "needs_player_input", "suggestions": ["ok"]},
-                ],
-                "output": "hi",
-            },
-        ):
-            resp = client.post("/next", json={})
-            assert resp.status_code == 200
-            data = resp.json()
-            assert data["events"][0]["type"] == "turn"
-            assert data["events"][1]["type"] == "needs_player_input"
-
     def test_step_endpoint(self, client: TestClient) -> None:
         with patch.object(
             client.app.state.proxy, "step", return_value={"event": "turn", "output": "hi"}
@@ -94,14 +76,6 @@ class TestWebGateway:
             assert resp.status_code == 200
             assert resp.json()["submitted"] == "hello"
             mock_input.assert_called_once_with(text="hello", attempt=None)
-
-    def test_skip_endpoint(self, client: TestClient) -> None:
-        with patch.object(
-            client.app.state.proxy, "skip", return_value={"event": "scene_loaded", "scene": {"id": "x"}}
-        ) as mock_skip:
-            resp = client.post("/skip", json={"scene_id": "meowfficer_scene"})
-            assert resp.status_code == 200
-            mock_skip.assert_called_once_with(scene_id="meowfficer_scene")
 
     def test_debug_endpoint(self, client: TestClient) -> None:
         with patch.object(

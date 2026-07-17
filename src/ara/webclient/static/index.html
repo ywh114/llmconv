@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ara — Visual Novel</title>
-  <link rel="stylesheet" href="/static/css/style.css?v=38">
+  <link rel="stylesheet" href="/static/css/style.css?v=39">
 </head>
 <body>
 
@@ -51,7 +51,7 @@
   <div id="vn-choices"></div>
 
   <!-- History / backlog -->
-  <div id="vn-history">
+  <div id="vn-history" role="dialog" aria-modal="true">
     <div class="vn-panel-header">
       <h2>History</h2>
       <button class="vn-panel-close" data-close="vn-history" aria-label="Close">✕</button>
@@ -60,7 +60,7 @@
   </div>
 
   <!-- Keybinds reference -->
-  <div id="vn-keybinds">
+  <div id="vn-keybinds" role="dialog" aria-modal="true">
     <div class="vn-panel-header">
       <h2>Keybinds</h2>
       <button class="vn-panel-close" data-close="vn-keybinds" aria-label="Close">✕</button>
@@ -79,7 +79,7 @@
   </div>
 
   <!-- System / player status overlay -->
-  <div id="vn-system">
+  <div id="vn-system" role="dialog" aria-modal="true">
     <div class="vn-panel-header">
       <h2>System</h2>
       <button class="vn-panel-close" data-close="vn-system" aria-label="Close">✕</button>
@@ -89,17 +89,17 @@
   </div>
 
   <!-- Settings panel -->
-  <div id="vn-settings">
+  <div id="vn-settings" role="dialog" aria-modal="true">
     <div class="vn-panel-header">
       <h2>Settings</h2>
       <button class="vn-panel-close" data-close="vn-settings" aria-label="Close">✕</button>
     </div>
     <div class="vn-setting-row">
-      <label>Text Speed</label>
+      <label for="setting-text-speed">Text Speed</label>
       <input type="range" id="setting-text-speed" min="5" max="100" value="30">
     </div>
     <div class="vn-setting-row">
-      <label>Auto Delay</label>
+      <label for="setting-auto-delay">Auto Delay</label>
       <input type="range" id="setting-auto-delay" min="1000" max="5000" value="2500">
     </div>
     <button class="vn-title-btn" id="btn-settings-close">Close</button>
@@ -126,7 +126,7 @@
   </div>
 
   <!-- Save/Load panel -->
-  <div id="vn-saveload">
+  <div id="vn-saveload" role="dialog" aria-modal="true">
     <div class="vn-panel-header">
       <h2 id="vn-saveload-title">Saves</h2>
       <button class="vn-panel-close" data-close="vn-saveload" aria-label="Close">✕</button>
@@ -136,7 +136,7 @@
   </div>
 
   <!-- Debug panel -->
-  <div id="vn-debug">
+  <div id="vn-debug" role="dialog" aria-modal="true">
     <div class="vn-panel-header">
       <h2>Debug</h2>
       <button class="vn-panel-close" data-close="vn-debug" aria-label="Close">✕</button>
@@ -151,7 +151,7 @@
   </div>
 
   <!-- Loading overlay -->
-  <div id="vn-loading">
+  <div id="vn-loading" role="dialog" aria-modal="true">
     <div class="vn-loading-spinner"></div>
     <div class="vn-loading-text">Loading…</div>
   </div>
@@ -159,7 +159,7 @@
   <!-- Keybinds hint (visible during gameplay) -->
   <div id="vn-keybinds-hint">[k: keybinds]</div>
 
-  <script src="/static/js/vn.js?v=38"></script>
-  <script src="/static/js/ui.js?v=38"></script>
+  <script src="/static/js/vn.js?v=39"></script>
+  <script src="/static/js/ui.js?v=39"></script>
 </body>
 </html>

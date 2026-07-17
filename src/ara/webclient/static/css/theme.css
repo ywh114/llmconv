@@ -23,6 +23,7 @@
      ----------------------------------------------------------------- */
   --vn-font-body: 'Georgia', 'Times New Roman', serif;
   --vn-font-display: 'Georgia', serif;
+  --vn-font-title: var(--vn-font-display);
   --vn-font-size-dialogue: 1.25rem;
   --vn-font-size-name: 1.1rem;
   --vn-font-size-choice: 1.1rem;
@@ -31,14 +32,13 @@
   /* -----------------------------------------------------------------
      Timing
      ----------------------------------------------------------------- */
-  --vn-typewriter-speed: 30ms;
   --vn-fade-duration: 0.6s;
   --vn-slide-duration: 0.5s;
-  --vn-auto-delay: 2500ms;
 
   /* -----------------------------------------------------------------
      Dimensions
      ----------------------------------------------------------------- */
+  --vn-bg-panel: rgba(20, 20, 40, 0.85);
   --vn-dialogue-max-width: 900px;
   --vn-dialogue-padding: 1.5rem 2rem;
   --vn-dialogue-border-radius: 4px;
