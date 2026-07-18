@@ -1,5 +1,6 @@
 """Centralized system-prompt builders for major roles.
 
-Only the four big system prompts live here; small one-off task prompts stay
-inline in the modules that use them.
+The big system prompts (character, narrator, orchestrator, summarizer) live
+here, along with small player-facing task prompts, so all model-facing text
+is discoverable in one place.
 """

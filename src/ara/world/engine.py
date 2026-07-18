@@ -8,14 +8,15 @@ from typing import Any
 
 from ara.llm.client import LLMClient
 from ara.llm.context import ConversationContext
-from ara.llm.tools import ToolRegistry, tool
+from ara.llm.tools import ToolRegistry
 from ara.memory.chroma import ChromaStore
 from ara.llm.models import GameRole
 from ara.world.character import Importance
 from ara.world.character import Character, create_anonymous_character
+from ara.world.character_tools import register_character_tools
 from ara.world.orchestrator import Orchestrator, TurnDecision
 from ara.world.scene import Location, Scene
-from ara.world.system_page import SystemPage
+from ara.world.system_page import apply_page_update
 
 from ara.utils.debug import DebugConsole
 from ara.utils.logger import get_logger
@@ -25,6 +26,7 @@ logger = get_logger(__name__)
 
 from ara.prompts.character import character_system_prompt as _character_system_prompt
 from ara.prompts.narrator import narrator_system_prompt as _narrator_system_prompt
+from ara.prompts.player import player_input_prompt
 
 
 def _hidden_not_visible(observer: Character, here_chars: set[Character]) -> set[str]:
@@ -175,6 +177,7 @@ class Engine:
         self._speaker_history: list[str] = []
         self._canonical_events: list[dict] = []
         self._canonical_index: int = 0
+        self._canonical_pending_choices: list[dict] | None = None
         self._free_status: dict[str, Any] = {}
         self._pending_attempts: list[dict[str, Any]] = []
 
@@ -264,6 +267,14 @@ class Engine:
         """Mirror the story-level narrative state into the engine."""
         self._story_state = dict(state)
 
+    def _log_change(self, type: str, **fields: Any) -> None:
+        """Record a mechanical state change against the current turn."""
+        self._mechanical_changelog.append({
+            "turn": self._turn_count,
+            "type": type,
+            **fields,
+        })
+
     # ------------------------------------------------------------------ #
     # Status-page helpers
     # ------------------------------------------------------------------ #
@@ -288,63 +299,6 @@ class Engine:
             merged_metadata.update(merged.get("metadata", {}))
             merged["metadata"] = merged_metadata
         return merged
-
-    def _apply_page_update(
-        self, page_dict: dict[str, Any], changes: dict[str, Any]
-    ) -> dict[str, Any]:
-        """Merge a status-page update into *page_dict* and return the new dict."""
-        page = SystemPage.from_dict(page_dict)
-        if "sections" in changes or "title" in changes:
-            new_page = SystemPage.from_dict(changes)
-            if new_page.title:
-                page.title = new_page.title
-            existing: dict[str, dict[str, Any]] = {}
-            for s in page.sections:
-                key = s.get("label")
-                if key:
-                    key = f"{s.get('type')}:{key}"
-                else:
-                    key = s.get("type")
-                existing[key] = s
-            for section in new_page.sections:
-                stype = section.get("type")
-                if stype == "inventory":
-                    section = dict(section)
-                    section["items"] = [
-                        self._resolve_inventory_item(it)
-                        for it in section.get("items", [])
-                    ]
-                key = section.get("label")
-                if key:
-                    key = f"{stype}:{key}"
-                else:
-                    key = stype
-                prev = existing.get(key)
-                if prev and prev.get("items") and section.get("items"):
-                    # Merge items by their label, replacing matches
-                    merged = []
-                    seen: set[str] = set()
-
-                    def _item_label(item: Any) -> str:
-                        if isinstance(item, dict):
-                            return str(item.get("label", ""))
-                        return str(item)
-
-                    for item in section.get("items", []):
-                        merged.append(item)
-                        seen.add(_item_label(item))
-                    for item in prev.get("items", []):
-                        if _item_label(item) not in seen:
-                            merged.append(item)
-                    existing[key] = dict(section, items=merged)
-                else:
-                    existing[key] = section
-            page.sections = list(existing.values())
-        else:
-            legacy = page.to_legacy()
-            legacy.update(changes)
-            page = SystemPage.from_legacy(legacy)
-        return page.to_dict()
 
     def _resolve_status_target(self, target: str) -> tuple[dict[str, Any], str]:
         """Return the status-page dict and label for *target*.
@@ -400,7 +354,7 @@ class Engine:
         self._ctx.enter_entities(*[c.canonical_name for c in self._here_chars])
         self._canonical_events = scene.canonical_events
         self._canonical_index = 0
-        self._canonical_pending_choices: list[dict] | None = None
+        self._canonical_pending_choices = None
 
     def _canonical_step(self) -> EngineStepResult:
         """Execute the next scripted event from the canonical queue."""
@@ -696,19 +650,9 @@ class Engine:
             raise RuntimeError("Engine is not waiting for player input")
         scene = self._scene
         player = scene.player
-        prompt = (
-            f"You are {player.name} in a visual novel scene.\n"
-            f"Zeitgeist: {scene.zeitgeist}\n"
-            f"Tone: {scene.tone}\n"
-            f"Language: {scene.language}\n\n"
-            f"Write a brief, natural spoken response (1–3 sentences) "
-            f"that matches this intent: {suggestion}\n\n"
-            f"Respond with ONLY the dialogue. No quotes, no narration, "
-            f"no stage directions."
-        )
         result = self.client.complete(
             role=GameRole.CHARACTER,
-            system_prompt=prompt,
+            system_prompt=player_input_prompt(player, scene, suggestion),
             messages=[{"role": "user", "content": "Write the response."}],
             stream=False,
             name=player.name,
@@ -887,129 +831,18 @@ class Engine:
         """
         char = decision.next_char
 
-        # ---- character tools ------------------------------------------------
-        recall_tool = tool(
-            name="recall",
-            description=(
-                "Search YOUR OWN memory for relevant past conversations or events. "
-                "This only returns memories from your personal perspective - you cannot "
-                "recall things you did not personally experience or store."
-            ),
-            properties={
-                "query": {
-                    "type": "string",
-                    "description": "What you want to remember. E.g., 'What did Player say about the book?'",
-                }
-            },
-            required=["query"],
-            strict=True,
-        )
-
-        wiki_recall_tool = tool(
-            name="wiki_recall",
-            description=(
-                "Look up established world facts from the permanent wiki. Use this when you need "
-                "to know something about the world, setting, factions, history, or rules that your "
-                "character could reasonably know or have heard of. The result is filtered for your "
-                "character's perspective and expertise."
-            ),
-            properties={
-                "query": {
-                    "type": "string",
-                    "description": "What you want to know about the world. E.g., 'What are the major sects in this city?'",
-                }
-            },
-            required=["query"],
-            strict=True,
-        )
-
-        write_scratch_tool = tool(
-            name="write_scratch",
-            description="Write a note to your scratchpad for future reference.",
-            properties={
-                "note": {
-                    "type": "string",
-                    "description": "The note to save. This will be visible to you in future scenes.",
-                }
-            },
-            required=["note"],
-            strict=True,
-        )
-
-        attempt_action_tool = tool(
-            name="attempt_action",
-            description=(
-                "Record an action you want to attempt. The orchestrator will see this "
-                "on the next turn and decide the outcome. Use for uncertain actions, "
-                "stealth, combat, or anything the world model should adjudicate."
-            ),
-            properties={
-                "action": {
-                    "type": "string",
-                    "description": "What you are trying to do.",
-                },
-                "intent": {
-                    "type": "string",
-                    "description": "Why you are doing it or what outcome you want.",
-                },
-                "target": {
-                    "type": "string",
-                    "description": "Who or what the action is directed at, if any.",
-                },
-                "secrecy": {
-                    "type": "string",
-                    "enum": ["silent", "quiet", "loud", "obvious"],
-                    "description": "How noticeable the action is.",
-                },
-            },
-            required=["action"],
-            strict=True,
-        )
-
+        # ---- character tools (schemas/handlers live in character_tools.py) --
         registry = ToolRegistry()
         has_tools = char.importance >= Importance.IMPORTANT
-
-        def _recall_handler(args: str) -> str:
-            data = json.loads(args)
-            query = data.get("query", "")
-            memories = char.memory.recall(
-                [query],
-                depth="medium",
-                client=self.client,
-                querier=char,
-            )
-            if memories:
-                return "\n".join(f"- {m}" for m in memories)
-            return "You don't recall anything relevant."
-
-        def _wiki_recall_handler(args: str) -> str:
-            data = json.loads(args)
-            query = data.get("query", "")
-            return self.orchestrator.wiki.recall(query, querier=char)
-
-        def _write_scratch_handler(args: str) -> str:
-            data = json.loads(args)
-            note = data.get("note", "")
-            if note:
-                if char.scratch.is_empty():
-                    char.scratch.text = f"[Note]: {note}"
-                else:
-                    char.scratch.text += f"\n[Note]: {note}"
-            return "Note saved."
-
-        def _attempt_action_handler(args: str) -> str:
-            data = json.loads(args)
-            data["source"] = char.canonical_name
-            self._pending_attempts.append(data)
-            return "Action attempt recorded for the orchestrator."
-
-        character_tools: list[dict] = []
-        if has_tools:
-            registry.register("recall", _recall_handler)
-            registry.register("wiki_recall", _wiki_recall_handler)
-            registry.register("write_scratch", _write_scratch_handler)
-            registry.register("attempt_action", _attempt_action_handler)
-            character_tools = [recall_tool, wiki_recall_tool, write_scratch_tool, attempt_action_tool]
+        character_tools = register_character_tools(
+            char,
+            registry,
+            recall_fn=lambda q: char.memory.recall(
+                [q], depth="medium", client=self.client, querier=char
+            ),
+            wiki_fn=lambda q: self.orchestrator.wiki.recall(q, querier=char),
+            record_attempt_fn=self._pending_attempts.append,
+        )
         # -------------------------------------------------------------------- #
 
         inner_mode = decision.response_mode if decision.response_mode in ("outer_and_inner", "inner_only") else "outer"
@@ -1140,11 +973,7 @@ class Engine:
         # The orchestrator may reference characters by display or canonical name.
         sprite_changes: dict[str, str] = {}
         if decision.change_sprite:
-            self._mechanical_changelog.append({
-                "turn": self._turn_count,
-                "type": "change_sprite",
-                "sprites": dict(decision.change_sprite),
-            })
+            self._log_change("change_sprite", sprites=dict(decision.change_sprite))
         for char_name, sprite_name in decision.change_sprite.items():
             char = scene.character_by_name(char_name)
             if char is not None and char in here_chars:
@@ -1185,23 +1014,23 @@ class Engine:
             self._directives_log[decision.next_char] = decision.directive
 
         if decision.switch_location is not None and decision.switch_location != loc:
-            self._mechanical_changelog.append({
-                "turn": self._turn_count,
-                "type": "switch_location",
-                "from": loc.canonical_name if loc else None,
-                "to": decision.switch_location.canonical_name,
-            })
+            self._log_change(
+                "switch_location",
+                **{
+                    "from": loc.canonical_name if loc else None,
+                    "to": decision.switch_location.canonical_name,
+                },
+            )
             self._loc = decision.switch_location
             loc = self._loc
 
         if decision.switch_background and loc is not None:
             if decision.switch_background in loc.backgrounds:
-                self._mechanical_changelog.append({
-                    "turn": self._turn_count,
-                    "type": "switch_background",
-                    "location": loc.canonical_name,
-                    "background": decision.switch_background,
-                })
+                self._log_change(
+                    "switch_background",
+                    location=loc.canonical_name,
+                    background=decision.switch_background,
+                )
                 loc.current_background = decision.switch_background
                 switch_background = decision.switch_background
             else:
@@ -1211,21 +1040,16 @@ class Engine:
                 )
 
         if decision.edit_location and loc is not None:
-            self._mechanical_changelog.append({
-                "turn": self._turn_count,
-                "type": "edit_location",
-                "location": loc.canonical_name,
-                "edit": decision.edit_location,
-            })
+            self._log_change(
+                "edit_location",
+                location=loc.canonical_name,
+                edit=decision.edit_location,
+            )
             loc.desc += f"\n\n[Update]: {decision.edit_location}"
             logger.info(f"Location '{loc.name}' updated: {decision.edit_location}")
 
         if decision.set_time:
-            self._mechanical_changelog.append({
-                "turn": self._turn_count,
-                "type": "set_time",
-                "time": decision.set_time,
-            })
+            self._log_change("set_time", time=decision.set_time)
             self._world_time = decision.set_time
             logger.info(f"World time set to: {decision.set_time}")
 
@@ -1233,7 +1057,7 @@ class Engine:
             changes = dict(decision.system_changes)
             target = changes.pop("target", "player")
             target_page, target_label = self._resolve_status_target(target)
-            updated = self._apply_page_update(target_page, changes)
+            updated = apply_page_update(target_page, changes, resolve_item=self._resolve_inventory_item)
             if target == "free":
                 self._free_status = updated
             elif target == "player":
@@ -1246,23 +1070,17 @@ class Engine:
                     char_target = scene.character_by_name(target)
                     if char_target is not None:
                         char_target.status = updated
-            self._mechanical_changelog.append({
-                "turn": self._turn_count,
-                "type": "system_changes",
-                "target": target_label,
-                "changes": changes,
-            })
+            self._log_change("system_changes", target=target_label, changes=changes)
             logger.info(f"Status page updated for {target_label}: {list(changes.keys())}")
 
         enter_names = [c.canonical_name for c in decision.entering_chars]
         exit_names = [c.canonical_name for c in decision.exiting_chars]
 
         if decision.entering_chars:
-            self._mechanical_changelog.append({
-                "turn": self._turn_count,
-                "type": "enter",
-                "chars": [c.canonical_name for c in decision.entering_chars],
-            })
+            self._log_change(
+                "enter",
+                chars=[c.canonical_name for c in decision.entering_chars],
+            )
             ctx.enter_entities(*enter_names)
             here_chars |= decision.entering_chars
             away_chars -= decision.entering_chars
@@ -1294,11 +1112,10 @@ class Engine:
             turn_inner = post[-1].get("inner", "") if len(post) > pre_len else ""
 
         if decision.exiting_chars:
-            self._mechanical_changelog.append({
-                "turn": self._turn_count,
-                "type": "exit",
-                "chars": [c.canonical_name for c in decision.exiting_chars],
-            })
+            self._log_change(
+                "exit",
+                chars=[c.canonical_name for c in decision.exiting_chars],
+            )
             ctx.exit_entities(*exit_names)
             here_chars -= decision.exiting_chars
             away_chars |= decision.exiting_chars
