@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass, field
-from typing import Any, Callable
+from typing import Any
 
 from ara.llm.client import LLMClient
 from ara.llm.context import ConversationContext
@@ -735,72 +735,6 @@ class Engine:
             name=player.name,
         )
         return result.content.strip()
-
-    def run(
-        self,
-        scene: Scene,
-        get_user_input: Callable[[str, list[str]], str] | None = None,
-        debug_console: DebugConsole | None = None,
-    ) -> str | None:
-        """Run *scene* to completion (convenience wrapper).
-
-        This is equivalent to calling :meth:`start` then looping :meth:`step`
-        until :attr:`finished` becomes ``True``.  Player input is obtained
-        through the optional *get_user_input* callback.
-
-        :param scene: The scene to play through.
-        :param get_user_input: Callback that receives a prompt string and a
-            list of suggestions, and returns the player's typed input.  If
-            omitted and a player turn occurs, a :exc:`RuntimeError` is raised.
-        :param debug_console: Optional debug console (forwarded to
-            :meth:`set_debug_console`).
-        :return: The identifier of the next scene chosen by the orchestrator,
-            or ``None`` if the story ends here.
-        """
-        self.set_debug_console(debug_console)
-        self.start(scene)
-        while not self.finished:
-            if self._debug and self._debug.auto_pause:
-                self._debug.pause(
-                    scene=self._scene,
-                    ctx=self._ctx,
-                    here_chars=self._here_chars,
-                    away_chars=self._away_chars,
-                    loc=self._loc or self._scene.starting_location,
-                    decision=self._last_decision,
-                )
-
-            result = self.step()
-
-            if result.needs_player_input:
-                if get_user_input is None:
-                    raise RuntimeError(
-                        "Engine needs player input but no get_user_input was provided. "
-                        "Use the step()/submit_player_input() API instead."
-                    )
-                while True:
-                    user_text = get_user_input(
-                        f"{self._scene.player.name}> ", result.suggestions
-                    )
-                    stripped = user_text.strip()
-                    if stripped.startswith(("/", ":")):
-                        if self._debug is not None:
-                            self._debug.pause(
-                                scene=self._scene,
-                                ctx=self._ctx,
-                                here_chars=self._here_chars,
-                                away_chars=self._away_chars,
-                                loc=self._loc or self._scene.starting_location,
-                                decision=self._last_decision,
-                                noshell=stripped[1:],
-                            )
-                        else:
-                            print("Debug console not available. Start with --debug-console.")
-                        continue
-                    break
-                self.submit_player_input(user_text)
-
-        return self.next_scene
 
     def _narrator_turn(
         self,

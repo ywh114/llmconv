@@ -13,7 +13,7 @@ import json
 import tomllib
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
 from ara.config import AraSettings
 from ara.llm.client import LLMClient
@@ -24,7 +24,6 @@ from ara.memory.wiki import WikiStore
 from ara.memory.story_memory import StoryMemory
 from ara.llm.models import GameRole
 from ara.world.character import Importance, create_anonymous_character
-from ara.utils.debug import DebugConsole
 from ara.utils.logger import get_logger
 from ara.memory.knowledge import CharacterMemory
 from ara.world.character import Character
@@ -1212,94 +1211,6 @@ Write one sentence describing the change."""
                 logger.info(f"Finalize turn generated: {text[:80]}")
         except Exception as exc:
             logger.debug(f"Finalize turn generation failed: {exc}")
-
-    def run(
-        self,
-        get_user_input: Callable[[str, list[str]], str] | None = None,
-        debug_console: DebugConsole | None = None,
-    ) -> None:
-        """Execute the full story from the initial scene onward.
-
-        This is a convenience wrapper around :meth:`start` and :meth:`step`.
-        For CLI-driven playback use the state-machine API directly.
-
-        :param get_user_input: Callback that receives a prompt string and a
-            list of suggestions, and returns the player's typed input.
-            Defaults to a simple ``input()`` wrapper.
-        :param debug_console: Optional debug console.
-        """
-        if get_user_input is None:
-            get_user_input = self._get_user_input
-
-        self.engine.set_debug_console(debug_console)
-        self.start()
-
-        while not self.finished:
-            if (
-                debug_console
-                and debug_console.auto_pause
-                and self._state == "running"
-                and not self.engine.needs_player_input
-            ):
-                self._debug_pause(debug_console)
-
-            result = self.step()
-
-            if result.event == "scene_loaded" and result.scene is not None:
-                print(f"\n=== Scene: {result.scene.id} ===")
-                print(f"Location: {result.scene.starting_location.name}")
-                print(f"Characters: {[c.name for c in result.scene.starting_characters]}\n")
-
-            elif result.event == "turn" and result.output:
-                print(result.output)
-                print()
-
-            elif result.event == "needs_player_input":
-                suggestions = result.suggestions or []
-                while True:
-                    text = get_user_input(
-                        f"{self.current_scene.player.name}> ", suggestions
-                    )
-                    stripped = text.strip()
-                    if stripped.startswith(("/", ":")):
-                        if debug_console is not None:
-                            self._debug_pause(debug_console, noshell=stripped[1:])
-                        else:
-                            print("Debug console not available. Start with --debug-console.")
-                        continue
-                    break
-                self.submit_player_input(text)
-
-        print("\n=== Story Complete ===")
-        print(f"Scenes visited: {self._scene_history}")
-
-    def _debug_pause(self, debug_console: DebugConsole, noshell: str = "") -> None:
-        """Enter the debug console with the current engine state."""
-        if self.current_scene is None:
-            return
-        debug_console.pause(
-            scene=self.current_scene,
-            ctx=self.engine.ctx,
-            here_chars=self.engine.here_chars,
-            away_chars=self.engine.away_chars,
-            loc=self.engine.loc or self.current_scene.starting_location,
-            decision=self.engine.last_decision,
-            noshell=noshell,
-        )
-
-    def _get_user_input(self, prompt: str, suggestions: list[str]) -> str:
-        """Display *prompt* and read a line from stdin.
-
-        :param prompt: Text to display before the cursor.
-        :param suggestions: Orchestrator-provided suggestions (unused by the
-            default implementation but available for custom front-ends).
-        :return: The player's input, or a default continuation string on EOF.
-        """
-        print(prompt, end="")
-        try:
-            return input()
-        except EOFError:
-            return "[OOC: continue]"
 
     def jump_to(self, scene_id: str) -> StoryStep:
         """Abandon the current scene and jump directly to *scene_id*.

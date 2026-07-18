@@ -428,51 +428,6 @@ def test_engine_records_mechanical_changelog() -> None:
 class TestEngineLoop:
     """Integration tests of the conversation engine with a mock LLM."""
 
-    def test_scene_ends_on_next_scene(self) -> None:
-        """The engine should exit when the orchestrator returns a next_scene."""
-        scene = _make_scene_for_smoke(MagicMock(spec=ChromaStore))
-
-        orchestrator_result = StreamResult(
-            content="",
-            tool_calls=[
-                {
-                    "id": "call_1",
-                    "function": {
-                        "name": "next_round",
-                        "arguments": json.dumps({
-                            "next_character": "Player",
-                            "directive": "",
-                            "suggestions": [],
-                            "enter_characters": [],
-                            "exit_characters": [],
-                            "switch_location": "",
-                            "next_scene": "end",
-                        }),
-                    },
-                }
-            ],
-        )
-
-        mock = MockLLMClient([orchestrator_result])
-        engine = Engine(mock)  # type: ignore[arg-type]
-        engine.orchestrator = MagicMock()
-        engine.orchestrator.decide_next_turn.return_value = TurnDecision(
-            next_char=scene.player,
-            directive="",
-            suggestions=[],
-            entering_chars=set(),
-            exiting_chars=set(),
-            switch_location=None,
-            next_scene="end",
-        )
-
-        inputs = ["hello"]
-        def fake_input(prompt: str, suggestions: list[str]) -> str:
-            return inputs.pop(0)
-
-        result = engine.run(scene, get_user_input=fake_input)
-        assert result == "end"
-
     def test_edit_location_updates_description(self) -> None:
         """The engine should update the location description when edit_location is set."""
         scene = _make_scene_for_smoke(MagicMock(spec=ChromaStore))
