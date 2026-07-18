@@ -169,9 +169,9 @@ race = [
 suffix = [
     { value = "blade" },
     { value = "born" },
-    { value = "craft" },
+    { value = "crafted" },
     { value = "spawn" },
-    { value = "bane" },
+    { value = "sbane" },
     { value = "seeker" },
     { value = "slayer" },
     { value = "weaver" },
@@ -185,7 +185,6 @@ suffix = [
     { value = "rider" },
     { value = "smith" },
     { value = "forged" },
-    { value = "vale" },
 ]
 
 [[class]]

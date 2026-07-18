@@ -45,8 +45,10 @@ noun = [
     { value = "impact factor", sticky = false, prefixable = false, suffixible = false },
 ]
 entity = [
+    { value = "Reviewer 1", proper_noun = true, sticky = false },
     { value = "Reviewer 2", proper_noun = true, sticky = false },
     { value = "Reviewer 3", proper_noun = true, sticky = false },
+    { value = "Reviewer {number}", proper_noun = true, sticky = false },
 ]
 suffix = [
     { value = "ology" },
