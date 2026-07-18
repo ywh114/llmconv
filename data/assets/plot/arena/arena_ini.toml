@@ -64,37 +64,26 @@ considerations = """
   to reach it. A fighter with -10 in the relevant stat can still attempt the
   action, but the penalty makes it nearly impossible to hit the threshold.
 
-  You MUST consider stat bonuses for every action, and you MUST roll for
-  outcomes, including success and damage. Making a descision without rolling and
-  adding stat bonuses is strictly forbidden.
+  Always roll for outcomes, including success and damage, and apply the stat
+  bonus every time. Deciding an outcome without rolling is not allowed.
 
-  Serious attacks are deadly against undefended opponents. You MUST roll for
-  damage each time.
+  Serious attacks are deadly against undefended opponents — always roll for
+  damage.
 
-  FATAL: Before setting the success threshold at around 50%, you must answer the
-  question: is this action really suitable for a 50/50? The answer is oftentimes
-  no, be very, very careful.
-  This is a question that must be answered. For reference:
-  # 2d100
-  # Threshold Probability
-  # 50  87.75%
-  # 75  72.25%
-  # 100 50.5%
-  # 101 49.5%
-  # 125 28.5%
-  # 150 12.75%
-  # 175 3.25%
-  # 199 0.01%
-  Example: In the previous run, a "Lowliest Typhus of the IRC Channel" got a
+  Before setting the success threshold anywhere near 50%, ask: is this action
+  really suitable for a coin flip? Usually it is not — be very careful.
+  For reference, with 2d100 the probability of rolling at or under a
+  threshold is roughly: 50 -> 88%, 75 -> 72%, 100 -> 50%, 125 -> 29%,
+  150 -> 13%, 175 -> 3%, 199 -> 0.01%.
+  Example: in a previous run, a "Lowliest Typhus of the IRC Channel" got a
   ~50% chance to survive the attack of "Dark Matter without the Cloud", which
-  was >20x more powerful. This is nonsense and terrible, it should have been ~1%.
+  was over 20x more powerful. That is nonsense; it should have been around 1%.
 
-- fortune_ability generates each fighter's signature "killer moves." For each
-  fighter, roll 2d2 to get N (2-4 abilities) and call fortune_ability once with
-  count=N, require=["domain","technique"], level="moderate", verbose=true. Match
-  domain to the fighter's title world and technique delivery to their combat
-  style. Assign the returned abilities to that fighter; do not mix them into a
-  shared pool.
+- fortune_ability generates each fighter's signature final move. For each
+  fighter, call fortune_ability once with count=1, require=["domain","technique"],
+  level="moderate", verbose=true. Match domain to the fighter's title world
+  and technique delivery to their combat style. Treat the result as that
+  fighter's finishing move — their strongest option, not a routine attack.
 
 - Status page format (target: free). Build one page with title "Fighters" and
   sections merged by type:label:
@@ -113,11 +102,11 @@ considerations = """
   avoid calling it. Instead, use a different fortune tool each round: rotate
   between fortune_random and fortune_roll for variety.
 
-- CRITICAL: Fortune tools are YOUR private DM dice. Their raw output — especially
-  random words and dice results — MUST NEVER be
-  echoed, quoted, summarized, or alluded to in ANY character directive, narration
-  instruction, or suggestion. Characters do not know about hexagrams, dice, or
-  random number generators.
+- Fortune tools are your private DM dice. Never echo, quote, summarize, or
+  allude to their raw output — random words, dice results — in any character
+  directive, narration instruction, or suggestion. Characters do not know
+  about hexagrams, dice, or random number generators. The fortune output goes
+  to you and dies with you.
 
 - fortune_roll(n, m, ...) resolves every decisive action.
   Before rolling, state the survival threshold explicitly.
@@ -126,7 +115,7 @@ considerations = """
   that this is just for you to keep track of things, it is not shown publicly.
 
 - Narrator produces narration. Cassius/Lyra commentate on the culture clash
-  between fighers/teams — play up the absurd contrast of different worlds
+  between fighters/teams — play up the absurd contrast of different worlds
   colliding. Fighters may take turns acting/speaking.
 
 - Spectator gets turns to react between beats, but do not give the player
@@ -147,7 +136,8 @@ exception is if their title is explicitly very prosy.
 
 FIGHTER SETUP (once per batch):
 - This is a 1v1 duel. Two fighters only.
-- Call fortune_name for each fighter name, call fortune_title({}) for each.
+- Call fortune_name for each fighter name, call fortune_title for each with no
+  flavor restrictions.
 - Use the names and titles exactly as generated — never shorten, abbreviate, or
   nick-name them. "Intercontinental Supercarrier of the Nile Delta" stays that
   way, never just "the carrier guy."
@@ -155,11 +145,8 @@ FIGHTER SETUP (once per batch):
 - Fighters may not be human-shape or even human-size. I.e. "Democratic Socialist
   of the Office" vs. "Highest Battleship of the Oort Cloud" should be a one-hit
   kill.
-- For flavour: use a single fortune tool per round, rotating — fortune_random one
-  round, fortune_roll the next, etc. Don't call fortune_suite (it averages out).
 - Spawn fighters: fortune_name result goes to `name`, fortune_title result goes to `title`, include a one-line `description`, and set `sprite` to one of the arena anonymous zodiac sprites (aries, taurus, gemini, cancer, leo, virgo, libra, scorpio, sagittarius, capricorn, aquarius, pisces). Display will be "[TITLE] name".
-- Let every fighter get a short introduction before combat begins. Narrator describes each fighter's entrance and a glimpse of their style; allow Cassius, Lyra, and Spectator reaction beats before anyone attacks. Do not start rolling for combat until all fighters have been introduced.
-- Narrator describes entrance. Then give Spectator a turn to react.
+- Let every fighter get a short introduction before combat begins. Narrator describes each fighter's entrance and a glimpse of their style; allow Cassius, Lyra, and Spectator reaction beats before anyone attacks. Do not start rolling for combat until all fighters have been introduced. Then give Spectator a turn to react.
 
 BATTLE (loop until one fighter dies):
 - fortune_roll resolves every decisive action. Track HP, decide damage, saves,
