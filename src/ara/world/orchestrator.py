@@ -12,7 +12,7 @@ from ara.llm.context import ConversationContext
 from ara.llm.tools import ToolRegistry, tool
 from ara.llm.models import Context, GameRole
 from ara.memory.chroma import ChromaStore
-from ara.memory.wiki import WIKI_COLLECTION, WikiStore
+from ara.memory.wiki import WikiStore
 from ara.prompts.orchestrator import orchestrator_system_prompt as _orchestrator_system_prompt
 from ara.memory.knowledge import Scratchpad
 from ara.world.character import Character, create_anonymous_character
@@ -96,7 +96,6 @@ class Orchestrator:
         self._capture: NextRoundCapture | None = None
         self._spawned_chars: list[dict[str, Any]] = []
         self._system_changes: dict[str, Any] = {}
-        self.wiki_collection = WIKI_COLLECTION
         self.prefetched_wiki: str = ''
         self.orchestrator_note: str = ''
         self.scratch = Scratchpad()
@@ -137,11 +136,6 @@ class Orchestrator:
                 "_canonical_name": "__orchestrator__",
             },
         ]
-
-    @staticmethod
-    def _normalize_wiki_doc(doc: str) -> str:
-        """Return a canonical form of a wiki document for deduplication."""
-        return WikiStore.normalize_doc(doc)
 
     def _wiki_recall(
         self,
@@ -195,20 +189,6 @@ class Orchestrator:
             exclude_docs=exclude_docs,
             max_distance=max_distance,
         )
-
-    def _filter_wiki_for_querier(
-        self,
-        query: str,
-        raw_docs: list[str],
-        ids: list[str],
-        metadatas: list[dict[str, Any]],
-        querier: Character,
-    ) -> list[str]:
-        """Run retrieved wiki documents through a querier-aware subagent.
-
-        Thin wrapper over :meth:`WikiStore.filter_for_querier`.
-        """
-        return self.wiki.filter_for_querier(query, raw_docs, ids, metadatas, querier)
 
     def _wiki_write(
         self,

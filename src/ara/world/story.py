@@ -165,7 +165,6 @@ The current round of conversation has ended.
 def _finalize_orchestrator(
     scene: Scene,
     engine: Engine,
-    directives_log: dict[Character, str],
 ) -> None:
     """Run an end-of-scene journal update for the orchestrator.
 
@@ -228,7 +227,7 @@ def _finalize_scene(
     # Finalize the orchestrator's journal.  This runs regardless of whether
     # there are character targets so the director always gets a scene-level
     # summary before the next scene loads.
-    _finalize_orchestrator(scene, engine, directives_log)
+    _finalize_orchestrator(scene, engine)
 
     if not targets:
         return
@@ -359,8 +358,6 @@ class Story:
         self._next_scene_location_descs: dict[str, str] = {}
         self._next_scene_time: str = ""
         self._finalize_turn_text: str = ""
-        self._finalize_turn_changes: dict[str, Any] = {}
-        self._next_scene_facts: list[dict[str, Any]] = []
         self._next_scene_player_status: dict[str, Any] = {}
         self._next_scene_free_status: dict[str, Any] = {}
         self._next_scene_location_statuses: dict[str, Any] = {}
@@ -883,7 +880,6 @@ class Story:
             return
 
         try:
-            import tomllib
             with next_path.open("rb") as f:
                 next_data = tomllib.load(f)
         except Exception:
@@ -1035,7 +1031,6 @@ class Story:
         self._next_scene_location_desc = finalized_descs.get(self.engine.loc.canonical_name, self.engine.loc.desc)
         self._next_scene_location_descs = finalized_descs
         self._next_scene_time = finalized_time
-        self._next_scene_facts = facts
         # If the summarizer emitted a SYSTEM_STATE block, treat it as the complete
         # new state; otherwise carry the current state forward unchanged.
         self._next_scene_player_status = (
@@ -1199,10 +1194,6 @@ Write one sentence describing the change."""
             text = result.content.strip()
             if text:
                 self._finalize_turn_text = text
-                self._finalize_turn_changes = {
-                    "location": self.engine.loc.name,
-                    "next_scene": next_scene_id,
-                }
                 logger.info(f"Finalize turn generated: {text[:80]}")
         except Exception as exc:
             logger.debug(f"Finalize turn generation failed: {exc}")

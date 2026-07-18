@@ -453,7 +453,6 @@ class SaveManager:
             "current_scene_id": scene.id if scene else None,
             "current_path": str(story._current_path) if story._current_path else None,
             "finalize_turn_text": story._finalize_turn_text,
-            "finalize_turn_changes": dict(story._finalize_turn_changes),
             "story_state": {
                 "_state": story._state,
                 "_skipped_scene": story._skipped_scene,
@@ -562,7 +561,6 @@ class SaveManager:
         saved_state = story_state.get("_state", "running")
         saved_current_path = data.get("current_path")
         saved_finalize_text = data.get("finalize_turn_text", "")
-        saved_finalize_changes = dict(data.get("finalize_turn_changes", {}))
         story._skipped_scene = story_state.get("_skipped_scene", False)
         story._next_scene_summaries = dict(story_state.get("_next_scene_summaries", {}))
         story._next_scene_location_desc = story_state.get("_next_scene_location_desc", "")
@@ -730,7 +728,6 @@ class SaveManager:
         else:
             story._state = saved_state if saved_state not in ("idle", "loading") else "running"
         story._finalize_turn_text = saved_finalize_text
-        story._finalize_turn_changes = saved_finalize_changes
 
     # ------------------------------------------------------------------ #
     # Delete

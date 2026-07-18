@@ -343,7 +343,6 @@ def test_save_load_preserves_transition_state() -> None:
         story._state = "finalizing"
         story._current_path = tmp / "scene_b.toml"
         story._finalize_turn_text = "The sun sets over the gate."
-        story._finalize_turn_changes = {"location": "Gate", "next_scene": "scene_b"}
         story.engine._next_scene = "scene_b"
         story.engine._running = False
 
@@ -357,8 +356,4 @@ def test_save_load_preserves_transition_state() -> None:
         assert fresh_story._state == "finalizing"
         assert fresh_story._current_path == tmp / "scene_b.toml"
         assert fresh_story._finalize_turn_text == "The sun sets over the gate."
-        assert fresh_story._finalize_turn_changes == {
-            "location": "Gate",
-            "next_scene": "scene_b",
-        }
         assert fresh_story.engine._next_scene == "scene_b"
