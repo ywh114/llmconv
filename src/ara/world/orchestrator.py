@@ -46,6 +46,10 @@ class TurnDecision:
     :ivar switch_background: Background stem to activate for the current
         location, or empty string for no change.
     :ivar spawn_anonymous: List of background characters to create on the fly.
+    :ivar spawned_characters: Canonical names of anonymous characters the
+        orchestrator already materialized while producing this decision (so
+        its own validation could reference them).  The engine reports these
+        in ``EngineStepResult.spawn`` instead of re-creating them.
     :ivar set_time: New world time to set (e.g. 'night'), or empty string.
     :ivar system_changes: Updates to a status page (player, free, location, or character).
     """
@@ -61,6 +65,7 @@ class TurnDecision:
     change_sprite: dict[str, str] = field(default_factory=dict)
     switch_background: str = ''
     spawn_anonymous: list[dict[str, str]] = field(default_factory=list)
+    spawned_characters: list[str] = field(default_factory=list)
     set_time: str = ''
     system_changes: dict[str, Any] = field(default_factory=dict)
     response_mode: str = 'outer'
@@ -1081,6 +1086,7 @@ Recent speakers: {recent_speakers_str}
             scene,
         )
         decision.spawn_anonymous = self._spawned_chars
+        decision.spawned_characters = [c.canonical_name for c in spawned_chars]
         decision.system_changes = self._system_changes
         switch_name = (
             decision.switch_location.name

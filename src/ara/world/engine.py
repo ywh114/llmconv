@@ -1202,19 +1202,21 @@ class Engine:
 
         switch_background = ""
 
-        # Apply anonymous character spawns from the orchestrator decision.
-        spawned_canonical: list[str] = []
-        spawned_here: set[Character] = set()
+        # Anonymous spawns are normally materialized by the orchestrator when
+        # it produces the decision (so its own validation can reference them);
+        # those arrive pre-registered in decision.spawned_characters.  Create
+        # any remaining ones here as a defensive fallback.
+        spawned_canonical: list[str] = list(decision.spawned_characters)
+        pre_materialized = set(decision.spawned_characters)
         existing_canonical = {c.canonical_name for c in scene.character_pool}
         for spawn in decision.spawn_anonymous:
             name = spawn.get("name", "")
             if not name:
                 logger.warning("Skipping anonymous spawn: no name provided.")
                 continue
-            # Reject spawn if the proposed name collides with an existing
-            # canonical or display name.
-            if name in existing_canonical or scene.character_by_display(name) is not None:
-                logger.warning(f"Skipping anonymous spawn for '{name}': already exists.")
+            if name in existing_canonical:
+                if name not in pre_materialized:
+                    logger.warning(f"Skipping anonymous spawn for '{name}': already exists.")
                 continue
             sprite = spawn.get("sprite", "unknown")
             new_char = create_anonymous_character(
@@ -1225,7 +1227,6 @@ class Engine:
             )
             scene.character_pool.add(new_char)
             here_chars.add(new_char)
-            spawned_here.add(new_char)
             ctx.add_entities(new_char.canonical_name)
             spawned_canonical.append(new_char.canonical_name)
             existing_canonical.add(new_char.canonical_name)

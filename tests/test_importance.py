@@ -382,3 +382,40 @@ def test_engine_spawn_anonymous_mid_scene() -> None:
     assert waiter.importance == Importance.ANONYMOUS
     assert waiter.card_fields["sprite"] == "waiter"
     assert waiter in engine.here_chars
+
+
+def test_engine_reports_orchestrator_materialized_spawn() -> None:
+    """When the orchestrator already materialized a spawn (so its decision
+    validation could reference it), the engine reports it in
+    EngineStepResult.spawn without re-creating it or warning."""
+    scene = _make_scene_for_spawn()
+    waiter = create_anonymous_character("Waiter", "A waiter.", sprite="waiter")
+    scene.character_pool.add(waiter)  # materialized orchestrator-side already
+    decisions = [
+        TurnDecision(
+            next_char=scene.narrator,
+            directive="",
+            suggestions=[],
+            entering_chars=set(),
+            exiting_chars=set(),
+            switch_location=None,
+            spawn_anonymous=[
+                {"name": "Waiter", "description": "A waiter.", "sprite": "waiter"},
+            ],
+            spawned_characters=["Waiter"],
+        ),
+    ]
+
+    class MockClient:
+        def complete(self, **kwargs):
+            from ara.llm.models import StreamResult
+            return StreamResult(content="mock")
+
+    engine = Engine(MockClient())  # type: ignore[arg-type]
+    engine.orchestrator = MagicMock()
+    engine.orchestrator.decide_next_turn.side_effect = lambda **kw: decisions.pop(0)
+    engine.start(scene)
+
+    result = engine.step()
+    assert result.spawn == ["Waiter"]
+    assert len([c for c in scene.character_pool if c.name == "Waiter"]) == 1
