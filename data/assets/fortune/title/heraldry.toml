@@ -1,0 +1,108 @@
+category = "history"
+
+adj = [
+    { value = "rampant" },
+    { value = "passant" },
+    { value = "salient" },
+    { value = "sejant" },
+    { value = "dormant" },
+    { value = "displayed" },
+    { value = "guardant" },
+    { value = "regardant" },
+    { value = "argent" },
+    { value = "gules" },
+    { value = "azure" },
+    { value = "sable" },
+    { value = "vert" },
+    { value = "purpure" },
+]
+noun = [
+    { value = "lion" },
+    { value = "griffin" },
+    { value = "wyvern" },
+    { value = "unicorn" },
+    { value = "escutcheon" },
+    { value = "shield" },
+    { value = "crest" },
+    { value = "sigil" },
+    { value = "banner" },
+    { value = "motto" },
+    { value = "charge" },
+    { value = "tincture" },
+    { value = "fleur-de-lis" },
+    { value = "boar" },
+    { value = "stag" },
+    { value = "eagle" },
+]
+class = [
+    { value = "herald" },
+    { value = "pursuivant" },
+    { value = "armiger" },
+    { value = "banneret" },
+]
+rank = [
+    { value = "King of Arms", sticky = false, prefixable = false, suffixible = false },
+    { value = "Earl Marshal", sticky = false, prefixable = false, suffixible = false },
+]
+suffix = [
+    { value = "shield" },
+    { value = "banner" },
+    { value = "crest" },
+]
+
+[[place]]
+value = "College of Arms"
+article = "the"
+proper_noun = true
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "tournament"
+article = "the"
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "siege"
+article = "the"
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[expose]]
+slot = "adj"
+from = [
+    "adj",
+]
+
+[[expose]]
+slot = "noun"
+from = [
+    "noun",
+]
+
+[[expose]]
+slot = "class"
+from = [
+    "class",
+]
+
+[[expose]]
+slot = "rank"
+from = [
+    "rank",
+]
+
+[[expose]]
+slot = "suffix"
+from = [
+    "suffix",
+]
+
+[[expose]]
+slot = "place"
+from = [
+    "place",
+]

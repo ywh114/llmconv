@@ -32,6 +32,13 @@ simple = [
     "The {noun}",
     "{entity:possessive} {subject}",
 
+    # "X the Y" epithet
+    "{entity} the {adj}",
+    "{entity} the {subject}",
+
+    # Possessive subject
+    "{subject:possessive} {noun}",
+
     # Subject + prepositional phrase
     "{subject} of {entity}",
     "{subject} of {place}",
@@ -61,7 +68,6 @@ simple = [
     "The {adj_sup}",
 
     # Modified
-    "{adj} {subject}",
     "{adj} {subject}",
     "{adj} {subject}",
     "{adj} {rank}",
@@ -125,8 +131,6 @@ moderate = [
     "{prefix}{noun} ({adj})",
     "{prefix}{noun} ({adj_sup})",
 
-    "{subject}{suffix} ({adj})",
-    "{subject}{suffix} ({adj_sup})",
     "{noun}{suffix} ({adj})",
     "{noun}{suffix} ({adj_sup})",
 
@@ -151,12 +155,6 @@ moderate = [
 
     # Prepositional phrases
     "{subject} before {noun}",
-    "{subject} from {place}",
-    "{subject} over {place}",
-    "{subject} upon {place}",
-    "{subject} near {place}",
-    "{subject} under {place}",
-    "{subject} within {place}",
     "{class}-{rank} against {place}",
 
     # Place attribution with adjective
@@ -179,7 +177,22 @@ moderate = [
     # Modifier-driven templates
     "{adj} {noun} of {place}",
     "{noun:possessive} {subject}",
-    "{ordinal} {subject}",
+
+    # "X the Y" epithet
+    "{entity} the {adj_sup}",
+    "{entity} the {adj} {subject}",
+
+    # Modified of-phrases
+    "{subject} of the {adj} {noun}",
+    "{rank} of the {adj} {noun}",
+
+    # Colon subtitles
+    "{subject}: The {adj} {noun}",
+    "{subject}: Part {number}",
+
+    # Possessive subject
+    "{subject:possessive} {adj} {noun}",
+    "{rank:possessive} {noun}{suffix}",
 ]
 
 complex = [
@@ -211,7 +224,6 @@ complex = [
     "{rank} {subject}, {adj_sup}",
 
     # Locative/attributive place before subject
-    "{place} {subject}",
     "{adj} {place} {subject}",
 
     # Prepositional phrases
@@ -236,6 +248,14 @@ complex = [
     "{adj_sup} {noun} of {place}",
     "{noun:possessive} {subject} of {place}",
     "{ordinal} {adj} {subject}",
+
+    # Modified of-phrases
+    "{subject} of the {adj_sup} {noun}",
+    "{adj} {subject} of the {adj} {noun}",
+
+    # Colon subtitles
+    "{noun}: The {subject} {roman_numeral}",
+    "{subject}: The {adj} {subject} of {place}",
 ]
 
 insane = [
@@ -320,4 +340,12 @@ insane = [
     "\"{entity}\"",
     "\"{entity}\" (in scare quotes)",
     "\"{adj}\" (in scare quotes)",
+
+    # More parentheticals
+    "{subject} (no relation)",
+    "{entity} (no relation)",
+    "{subject} (retired)",
+    "{subject} (the other one)",
+    "{subject} (season {number})",
+    "{subject} (remastered)",
 ]

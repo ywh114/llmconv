@@ -1,0 +1,155 @@
+category = "science"
+
+class = [
+    { value = "linguist" },
+    { value = "phonologist" },
+    { value = "phonetician" },
+    { value = "lexicographer" },
+    { value = "grammarian" },
+    { value = "philologist" },
+    { value = "polyglot" },
+    { value = "prescriptivist" },
+    { value = "descriptivist" },
+    { value = "conlanger" },
+    { value = "field researcher", sticky = false, prefixable = false, suffixible = false },
+]
+adj = [
+    { value = "agglutinative" },
+    { value = "fusional" },
+    { value = "isolating" },
+    { value = "polysynthetic" },
+    { value = "ergative" },
+    { value = "tonal" },
+    { value = "reconstructed" },
+    { value = "attested" },
+    { value = "unattested" },
+    { value = "extinct" },
+    { value = "moribund" },
+    { value = "endangered" },
+    { value = "creole" },
+    { value = "pidgin" },
+]
+adj_sup = [
+    { value = "most conservative", sticky = false, prefixable = false, suffixible = false },
+    { value = "least attested", sticky = false, prefixable = false, suffixible = false },
+    { value = "most widely spoken", sticky = false, prefixable = false, suffixible = false },
+]
+noun = [
+    { value = "phoneme" },
+    { value = "morpheme" },
+    { value = "lexeme" },
+    { value = "allophone" },
+    { value = "grapheme" },
+    { value = "declension" },
+    { value = "conjugation" },
+    { value = "umlaut" },
+    { value = "ablaut" },
+    { value = "sandhi" },
+    { value = "lenition" },
+    { value = "diphthong" },
+    { value = "schwa" },
+    { value = "corpus", plural = "corpora" },
+    { value = "lexicon" },
+    { value = "glottal stop", sticky = false, prefixable = false, suffixible = false },
+    { value = "click consonant", sticky = false, prefixable = false, suffixible = false },
+]
+entity = [
+    { value = "Panini", proper_noun = true, sticky = false },
+    { value = "Sapir", proper_noun = true, sticky = false },
+    { value = "Whorf", proper_noun = true, sticky = false },
+    { value = "Noam Chomsky", proper_noun = true, sticky = false },
+    { value = "Sir William Jones", proper_noun = true, sticky = false },
+]
+prefix = [
+    { value = "proto" },
+    { value = "paleo" },
+    { value = "iso" },
+    { value = "allo" },
+]
+suffix = [
+    { value = "phone" },
+    { value = "glot" },
+    { value = "lect" },
+]
+
+[[place]]
+value = "Sprachbund"
+article = "the"
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "Caucasus"
+article = "the"
+proper_noun = true
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "Pontic steppe"
+article = "the"
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "proto-homeland"
+article = "the"
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "Babel"
+proper_noun = true
+prefixable = false
+suffixible = false
+
+[[expose]]
+slot = "class"
+from = [
+    "class",
+]
+
+[[expose]]
+slot = "adj"
+from = [
+    "adj",
+]
+
+[[expose]]
+slot = "adj_sup"
+from = [
+    "adj_sup",
+]
+
+[[expose]]
+slot = "noun"
+from = [
+    "noun",
+]
+
+[[expose]]
+slot = "entity"
+from = [
+    "entity",
+]
+
+[[expose]]
+slot = "place"
+from = [
+    "place",
+]
+
+[[expose]]
+slot = "prefix"
+from = [
+    "prefix",
+]
+
+[[expose]]
+slot = "suffix"
+from = [
+    "suffix",
+]

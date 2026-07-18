@@ -1,0 +1,109 @@
+category = "science"
+
+noun = [
+    { value = "cumulonimbus" },
+    { value = "cumulus" },
+    { value = "nimbostratus" },
+    { value = "cirrus" },
+    { value = "derecho" },
+    { value = "haboob" },
+    { value = "monsoon" },
+    { value = "squall" },
+    { value = "cyclone" },
+    { value = "anticyclone" },
+    { value = "isobar" },
+    { value = "updraft" },
+    { value = "downdraft" },
+    { value = "supercell" },
+    { value = "jet stream", sticky = false, prefixable = false, suffixible = false },
+]
+adj = [
+    { value = "tornadic" },
+    { value = "cyclonic" },
+    { value = "isobaric" },
+    { value = "turbulent" },
+    { value = "convective" },
+    { value = "frontal" },
+    { value = "occluded" },
+    { value = "severe" },
+    { value = "wintry" },
+]
+adj_sup = [
+    { value = "wettest" },
+    { value = "driest" },
+    { value = "windiest" },
+    { value = "category {digit}", sticky = false, prefixable = false, suffixible = false },
+]
+class = [
+    { value = "meteorologist" },
+    { value = "forecaster" },
+    { value = "weatherman" },
+    { value = "storm chaser", sticky = false, prefixable = false, suffixible = false },
+]
+suffix = [
+    { value = "caster" },
+    { value = "chaser" },
+]
+
+[[place]]
+value = "eye of the storm"
+article = "the"
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "jet stream"
+article = "the"
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "doldrums"
+article = "the"
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "Tornado Alley"
+proper_noun = true
+prefixable = false
+suffixible = false
+
+[[expose]]
+slot = "noun"
+from = [
+    "noun",
+]
+
+[[expose]]
+slot = "adj"
+from = [
+    "adj",
+]
+
+[[expose]]
+slot = "adj_sup"
+from = [
+    "adj_sup",
+]
+
+[[expose]]
+slot = "class"
+from = [
+    "class",
+]
+
+[[expose]]
+slot = "suffix"
+from = [
+    "suffix",
+]
+
+[[expose]]
+slot = "place"
+from = [
+    "place",
+]

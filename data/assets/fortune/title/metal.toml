@@ -1,0 +1,160 @@
+category = "music"
+
+class = [
+    { value = "guitarist" },
+    { value = "drummer" },
+    { value = "bassist" },
+    { value = "vocalist" },
+    { value = "frontman" },
+    { value = "shredder" },
+    { value = "headbanger" },
+    { value = "roadie" },
+    { value = "metalhead" },
+]
+adj = [
+    { value = "heavy" },
+    { value = "brutal" },
+    { value = "thrash" },
+    { value = "doom" },
+    { value = "sludge" },
+    { value = "blackened" },
+    { value = "grind" },
+    { value = "power" },
+    { value = "technical" },
+    { value = "progressive" },
+    { value = "grim" },
+    { value = "frostbitten" },
+    { value = "raw" },
+    { value = "trve" },
+    { value = "cvlt" },
+]
+adj_sup = [
+    { value = "heaviest" },
+    { value = "loudest" },
+    { value = "fastest" },
+    { value = "most brutal", sticky = false, prefixable = false, suffixible = false },
+]
+noun = [
+    { value = "riff", plural = "riffs" },
+    { value = "breakdown" },
+    { value = "solo" },
+    { value = "tremolo" },
+    { value = "growl" },
+    { value = "distortion" },
+    { value = "blast beat", sticky = false, prefixable = false, suffixible = false },
+    { value = "mosh pit", sticky = false, prefixable = false, suffixible = false },
+    { value = "wall of death", sticky = false, prefixable = false, suffixible = false },
+    { value = "corpse paint", sticky = false, prefixable = false, suffixible = false },
+]
+entity = [
+    { value = "Dio", proper_noun = true, sticky = false },
+    { value = "Lemmy", proper_noun = true, sticky = false },
+    { value = "Ozzy", proper_noun = true, sticky = false },
+]
+rank = [
+    { value = "guitar god", sticky = false, prefixable = false, suffixible = false },
+    { value = "riff lord", sticky = false, prefixable = false, suffixible = false },
+    { value = "drum machine", sticky = false, prefixable = false, suffixible = false },
+]
+suffix = [
+    { value = "slinger" },
+    { value = "hammer" },
+    { value = "wolf" },
+    { value = "goat" },
+]
+
+[[place]]
+value = "mosh pit"
+article = "the"
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "pit"
+article = "the"
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "underground"
+article = "the"
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "garage"
+article = "the"
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "stage"
+article = "the"
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "frozen north"
+article = "the"
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "Wacken"
+proper_noun = true
+prefixable = false
+suffixible = false
+
+[[expose]]
+slot = "class"
+from = [
+    "class",
+]
+
+[[expose]]
+slot = "adj"
+from = [
+    "adj",
+]
+
+[[expose]]
+slot = "adj_sup"
+from = [
+    "adj_sup",
+]
+
+[[expose]]
+slot = "noun"
+from = [
+    "noun",
+]
+
+[[expose]]
+slot = "entity"
+from = [
+    "entity",
+]
+
+[[expose]]
+slot = "rank"
+from = [
+    "rank",
+]
+
+[[expose]]
+slot = "suffix"
+from = [
+    "suffix",
+]
+
+[[expose]]
+slot = "place"
+from = [
+    "place",
+]

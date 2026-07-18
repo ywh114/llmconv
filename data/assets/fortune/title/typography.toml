@@ -1,0 +1,97 @@
+noun = [
+    { value = "kerning" },
+    { value = "ligature" },
+    { value = "serif" },
+    { value = "sans-serif" },
+    { value = "baseline" },
+    { value = "x-height" },
+    { value = "ascender" },
+    { value = "descender" },
+    { value = "glyph" },
+    { value = "typeface" },
+    { value = "widow" },
+    { value = "orphan" },
+    { value = "tracking" },
+    { value = "leading" },
+    { value = "Papyrus" },
+    { value = "Helvetica" },
+    { value = "Wingdings" },
+    { value = "Comic Sans", sticky = false, prefixable = false, suffixible = false },
+    { value = "em dash", sticky = false, prefixable = false, suffixible = false },
+]
+adj = [
+    { value = "bold" },
+    { value = "italic" },
+    { value = "oblique" },
+    { value = "condensed" },
+    { value = "monospaced" },
+    { value = "proportional" },
+    { value = "grotesque" },
+    { value = "blackletter" },
+    { value = "kerned" },
+    { value = "underlined" },
+]
+adj_sup = [
+    { value = "boldest" },
+    { value = "tightest" },
+    { value = "most legible", sticky = false, prefixable = false, suffixible = false },
+]
+class = [
+    { value = "typographer" },
+    { value = "typesetter" },
+    { value = "printer" },
+    { value = "type designer", sticky = false, prefixable = false, suffixible = false },
+]
+entity = [
+    { value = "Gutenberg", proper_noun = true, sticky = false },
+]
+
+[[place]]
+value = "foundry"
+article = "the"
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "print shop"
+article = "the"
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[expose]]
+slot = "noun"
+from = [
+    "noun",
+]
+
+[[expose]]
+slot = "adj"
+from = [
+    "adj",
+]
+
+[[expose]]
+slot = "adj_sup"
+from = [
+    "adj_sup",
+]
+
+[[expose]]
+slot = "class"
+from = [
+    "class",
+]
+
+[[expose]]
+slot = "entity"
+from = [
+    "entity",
+]
+
+[[expose]]
+slot = "place"
+from = [
+    "place",
+]

@@ -74,7 +74,7 @@ patterns = [
 
 [[_nonzero_number]]
 patterns = [
-    "{digit}",
+    "{_nonzero_digit}",
     "{_nonzero_digit}{digit}",
     "{_nonzero_digit}{digit}{digit}",
     "{_nonzero_digit}{digit}{digit}{digit}",

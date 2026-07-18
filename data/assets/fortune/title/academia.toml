@@ -1,0 +1,136 @@
+class = [
+    { value = "adjunct" },
+    { value = "postdoc" },
+    { value = "lecturer" },
+    { value = "TA" },
+    { value = "grad student", sticky = false, prefixable = false, suffixible = false },
+    { value = "teaching assistant", sticky = false, prefixable = false, suffixible = false },
+]
+rank = [
+    { value = "professor" },
+    { value = "dean" },
+    { value = "provost" },
+    { value = "chancellor" },
+    { value = "department chair", sticky = false, prefixable = false, suffixible = false },
+]
+adj = [
+    { value = "tenured" },
+    { value = "untenured" },
+    { value = "emeritus" },
+    { value = "adjunct" },
+    { value = "peer-reviewed" },
+    { value = "unpublished" },
+    { value = "underfunded" },
+    { value = "interdisciplinary" },
+]
+adj_sup = [
+    { value = "most-cited" },
+    { value = "least-cited" },
+    { value = "most overworked", sticky = false, prefixable = false, suffixible = false },
+]
+noun = [
+    { value = "dissertation" },
+    { value = "thesis" },
+    { value = "citation" },
+    { value = "grant" },
+    { value = "tenure" },
+    { value = "sabbatical" },
+    { value = "journal" },
+    { value = "conference" },
+    { value = "preprint" },
+    { value = "retraction" },
+    { value = "syllabus" },
+    { value = "peer review", sticky = false, prefixable = false, suffixible = false },
+    { value = "office hours", sticky = false, prefixable = false, suffixible = false },
+    { value = "impact factor", sticky = false, prefixable = false, suffixible = false },
+]
+entity = [
+    { value = "Reviewer 2", proper_noun = true, sticky = false },
+    { value = "Reviewer 3", proper_noun = true, sticky = false },
+]
+suffix = [
+    { value = "ology" },
+]
+
+[[place]]
+value = "ivory tower"
+article = "the"
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "faculty lounge"
+article = "the"
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "lecture hall"
+article = "the"
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "lab"
+article = "the"
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[place]]
+value = "tenure track"
+article = "the"
+proper_noun = false
+prefixable = false
+suffixible = false
+
+[[expose]]
+slot = "class"
+from = [
+    "class",
+]
+
+[[expose]]
+slot = "rank"
+from = [
+    "rank",
+]
+
+[[expose]]
+slot = "adj"
+from = [
+    "adj",
+]
+
+[[expose]]
+slot = "adj_sup"
+from = [
+    "adj_sup",
+]
+
+[[expose]]
+slot = "noun"
+from = [
+    "noun",
+]
+
+[[expose]]
+slot = "entity"
+from = [
+    "entity",
+]
+
+[[expose]]
+slot = "suffix"
+from = [
+    "suffix",
+]
+
+[[expose]]
+slot = "place"
+from = [
+    "place",
+]
