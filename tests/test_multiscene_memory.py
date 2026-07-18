@@ -17,7 +17,7 @@ from ara.world.orchestrator import TurnDecision
 from ara.world.scene import Location, Scene, SceneChoice, load_location
 from ara.world.story import Story
 from ara.world.orchestrator import Orchestrator
-from ara.world.summarizer import Summarizer, SceneStateModifiers
+from ara.world.summarizer import Summarizer, SceneStateModifiers, TransitionRequest
 from ara.world.character import load_character
 from ara.persistence.save import SaveManager
 
@@ -960,16 +960,18 @@ TIME: afternoon"""
         summarizer = Summarizer(client)
 
         summarizer.summarize_transition(
-            current_scene=scene,
-            current_scene_considerations="",
-            next_scene_plot="The hero arrives at the inn.",
-            next_scene_considerations="",
-            conversation_context=[],
-            location_desc="A room.",
-            language="English",
-            scratchpads={},
-            next_scene_chars=["NPC"],
-            history_context="Earlier scene: a promise was made at the crossroads.",
+            TransitionRequest(
+                current_scene=scene,
+                current_scene_considerations="",
+                next_scene_plot="The hero arrives at the inn.",
+                next_scene_considerations="",
+                conversation_context=[],
+                location_desc="A room.",
+                language="English",
+                scratchpads={},
+                next_scene_chars=["NPC"],
+                history_context="Earlier scene: a promise was made at the crossroads.",
+            )
         )
 
         assert len(client.calls) == 1

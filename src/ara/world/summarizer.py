@@ -173,6 +173,88 @@ class SceneStateModifiers:
         )
 
 
+@dataclass
+class TransitionRequest:
+    """Inputs for :meth:`Summarizer.summarize_transition`.
+
+    :param current_scene: The scene that just ended.
+    :param current_scene_considerations: Considerations text of that scene.
+    :param next_scene_plot: Plot text of the upcoming scene.
+    :param next_scene_considerations: Considerations text of the upcoming scene.
+    :param conversation_context: Orchestrator's curated view of the conversation
+        history (observer ``__orchestrator__``, ``collapse=False``).
+    :param location_desc: Current primary location description (may contain
+        ``[Update]`` tags).
+    :param language: Target language for output.
+    :param scratchpads: Mapping from character name to scratch text.
+    :param next_scene_chars: Names of all characters who will appear in the
+        next scene.
+    :param location_descs: Mapping from location name to current description
+        for all locations present in the current scene.
+    :param next_scene_locations: Names of locations that will appear in the
+        next scene.
+    :param mechanical_changelog: Mechanical state changes applied during the
+        scene.
+    :param player_status: Final player system-page state at the end of the scene.
+    :param world_time: Final world time at the end of the scene.
+    :param query_characters_fn: Optional callback to expand the character roster.
+    :param next_scene_cast: Authoritative list of character names the summarizer
+        must account for in the next scene. Defaults to ``next_scene_chars``.
+    :param previous_scene_characters: Characters present at the end of the
+        previous scene, with anonymous members marked ``[anonymous]``.
+    :param current_character_status: Current stored status flags for all known
+        characters.
+    :param narrative_state: Current story-level narrative state flags.
+    :param next_player_name: Display name of the upcoming scene's player character.
+    :param next_narrator_name: Display name of the upcoming scene's narrator.
+    :param summarizer_considerations: Author-supplied instructions for how to
+        summarize this specific transition.
+    :param history_context: Relevant past-scene summaries retrieved from the
+        long-term story memory, if any.
+    """
+
+    current_scene: Scene
+    current_scene_considerations: str
+    next_scene_plot: str
+    next_scene_considerations: str
+    conversation_context: list[dict]
+    location_desc: str
+    language: str
+    scratchpads: dict[str, str]
+    next_scene_chars: list[str]
+    location_descs: dict[str, str] = field(default_factory=dict)
+    next_scene_locations: list[str] = field(default_factory=list)
+    mechanical_changelog: list[dict[str, Any]] = field(default_factory=list)
+    player_status: dict[str, Any] = field(default_factory=dict)
+    world_time: str = ""
+    query_characters_fn: Callable[[str], list[str]] | None = None
+    next_scene_cast: list[str] | None = None
+    previous_scene_characters: list[str] = field(default_factory=list)
+    current_character_status: dict[str, dict[str, Any]] = field(default_factory=dict)
+    narrative_state: dict[str, Any] = field(default_factory=dict)
+    next_player_name: str = ""
+    next_narrator_name: str = ""
+    summarizer_considerations: str = ""
+    history_context: str = ""
+
+
+@dataclass
+class TransitionResult:
+    """Outputs of :meth:`Summarizer.summarize_transition`."""
+
+    summaries: dict[str, str] = field(default_factory=dict)
+    location_descs: dict[str, str] = field(default_factory=dict)
+    time: str = ""
+    facts: list[dict[str, Any]] = field(default_factory=list)
+    player_status_delta: dict[str, Any] = field(default_factory=dict)
+    character_status_updates: dict[str, dict[str, Any]] = field(default_factory=dict)
+    narrative_state: dict[str, Any] = field(default_factory=dict)
+    state_modifiers: SceneStateModifiers = field(default_factory=SceneStateModifiers)
+    character_overrides: dict[str, dict[str, str]] = field(default_factory=dict)
+    anonymous_chars: dict[str, dict[str, str]] = field(default_factory=dict)
+    orchestrator_note: str = ""
+
+
 class Summarizer:
     """Generates inter-scene bridging summaries and finalizes location state."""
 
@@ -183,124 +265,68 @@ class Summarizer:
         """
         self.client = client
 
-    def summarize_transition(
-        self,
-        current_scene: Scene,
-        current_scene_considerations: str,
-        next_scene_plot: str,
-        next_scene_considerations: str,
-        conversation_context: list[dict],
-        location_desc: str,
-        language: str,
-        scratchpads: dict[str, str],
-        next_scene_chars: list[str],
-        location_descs: dict[str, str] | None = None,
-        next_scene_locations: list[str] | None = None,
-        mechanical_changelog: list[dict[str, Any]] | None = None,
-        player_status: dict[str, Any] | None = None,
-        world_time: str = "",
-        query_characters_fn: Callable[[str], list[str]] | None = None,
-        next_scene_cast: list[str] | None = None,
-        previous_scene_characters: list[str] | None = None,
-        current_character_status: dict[str, dict[str, Any]] | None = None,
-        narrative_state: dict[str, Any] | None = None,
-        next_player_name: str = "",
-        next_narrator_name: str = "",
-        summarizer_considerations: str = "",
-        history_context: str = "",
-    ) -> tuple[dict[str, str], dict[str, str], str, list[dict[str, Any]], dict[str, Any], dict[str, dict[str, Any]], dict[str, Any], SceneStateModifiers, dict[str, dict[str, str]], dict[str, dict[str, str]], str]:
+    def summarize_transition(self, request: TransitionRequest) -> TransitionResult:
         """Produce per-character bridging summaries and finalized location descriptions.
 
-        :param current_scene: The scene that just ended.
-        :param current_scene_considerations: Considerations text of the scene that just ended.
-        :param next_scene_plot: Plot text of the upcoming scene.
-        :param next_scene_considerations: Considerations text of the upcoming scene.
-        :param conversation_context: Orchestrator's curated view of the conversation
-            history (observer ``__orchestrator__``, ``collapse=False``).
-        :param location_desc: Current primary location description (may contain ``[Update]`` tags).
-        :param language: Target language for output.
-        :param scratchpads: Mapping from character name → scratch text.
-        :param next_scene_chars: Names of all characters who will appear in the next scene.
-        :param location_descs: Mapping from location name → current description for
-            all locations present in the current scene.
-        :param next_scene_locations: Names of locations that will appear in the next scene.
-        :param mechanical_changelog: Mechanical state changes applied during the scene.
-        :param player_status: Final player system-page state at the end of the scene.
-        :param world_time: Final world time at the end of the scene.
-        :param query_characters_fn: Optional callback to expand the character roster.
-        :param next_scene_cast: Authoritative list of character names the summarizer
-            must account for in the next scene. Defaults to ``next_scene_chars``.
-        :param previous_scene_characters: List of characters present at the end of the
-            previous scene, with anonymous members marked ``[anonymous]``.
-        :param next_player_name: Display name of the upcoming scene's player character.
-        :param next_narrator_name: Display name of the upcoming scene's narrator.
-        :param current_character_status: Current stored status flags for all known characters.
-        :param narrative_state: Current story-level narrative state flags.
-        :param summarizer_considerations: Author-supplied instructions for how to
-            summarize this specific transition (from ``[plot.next.<id>].summarizer_considerations``).
-        :param history_context: Relevant past-scene summaries retrieved from the
-            long-term story memory, if any.
-        :return: ``(per_character_summaries, finalized_location_descs, time, facts, player_status_delta, character_status_updates, narrative_state, state_modifiers, character_overrides, anonymous_chars, orchestrator_note)``.
+        See :class:`TransitionRequest` and :class:`TransitionResult` for the
+        parameter and return semantics.
         """
-        location_descs = dict(location_descs) if location_descs else {}
-        next_scene_locations = list(next_scene_locations) if next_scene_locations else []
-        mechanical_changelog = list(mechanical_changelog) if mechanical_changelog else []
-        player_status = dict(player_status) if player_status else {}
-        next_scene_cast = list(next_scene_cast) if next_scene_cast else list(next_scene_chars)
-        previous_scene_characters = list(previous_scene_characters) if previous_scene_characters else []
-        current_character_status = dict(current_character_status) if current_character_status else {}
-        narrative_state = dict(narrative_state) if narrative_state else {}
+        next_scene_cast = (
+            list(request.next_scene_cast)
+            if request.next_scene_cast
+            else list(request.next_scene_chars)
+        )
 
         # Build a compact transcript from the already-curated conversation context.
         # The caller is expected to pass the orchestrator's view, where the
         # orchestrator is the only assistant and every other speaker is reported
         # through user messages.
         transcript = ConversationContext.to_narrative_text(
-            conversation_context,
+            request.conversation_context,
             observer_name="Orchestrator",
             max_lines=50,
         )
 
         # Build scratchpad section.
         scratch_lines: list[str] = []
-        for name, text in scratchpads.items():
+        for name, text in request.scratchpads.items():
             if text and text != "Nothing yet!":
                 scratch_lines.append(f"--- {name}'s scratchpad ---\n{text}")
         scratch_section = "\n\n".join(scratch_lines) if scratch_lines else "(No scratchpads available.)"
 
         # Determine which characters are continuing vs. new.
-        prev_char_names = {c.name for c in current_scene.character_pool}
+        prev_char_names = {c.name for c in request.current_scene.character_pool}
 
-        def _run(roster: list[str]) -> tuple[str, dict[str, Any]]:
+        def _run(roster: list[str]) -> str:
             continuing = [c for c in roster if c in prev_char_names]
             new_arrivals = [c for c in roster if c not in prev_char_names]
 
-            system_prompt = self._build_system_prompt(
-                language=language,
-                has_changelog=bool(mechanical_changelog),
-                has_player_status=bool(player_status),
+            system_prompt = summarizer_system_prompt(
+                request.language,
+                bool(request.mechanical_changelog),
+                bool(request.player_status),
             )
-            user_prompt = self._build_user_prompt(
-                current_scene=current_scene,
-                current_scene_considerations=current_scene_considerations,
-                next_scene_plot=next_scene_plot,
-                next_scene_considerations=next_scene_considerations,
-                location_desc=location_desc,
-                transcript=transcript,
-                scratch_section=scratch_section,
-                roster=roster,
-                continuing=continuing,
-                new_arrivals=new_arrivals,
-                mechanical_changelog=mechanical_changelog,
-                player_status=player_status,
-                world_time=world_time,
-                current_character_status=current_character_status,
-                narrative_state=narrative_state,
-                next_player_name=next_player_name,
-                next_narrator_name=next_narrator_name,
-                previous_scene_characters=previous_scene_characters,
-                summarizer_considerations=summarizer_considerations,
-                history_context=history_context,
+            user_prompt = summarizer_user_prompt(
+                request.current_scene,
+                request.current_scene_considerations,
+                request.next_scene_plot,
+                request.next_scene_considerations,
+                request.location_desc,
+                transcript,
+                scratch_section,
+                roster,
+                continuing,
+                new_arrivals,
+                request.mechanical_changelog,
+                request.player_status,
+                request.world_time,
+                request.current_character_status,
+                request.narrative_state,
+                request.next_player_name,
+                request.next_narrator_name,
+                request.previous_scene_characters,
+                request.summarizer_considerations,
+                request.history_context,
             )
 
             result = self.client.complete(
@@ -310,22 +336,21 @@ class Summarizer:
                 stream=False,
             )
 
-            text = result.content.strip()
-            return text, player_status
+            return result.content.strip()
 
-        text, _ = _run(next_scene_cast)
+        text = _run(next_scene_cast)
 
         # Optional one-time roster expansion via query_characters tool.
-        if query_characters_fn is not None:
+        if request.query_characters_fn is not None:
             query = self._extract_query(text)
             if query:
-                extra = query_characters_fn(query)
+                extra = request.query_characters_fn(query)
                 if extra:
                     expanded_roster = list(dict.fromkeys(next_scene_cast + [line.split(":")[0].strip() for line in extra if ":" in line]))
-                    text, _ = _run(expanded_roster)
+                    text = _run(expanded_roster)
 
         summaries, primary_location, time, facts, player_status_delta, character_status_updates, narrative_state, state_modifiers, character_overrides, anonymous_chars, orchestrator_note = self._parse_response(
-            text, next_scene_chars, location_desc, current_scene.time
+            text, request.next_scene_chars, request.location_desc, request.current_scene.time
         )
 
         logger.debug(
@@ -341,19 +366,31 @@ class Summarizer:
         # Determine which locations may need rewriting beyond the primary one.
         relevant_locations = {
             name: desc
-            for name, desc in location_descs.items()
-            if name in next_scene_locations or name == current_scene.starting_location.name
+            for name, desc in request.location_descs.items()
+            if name in request.next_scene_locations or name == request.current_scene.starting_location.name
         }
 
         finalized_descs = self._finalize_locations(
             relevant_locations=relevant_locations,
-            primary_name=current_scene.starting_location.name,
+            primary_name=request.current_scene.starting_location.name,
             primary_desc=primary_location,
             transcript=transcript,
-            language=language,
+            language=request.language,
         )
 
-        return summaries, finalized_descs, time, facts, player_status_delta, character_status_updates, narrative_state, state_modifiers, character_overrides, anonymous_chars, orchestrator_note
+        return TransitionResult(
+            summaries=summaries,
+            location_descs=finalized_descs,
+            time=time,
+            facts=facts,
+            player_status_delta=player_status_delta,
+            character_status_updates=character_status_updates,
+            narrative_state=narrative_state,
+            state_modifiers=state_modifiers,
+            character_overrides=character_overrides,
+            anonymous_chars=anonymous_chars,
+            orchestrator_note=orchestrator_note,
+        )
 
     def prefetch_wiki_context(
         self,
@@ -510,60 +547,6 @@ Scene considerations:
         if not all(line.upper().startswith("QUERY:") for line in lines):
             return None
         return lines[0][len("QUERY:"):].strip()
-
-    @staticmethod
-    def _build_system_prompt(
-        language: str,
-        has_changelog: bool,
-        has_player_status: bool,
-    ) -> str:
-        return summarizer_system_prompt(language, has_changelog, has_player_status)
-
-    @staticmethod
-    def _build_user_prompt(
-        current_scene: Scene,
-        current_scene_considerations: str,
-        next_scene_plot: str,
-        next_scene_considerations: str,
-        location_desc: str,
-        transcript: str,
-        scratch_section: str,
-        roster: list[str],
-        continuing: list[str],
-        new_arrivals: list[str],
-        mechanical_changelog: list[dict[str, Any]],
-        player_status: dict[str, Any],
-        world_time: str,
-        current_character_status: dict[str, dict[str, Any]],
-        narrative_state: dict[str, Any],
-        next_player_name: str,
-        next_narrator_name: str,
-        previous_scene_characters: list[str],
-        summarizer_considerations: str = "",
-        history_context: str = "",
-    ) -> str:
-        return summarizer_user_prompt(
-            current_scene,
-            current_scene_considerations,
-            next_scene_plot,
-            next_scene_considerations,
-            location_desc,
-            transcript,
-            scratch_section,
-            roster,
-            continuing,
-            new_arrivals,
-            mechanical_changelog,
-            player_status,
-            world_time,
-            current_character_status,
-            narrative_state,
-            next_player_name,
-            next_narrator_name,
-            previous_scene_characters,
-            summarizer_considerations,
-            history_context,
-        )
 
     def _finalize_locations(
         self,

@@ -16,7 +16,7 @@ from ara.world.engine import Engine
 from ara.world.orchestrator import TurnDecision
 from ara.world.scene import Scene, SceneChoice
 from ara.world.story import Story, _finalize_character
-from ara.world.summarizer import Summarizer
+from ara.world.summarizer import Summarizer, TransitionRequest
 
 from tests.helpers import ScriptedLLMClient as MockLLMClient
 from tests.helpers import make_scene
@@ -596,10 +596,10 @@ def test_summarizer_receives_orchestrator_view_and_orchestrator_scratch() -> Non
         captured: dict[str, Any] = {}
         original_summarize = Summarizer.summarize_transition
 
-        def fake_summarize(self: Summarizer, *args: Any, **kwargs: Any) -> Any:
-            captured["conversation_context"] = kwargs.get("conversation_context")
-            captured["scratchpads"] = kwargs.get("scratchpads")
-            return original_summarize(self, *args, **kwargs)
+        def fake_summarize(self: Summarizer, request: TransitionRequest) -> Any:
+            captured["conversation_context"] = request.conversation_context
+            captured["scratchpads"] = request.scratchpads
+            return original_summarize(self, request)
 
         with patch("ara.world.story.Scene.load", side_effect=fake_load), \
              patch("ara.world.story.Summarizer.summarize_transition", fake_summarize):

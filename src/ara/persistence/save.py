@@ -23,7 +23,7 @@ from ara.llm.context import ConversationContext
 from ara.world.i18n import normalize_language
 from ara.world.orchestrator import TurnDecision
 from ara.world.scene import Location, Scene, load_location
-from ara.world.story import Story
+from ara.world.story import PendingTransition, Story
 
 logger = get_logger(__name__)
 
@@ -444,6 +444,12 @@ class SaveManager:
                 ),
             }
 
+        pending = story._pending_transition
+        primary_loc_desc = (
+            pending.location_descs.get(story.engine.loc.canonical_name, "")
+            if story.engine is not None and story.engine.loc is not None
+            else ""
+        )
         snapshot: dict[str, Any] = {
             "version": SAVE_VERSION,
             "timestamp": datetime.now(timezone.utc).isoformat(),
@@ -456,12 +462,12 @@ class SaveManager:
             "story_state": {
                 "_state": story._state,
                 "_skipped_scene": story._skipped_scene,
-                "_next_scene_summaries": story._next_scene_summaries,
-                "_next_scene_location_desc": story._next_scene_location_desc,
-                "_next_scene_location_descs": story._next_scene_location_descs,
-                "_next_scene_time": story._next_scene_time,
-                "_next_scene_player_status": story._next_scene_player_status,
-                "_next_scene_wiki_context": story._next_scene_wiki_context,
+                "_next_scene_summaries": pending.summaries,
+                "_next_scene_location_desc": primary_loc_desc,
+                "_next_scene_location_descs": pending.location_descs,
+                "_next_scene_time": pending.time,
+                "_next_scene_player_status": pending.player_status,
+                "_next_scene_wiki_context": pending.wiki_context,
                 "_character_status": dict(story._character_status),
                 "_narrative_state": dict(story._narrative_state),
                 "_world_id": story._world_id,
@@ -562,12 +568,16 @@ class SaveManager:
         saved_current_path = data.get("current_path")
         saved_finalize_text = data.get("finalize_turn_text", "")
         story._skipped_scene = story_state.get("_skipped_scene", False)
-        story._next_scene_summaries = dict(story_state.get("_next_scene_summaries", {}))
-        story._next_scene_location_desc = story_state.get("_next_scene_location_desc", "")
-        story._next_scene_location_descs = dict(story_state.get("_next_scene_location_descs", {}))
-        story._next_scene_time = story_state.get("_next_scene_time", "")
-        story._next_scene_player_status = dict(story_state.get("_next_scene_player_status", {}))
-        story._next_scene_wiki_context = story_state.get("_next_scene_wiki_context", "")
+        story._pending_transition = PendingTransition()
+        pending = story._pending_transition
+        pending.summaries = dict(story_state.get("_next_scene_summaries", {}))
+        pending.location_descs = dict(story_state.get("_next_scene_location_descs", {}))
+        # Pre-PendingTransition saves stored a standalone singular description;
+        # it is applied only when the dict is empty.
+        pending.legacy_location_desc = story_state.get("_next_scene_location_desc", "")
+        pending.time = story_state.get("_next_scene_time", "")
+        pending.player_status = dict(story_state.get("_next_scene_player_status", {}))
+        pending.wiki_context = story_state.get("_next_scene_wiki_context", "")
         story._character_status = dict(story_state.get("_character_status", {}))
         story._narrative_state = dict(story_state.get("_narrative_state", {}))
         story._world_id = story_state.get("_world_id", "")

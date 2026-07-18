@@ -34,9 +34,35 @@ from ara.world.registry import AssetRegistry
 from ara.world.scene import Location, Scene
 from ara.world.i18n import normalize_language
 from ara.world.setting import resolve_world_setting_path
-from ara.world.summarizer import Summarizer, SceneStateModifiers
+from ara.world.summarizer import Summarizer, SceneStateModifiers, TransitionRequest
 
 logger = get_logger(__name__)
+
+
+@dataclass
+class PendingTransition:
+    """Summarizer outputs staged for the next scene.
+
+    Written by ``Story._run_summarizer`` during finalization and consumed by
+    ``Story._load_scene`` once the next scene exists.  Replaced wholesale
+    after consumption — no field is cleared individually.
+    """
+
+    summaries: dict[str, str] = field(default_factory=dict)
+    location_descs: dict[str, str] = field(default_factory=dict)
+    time: str = ""
+    player_status: dict[str, Any] = field(default_factory=dict)
+    free_status: dict[str, Any] = field(default_factory=dict)
+    location_statuses: dict[str, Any] = field(default_factory=dict)
+    state_modifiers: SceneStateModifiers = field(default_factory=SceneStateModifiers)
+    character_status_updates: dict[str, dict[str, Any]] = field(default_factory=dict)
+    character_overrides: dict[str, dict[str, str]] = field(default_factory=dict)
+    anonymous_chars: dict[str, dict[str, str]] = field(default_factory=dict)
+    orchestrator_note: str = ""
+    wiki_context: str = ""
+    # Backward compat for pre-PendingTransition saves: a standalone primary
+    # location description restored when location_descs is empty.
+    legacy_location_desc: str = ""
 
 
 def _merge_characters(prev_scene: Scene, new_scene: Scene) -> None:
@@ -353,20 +379,8 @@ class Story:
         self._state: str = "idle"
         self._skipped_scene: bool = False
         self._summarizer = Summarizer(client)
-        self._next_scene_summaries: dict[str, str] = {}
-        self._next_scene_location_desc: str = ""
-        self._next_scene_location_descs: dict[str, str] = {}
-        self._next_scene_time: str = ""
+        self._pending_transition = PendingTransition()
         self._finalize_turn_text: str = ""
-        self._next_scene_player_status: dict[str, Any] = {}
-        self._next_scene_free_status: dict[str, Any] = {}
-        self._next_scene_location_statuses: dict[str, Any] = {}
-        self._next_scene_state_modifiers = SceneStateModifiers()
-        self._next_scene_character_status_updates: dict[str, dict[str, Any]] = {}
-        self._next_scene_character_overrides: dict[str, dict[str, str]] = {}
-        self._next_scene_anonymous_chars: dict[str, dict[str, str]] = {}
-        self._next_scene_orchestrator_note: str = ""
-        self._next_scene_wiki_context: str = ""
         self._character_status: dict[str, dict[str, Any]] = {}
         self._narrative_state: dict[str, Any] = {}
         self._story_meta: dict[str, str] = {}
@@ -673,19 +687,19 @@ class Story:
         if self._prev_scene is not None:
             _merge_characters(self._prev_scene, scene)
 
+        pt = self._pending_transition
+
         # Instantiate any anonymous NPCs explicitly declared by the transition
         # summarizer. They are added to the scene as starting characters.
-        if self._next_scene_anonymous_chars:
-            for name, data in self._next_scene_anonymous_chars.items():
-                if scene.character_by_name(name) is None:
-                    anon = create_anonymous_character(
-                        name=name,
-                        description=data.get("description", ""),
-                        sprite=data.get("sprite", ""),
-                    )
-                    scene.character_pool.add(anon)
-                    scene.starting_characters.add(anon)
-            self._next_scene_anonymous_chars = {}
+        for name, data in pt.anonymous_chars.items():
+            if scene.character_by_name(name) is None:
+                anon = create_anonymous_character(
+                    name=name,
+                    description=data.get("description", ""),
+                    sprite=data.get("sprite", ""),
+                )
+                scene.character_pool.add(anon)
+                scene.starting_characters.add(anon)
 
         # Apply any stored character status flags to the newly-loaded scene cast.
         for char in scene.character_pool:
@@ -694,35 +708,30 @@ class Story:
 
         # Normalize and apply any character status updates emitted by the
         # summarizer for the next scene.
-        for name, status in self._next_scene_character_status_updates.items():
+        for name, status in pt.character_status_updates.items():
             char = scene.character_by_name(name)
             if char is not None:
                 self._character_status[char.canonical_name] = status
                 char.status = dict(status)
-        self._next_scene_character_status_updates = {}
 
         self._state = "running"
         previous_world_time = self.engine.world_time
         self.engine.start(scene)
 
         # Restore status pages carried over from the previous scene.
-        if self._next_scene_player_status:
-            self.engine._player_status = dict(self._next_scene_player_status)
-            self._next_scene_player_status = {}
-        if self._next_scene_free_status:
-            self.engine._free_status = dict(self._next_scene_free_status)
-            self._next_scene_free_status = {}
-        if self._next_scene_location_statuses:
+        if pt.player_status:
+            self.engine._player_status = dict(pt.player_status)
+        if pt.free_status:
+            self.engine._free_status = dict(pt.free_status)
+        if pt.location_statuses:
             for loc in scene.location_pool:
-                if loc.canonical_name in self._next_scene_location_statuses:
-                    loc.status = dict(self._next_scene_location_statuses[loc.canonical_name])
-            self._next_scene_location_statuses = {}
+                if loc.canonical_name in pt.location_statuses:
+                    loc.status = dict(pt.location_statuses[loc.canonical_name])
 
         # Apply state modifiers from the transition summarizer. Normalize keys
         # from display names to canonical IDs using the newly-loaded scene.
-        normalized_modifiers = self._normalize_state_modifiers(scene, self._next_scene_state_modifiers)
+        normalized_modifiers = self._normalize_state_modifiers(scene, pt.state_modifiers)
         self._apply_state_modifiers(scene, normalized_modifiers)
-        self._next_scene_state_modifiers = SceneStateModifiers()
 
         # For the very first scene, ask the summarizer for initial state modifiers
         # after world settings have been loaded. Skip if there is nothing to modify.
@@ -739,10 +748,8 @@ class Story:
         self._load_world_settings(scene)
 
         # Inject summarizer-prefetched wiki context and orchestrator note.
-        self.engine.orchestrator.prefetched_wiki = self._next_scene_wiki_context
-        self.engine.orchestrator.orchestrator_note = self._next_scene_orchestrator_note
-        self._next_scene_wiki_context = ""
-        self._next_scene_orchestrator_note = ""
+        self.engine.orchestrator.prefetched_wiki = pt.wiki_context
+        self.engine.orchestrator.orchestrator_note = pt.orchestrator_note
 
         # For the very first scene, run the same wiki prefetch now that world
         # settings have been upserted. Other finalization tasks are skipped.
@@ -759,37 +766,35 @@ class Story:
 
         # Distribute per-character bridging summaries from the summarizer.
         # Keys may be display or canonical names; resolve against the new scene.
-        if self._next_scene_summaries:
-            for name, summary in self._next_scene_summaries.items():
-                char = scene.character_by_name(name)
-                if char is not None and summary:
-                    char.prev_scene_summary = summary
-            self._next_scene_summaries = {}
+        for name, summary in pt.summaries.items():
+            char = scene.character_by_name(name)
+            if char is not None and summary:
+                char.prev_scene_summary = summary
 
         # Apply per-character card-field overrides from the summarizer.
-        if self._next_scene_character_overrides:
-            for name, overrides in self._next_scene_character_overrides.items():
-                char = scene.character_by_name(name)
-                if char is not None and overrides:
-                    char.card_overrides = dict(overrides)
-            self._next_scene_character_overrides = {}
+        for name, overrides in pt.character_overrides.items():
+            char = scene.character_by_name(name)
+            if char is not None and overrides:
+                char.card_overrides = dict(overrides)
 
         # Apply finalized location descriptions and time from the summarizer.
-        if self._next_scene_location_descs:
-            for name, desc in self._next_scene_location_descs.items():
+        # The staged dict always carries the primary location (see
+        # _run_summarizer); the legacy fallback covers pre-PendingTransition
+        # saves that stored a standalone singular description.
+        if pt.location_descs:
+            for name, desc in pt.location_descs.items():
                 loc = scene.location_by_name(name)
                 if loc is not None:
                     loc.desc = desc
-            self._next_scene_location_descs = {}
-            self._next_scene_location_desc = ""
-        elif self._next_scene_location_desc:
-            scene.starting_location.desc = self._next_scene_location_desc
-            self._next_scene_location_desc = ""
-        if self._next_scene_time:
-            scene.time = self._next_scene_time
-            self._next_scene_time = ""
+        elif pt.legacy_location_desc:
+            scene.starting_location.desc = pt.legacy_location_desc
+        if pt.time:
+            scene.time = pt.time
         elif not scene.time:
             scene.time = previous_world_time
+
+        # Everything staged for this scene has been consumed.
+        self._pending_transition = PendingTransition()
 
         if self._skipped_scene and self.engine.ctx is not None:
             self.engine.ctx.user_message(
@@ -978,31 +983,33 @@ class Story:
         with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
             summary_future = executor.submit(
                 self._summarizer.summarize_transition,
-                current_scene=self._current_scene,
-                current_scene_considerations=current_considerations,
-                next_scene_plot=next_plot,
-                next_scene_considerations=next_considerations,
-                conversation_context=self.engine.ctx.curated_view(
-                    "__orchestrator__", collapse=False
+                TransitionRequest(
+                    current_scene=self._current_scene,
+                    current_scene_considerations=current_considerations,
+                    next_scene_plot=next_plot,
+                    next_scene_considerations=next_considerations,
+                    conversation_context=self.engine.ctx.curated_view(
+                        "__orchestrator__", collapse=False
+                    ),
+                    location_desc=self.engine.loc.desc,
+                    language=self._language,
+                    scratchpads=scratchpads,
+                    next_scene_chars=next_scene_cast,
+                    next_player_name=next_player_name,
+                    next_narrator_name=next_narrator_name,
+                    previous_scene_characters=previous_scene_characters,
+                    location_descs=location_descs,
+                    next_scene_locations=next_scene_locations,
+                    mechanical_changelog=self.engine.mechanical_changelog,
+                    player_status=self.engine.player_status,
+                    world_time=self.engine.world_time,
+                    query_characters_fn=self._query_characters,
+                    next_scene_cast=next_scene_cast,
+                    current_character_status=self._character_status,
+                    narrative_state=self._narrative_state,
+                    summarizer_considerations=summarizer_considerations,
+                    history_context=history_context,
                 ),
-                location_desc=self.engine.loc.desc,
-                language=self._language,
-                scratchpads=scratchpads,
-                next_scene_chars=next_scene_cast,
-                next_player_name=next_player_name,
-                next_narrator_name=next_narrator_name,
-                previous_scene_characters=previous_scene_characters,
-                location_descs=location_descs,
-                next_scene_locations=next_scene_locations,
-                mechanical_changelog=self.engine.mechanical_changelog,
-                player_status=self.engine.player_status,
-                world_time=self.engine.world_time,
-                query_characters_fn=self._query_characters,
-                next_scene_cast=next_scene_cast,
-                current_character_status=self._character_status,
-                narrative_state=self._narrative_state,
-                summarizer_considerations=summarizer_considerations,
-                history_context=history_context,
             )
             wiki_future = None
             if self._wiki_has_content():
@@ -1016,7 +1023,7 @@ class Story:
                     language=self._language,
                     wiki_recall_fn=self.engine.orchestrator.prefetch_wiki,
                 )
-            bridging_summaries, finalized_descs, finalized_time, facts, player_status_delta, character_status_updates, narrative_state, state_modifiers, character_overrides, anonymous_chars, orchestrator_note = summary_future.result()
+            result = summary_future.result()
             if wiki_future is not None:
                 try:
                     wiki_context = wiki_future.result()
@@ -1024,35 +1031,41 @@ class Story:
                     logger.warning(f"Wiki prefetch failed: {exc}")
                     wiki_context = ""
 
-        # Store summarizer outputs raw. They reference the next scene's cast,
+        # Stage summarizer outputs raw. They reference the next scene's cast,
         # which may not exist in the current scene; normalization happens in
         # _load_scene once the next scene is loaded.
-        self._next_scene_summaries = bridging_summaries
-        self._next_scene_location_desc = finalized_descs.get(self.engine.loc.canonical_name, self.engine.loc.desc)
-        self._next_scene_location_descs = finalized_descs
-        self._next_scene_time = finalized_time
+        pt = self._pending_transition
+        pt.summaries = result.summaries
+        pt.location_descs = dict(result.location_descs)
+        # Always carry the primary location's finalized description in the dict
+        # (falling back to its current text) so consumers never need a
+        # separate singular field.
+        pt.location_descs.setdefault(self.engine.loc.canonical_name, self.engine.loc.desc)
+        pt.time = result.time
         # If the summarizer emitted a SYSTEM_STATE block, treat it as the complete
         # new state; otherwise carry the current state forward unchanged.
-        self._next_scene_player_status = (
-            player_status_delta if player_status_delta else dict(self.engine.player_status)
+        pt.player_status = (
+            dict(result.player_status_delta) if result.player_status_delta else dict(self.engine.player_status)
         )
-        self._next_scene_free_status = dict(self.engine.free_status)
-        self._next_scene_location_statuses = {
+        pt.free_status = dict(self.engine.free_status)
+        pt.location_statuses = {
             loc.canonical_name: dict(loc.status)
             for loc in self._current_scene.location_pool
         }
-        self._next_scene_state_modifiers = state_modifiers
-        self._next_scene_character_status_updates = character_status_updates
-        self._next_scene_character_overrides = character_overrides
-        self._next_scene_anonymous_chars = anonymous_chars
-        self._next_scene_orchestrator_note = orchestrator_note
-        self._next_scene_wiki_context = wiki_context
+        pt.state_modifiers = result.state_modifiers
+        pt.character_status_updates = result.character_status_updates
+        pt.character_overrides = result.character_overrides
+        pt.anonymous_chars = result.anonymous_chars
+        pt.orchestrator_note = result.orchestrator_note
+        pt.wiki_context = wiki_context
         # Apply narrative state updates and mirror to wiki.
+        narrative_state = result.narrative_state
+        facts = result.facts
         if narrative_state:
             self._narrative_state.update(narrative_state)
             self._upsert_narrative_state()
         self._upsert_invented_facts(facts)
-        total_chars = len(bridging_summaries)
+        total_chars = len(pt.summaries)
         logger.info(f"Summarizer produced {total_chars} character summaries for transition to {next_scene_id}")
 
     def _normalize_state_modifiers(
@@ -1152,13 +1165,15 @@ class Story:
         """
         if not self._current_scene or not self.engine.loc:
             return
-        if not self._next_scene_location_desc and not self._next_scene_time:
+        pt = self._pending_transition
+        next_desc = pt.location_descs.get(self.engine.loc.canonical_name, "")
+        if not next_desc and not pt.time:
             return
         changes = []
-        if self._next_scene_location_desc and self._next_scene_location_desc.strip() != self.engine.loc.desc.strip():
+        if next_desc and next_desc.strip() != self.engine.loc.desc.strip():
             changes.append(f"location: {self.engine.loc.name}")
-        if self._next_scene_time and self._next_scene_time != self.engine.world_time:
-            changes.append(f"time: {self._next_scene_time}")
+        if pt.time and pt.time != self.engine.world_time:
+            changes.append(f"time: {pt.time}")
         if not changes:
             return
 
@@ -1168,12 +1183,12 @@ how the scene has changed between scenes. Do NOT use meta-language, do NOT
 address the player directly, and do NOT include dialogue."""
 
         previous_time = self.engine.world_time or "unspecified"
-        updated_time = self._next_scene_time or previous_time
+        updated_time = pt.time or previous_time
         user_prompt = f"""Previous location description:
 {self.engine.loc.desc}
 
 Updated location description:
-{self._next_scene_location_desc}
+{next_desc or self.engine.loc.desc}
 
 Previous time: {previous_time}
 Updated time: {updated_time}
