@@ -25,7 +25,7 @@ class TestNarratorPrompt:
         scene = _scene()
         prompt = narrator_system_prompt(scene.player, scene.narrator, scene)
 
-        assert "Reply in English only!" in prompt
+        assert "Reply in English only." in prompt
         assert "You are the Narrator, the Narrator" in prompt
         assert "The player is Player." in prompt
         assert "zeitgeist: test" in prompt
@@ -35,7 +35,7 @@ class TestNarratorPrompt:
         scene = _scene()
         scene.language = "Chinese"
         prompt = narrator_system_prompt(scene.player, scene.narrator, scene)
-        assert "Reply in Chinese only!" in prompt
+        assert "Reply in Chinese only." in prompt
 
 
 class TestCharacterPrompt:
@@ -46,10 +46,10 @@ class TestCharacterPrompt:
         alice = make_char("Alice", MagicMock(spec=ChromaStore))
         prompt = character_system_prompt(alice, scene)
 
-        assert "Reply in English only!" in prompt
+        assert "Reply in English only." in prompt
         assert "You are Alice." in prompt
         assert "## Available tools" not in prompt
-        assert "IMPORTANT" in prompt  # default importance note
+        assert "Your importance level is" in prompt  # default importance note
 
     def test_has_tools_lists_tools(self) -> None:
         scene = _scene()
@@ -70,7 +70,7 @@ class TestCharacterPrompt:
         prompt = character_system_prompt(anon, scene, has_tools=False)
 
         assert "ANONYMOUS" in prompt
-        assert "You have NO tools" in prompt
+        assert "You have no tools" in prompt
 
     def test_prompt_has_anonymity_rule(self) -> None:
         scene = _scene()
@@ -86,7 +86,7 @@ class TestOrchestratorPrompt:
         scene = _scene()
         prompt = orchestrator_system_prompt(scene.player, scene.narrator, scene)
 
-        assert "Give suggestions and directives in English only!" in prompt
+        assert "Give suggestions and directives in English only." in prompt
         assert "the role of Player" in prompt
         assert "The narrator name is Narrator." in prompt
         assert "zeitgeist of the plot is: test" in prompt
@@ -129,7 +129,7 @@ class TestSummarizerSystemPrompt:
         prompt = summarizer_system_prompt(
             "English", has_changelog=False, has_player_status=False
         )
-        assert "Write in English only!" in prompt
+        assert "Write in English only." in prompt
         assert "Mechanical state changes" not in prompt
         assert "Player status" not in prompt
 

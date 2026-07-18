@@ -28,14 +28,14 @@ You may call the following tools before you speak:
     if importance_name == "ANONYMOUS":
         importance_note = f"""## Importance
 Your importance level is ANONYMOUS. You are a background or spawned character.
-You have NO tools. Do NOT output `<｜｜DSML｜｜tool_calls>` markup or any tool invocation.
-If you see examples of tool use in the conversation, they came from higher-importance characters and do NOT apply to you.
+You have no tools. Do not output `<｜｜DSML｜｜tool_calls>` markup or any tool invocation.
+If you see examples of tool use in the conversation, they came from higher-importance characters and do not apply to you.
 """
     else:
         importance_note = f"""## Importance
-Your importance level is {importance_name}. You may use the tools listed below if any are provided.
+Your importance level is {importance_name}. You may use the tools listed above if any are provided.
 """
-    return f"""IMPORTANT: Reply in {scene.language} only!
+    return f"""Reply in {scene.language} only.
 # Role
  - You are {char.name}.
  - Write how you think {char.name} would reply based on {char.name}'s previous messages.

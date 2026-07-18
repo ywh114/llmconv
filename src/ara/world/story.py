@@ -136,7 +136,7 @@ If the scratchpad does not need changing, do not provide the `contents` field.""
         f"{char.name}, the current conversation has ended. "
         "Follow the instructions in your system prompt."
     )
-    system = f"""IMPORTANT: Write scratch in {scene.language} only!
+    system = f"""Write scratch in {scene.language} only.
 The current round of conversation has ended.
 # Role
  - You are the ephemeral scratch-writing agent representing {char.name}.
@@ -1174,10 +1174,10 @@ class Story:
         if not changes:
             return
 
-        system_prompt = f"""IMPORTANT: Write in {self._language} only!
+        system_prompt = f"""Write in {self._language} only.
 You are the Narrator. Write a single short sentence (maximum 25 words) describing
-how the scene has changed between scenes. Do NOT use meta-language, do NOT
-address the player directly, and do NOT include dialogue."""
+how the scene has changed between scenes. Do not use meta-language, do not
+address the player directly, and do not include dialogue."""
 
         previous_time = self.engine.world_time or "unspecified"
         updated_time = pt.time or previous_time

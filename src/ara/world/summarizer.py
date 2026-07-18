@@ -430,7 +430,7 @@ class Summarizer:
         :return: Combined wiki context block, or an empty string if nothing
             relevant was found.
         """
-        prompt = f"""IMPORTANT: Respond in {language} only.
+        prompt = f"""Respond in {language} only.
 Given the upcoming scene details below, produce 3-5 short keyword search queries
 for a vector wiki of world facts. Each query should be a short phrase likely to
 retrieve relevant setting, lore, or plot background. Return ONLY one query per
@@ -512,7 +512,7 @@ Tone: {tone}
         state (hidden characters, status pages, sprite overrides) that should
         be in place before the first turn.
         """
-        prompt = f"""IMPORTANT: Respond in {language} only.
+        prompt = f"""Respond in {language} only.
 You are the State Modifier. Read the upcoming scene below and emit any initial mechanical state that should be applied before the first turn.
 
 Allowed blocks:
@@ -607,7 +607,7 @@ Scene considerations:
         location_block = "\n\n".join(
             f"{name}:\n{desc}" for name, desc in locations.items()
         )
-        prompt = f"""IMPORTANT: Respond in {language} only.
+        prompt = f"""Respond in {language} only.
 You are a classifier. Given the scene transcript and a list of locations, decide
 whether each location changed in a major, lasting way during the scene.
 
@@ -648,7 +648,7 @@ down, was ransacked, a bridge collapsed). Minor changes should be NOOP.
         language: str,
     ) -> str:
         """Use a subagent to rewrite a single location description."""
-        prompt = f"""IMPORTANT: Respond in {language} only.
+        prompt = f"""Respond in {language} only.
 Rewrite the description of '{name}' so any major permanent changes from the
 scene are incorporated smoothly. Ignore minor incidental changes. If nothing
 major changed, return the original description cleaned of any [Update] tags.

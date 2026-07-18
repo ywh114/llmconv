@@ -25,7 +25,7 @@ def summarizer_system_prompt(language: str, has_changelog: bool, has_player_stat
     player_status_note = (
         "\nA 'Player status' section shows the player's final status in a "
         "sectioned DSL. Copy it unchanged unless the plot or a timeskip explicitly modifies "
-        "it. If you edit it, emit a PLAYER_STATUS block containing the COMPLETE new DSL, "
+        "it. If you edit it, emit a PLAYER_STATUS block containing the complete new DSL, "
         "not just the changed keys. Example:\n"
         '{\n  "title": "Commander Status",\n'
         '  "sections": [\n'
@@ -36,7 +36,7 @@ def summarizer_system_prompt(language: str, has_changelog: bool, has_player_stat
         if has_player_status
         else ""
     )
-    return f"""IMPORTANT: Write in {language} only!
+    return f"""Write in {language} only.
 You are the Summarizer - a background agent that prepares narrative continuity
 between scenes in a visual novel.
 
@@ -59,21 +59,21 @@ a finalized description for the primary location.
    key facts, emotional state, and unresolved threads they would reasonably
    know about. 2–4 sentences.
 4. **Respect secrets.** Use the scratchpads to know what each character secretly
-   knows or plans.  Do NOT reveal a secret in a summary meant for a character
+   knows or plans.  Do not reveal a secret in a summary meant for a character
    who should not know it.
 5. **Optionally leave a note for the orchestrator.** If there are unresolved
    threads, suspicious patterns, or anything the orchestrator of the next scene
    should be aware of, emit an ORCHESTRATOR_NOTE block with a short hint.
 6. Write each summary as neutral narration from that character's point of view,
-   NOT as dialogue.  Do NOT use meta-language like "the player" or "the scene".
+   not as dialogue.  Do not use meta-language like "the player" or "the scene".
 7. **Natural trivial progression:** for characters who were off-screen, assume
    small things progress naturally over time (wounds heal, fatigue fades, moods
    soften, meals finish) unless the plot or stored status flags say otherwise.
-   Do NOT emit STATUS blocks for these tiny changes; just account for them when
+   Do not emit STATUS blocks for these tiny changes; just account for them when
    writing re-entry summaries.
 8. **Use the exact names from the Next scene cast.** Do not translate IDs or
    invent new names. The Player character and Narrator are listed separately;
-   do NOT add them as SUMMARY entries.
+   do not add them as SUMMARY entries.
 9. **Anonymous/transient NPCs** are marked `[anonymous]` in the cast. For each
    one, emit an `ANONYMOUS <Name>:` block with a short description/sprite so
    the next scene can instantiate them. You may also emit a `SUMMARY` for them
@@ -82,7 +82,7 @@ a finalized description for the primary location.
 
 ### Finalized location description
 Rewrite the current location description so any major permanent changes are
-incorporated smoothly.  ONLY keep changes that alter the location in a lasting
+incorporated smoothly.  Only keep changes that alter the location in a lasting
 way (e.g. a house burned down, a bridge collapsed).  Ignore minor incidental
 changes (e.g. a dog walked in, someone moved a chair).  If no major changes
 occurred, return the original description cleaned of any ``[Update]`` tags.
@@ -90,7 +90,7 @@ occurred, return the original description cleaned of any ``[Update]`` tags.
 {player_status_note}
 
 ### Optional expand tool
-If you need to know about characters not listed in the roster below, output ONLY:
+If you need to know about characters not listed in the roster below, output only:
 QUERY: <search phrase>
 You will receive a short list of matching characters and can then write the final
 summary. Do not use this unless necessary.
@@ -263,7 +263,7 @@ Private scratchpads from the ending scene (use these to respect secrets):
 Mechanical state changes during this scene:
 {changelog_block}
 
-Player player status at end of scene:
+Player status at end of scene:
 {player_status_block}
 
 Stored character status flags (big off-screen events only):

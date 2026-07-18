@@ -21,6 +21,6 @@ def player_input_prompt(player: Character, scene: Scene, suggestion: str) -> str
         f"Language: {scene.language}\n\n"
         f"Write a brief, natural spoken response (1–3 sentences) "
         f"that matches this intent: {suggestion}\n\n"
-        f"Respond with ONLY the dialogue. No quotes, no narration, "
+        f"Respond with only the dialogue. No quotes, no narration, "
         f"no stage directions."
     )

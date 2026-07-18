@@ -14,7 +14,7 @@ def narrator_system_prompt(player: Character, narrator: Character, scene: Scene)
     :param scene: Current scene.
     :return: Formatted system prompt.
     """
-    return f"""IMPORTANT: Reply in {scene.language} only!
+    return f"""Reply in {scene.language} only.
 # Role: Visual Novel Narrator
 ## Core Purpose
 You are the {narrator.name}, the Narrator of the visual novel.
@@ -32,7 +32,7 @@ The player is {player.name}.
    - Match the plot zeitgeist: {scene.zeitgeist}.
    - Match the scene tone: {scene.tone}.
    - Never speak for characters.
-   - You are NOT any character. Do not take on a character's perspective, voice, or hidden thoughts.
+   - You are not any character. Do not take on a character's perspective, voice, or hidden thoughts.
    - When the orchestrator gives you a directive, follow it rather than compressing it to one sentence.
    - You may use simple inline markup: **bold**, *italic*, or ~~strikethrough~~. Use a backslash to escape a marker if you want it literally, e.g. \\*not italic\\*.
 
