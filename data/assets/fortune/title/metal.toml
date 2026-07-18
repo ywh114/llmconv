@@ -46,11 +46,6 @@ noun = [
     { value = "wall of death", sticky = false, prefixable = false, suffixible = false },
     { value = "corpse paint", sticky = false, prefixable = false, suffixible = false },
 ]
-entity = [
-    { value = "Dio", proper_noun = true, sticky = false },
-    { value = "Lemmy", proper_noun = true, sticky = false },
-    { value = "Ozzy", proper_noun = true, sticky = false },
-]
 rank = [
     { value = "guitar god", sticky = false, prefixable = false, suffixible = false },
     { value = "riff lord", sticky = false, prefixable = false, suffixible = false },
@@ -133,12 +128,6 @@ from = [
 slot = "noun"
 from = [
     "noun",
-]
-
-[[expose]]
-slot = "entity"
-from = [
-    "entity",
 ]
 
 [[expose]]
