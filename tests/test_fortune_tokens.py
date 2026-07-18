@@ -222,6 +222,20 @@ def test_drops_suffix_when_no_suffixible_entry() -> None:
     assert tokens.expand("{noun}{suffix}", grammar) == "World"
 
 
+def test_dropped_suffix_leaves_no_double_space() -> None:
+    # A non-sticky multiword noun forces a separator before the suffix, so the
+    # suffix is dropped across the space; the separator must be dropped too.
+    grammar = {
+        "noun": [{"value": "Higgs boson", "sticky": False}],
+        "suffix": [{"value": "meter"}],
+        "adj_sup": [{"value": "brightest"}],
+    }
+    assert (
+        tokens.expand("{noun}{suffix} ({adj_sup})", grammar)
+        == "Higgs Boson (Brightest)"
+    )
+
+
 def test_drops_prefix_when_no_prefixable_entry() -> None:
     grammar = {
         "prefix": [{"value": "neo"}],

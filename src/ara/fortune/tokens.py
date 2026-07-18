@@ -1059,7 +1059,15 @@ def attach_affixes(tokens: list[Token]) -> list[Token]:
                         changed = True
                         i += 1
                         continue
-                    # Suffix cannot attach to a non-word (e.g. across a space): drop it.
+                    # Suffix cannot attach to a non-word (e.g. across a space): drop it,
+                    # along with the separator apply_sticky inserted before it,
+                    # so the drop does not leave a double space behind.
+                    if (
+                        result
+                        and isinstance(result[-1], Literal)
+                        and not result[-1].text.strip()
+                    ):
+                        result.pop()
                     i += 1
                     continue
                 if token.side == 'right' and i + 1 < len(tokens):
