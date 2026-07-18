@@ -32,10 +32,6 @@ simple = [
     "The {noun}",
     "{entity:possessive} {subject}",
 
-    # "X the Y" epithet
-    "{entity} the {adj}",
-    "{entity} the {subject}",
-
     # Possessive subject
     "{subject:possessive} {noun}",
 
@@ -177,10 +173,6 @@ moderate = [
     # Modifier-driven templates
     "{adj} {noun} of {place}",
     "{noun:possessive} {subject}",
-
-    # "X the Y" epithet
-    "{entity} the {adj_sup}",
-    "{entity} the {adj} {subject}",
 
     # Modified of-phrases
     "{subject} of the {adj} {noun}",
