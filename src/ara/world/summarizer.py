@@ -66,6 +66,8 @@ def _flush_modifier_block(
         modifiers.world_status = value
     elif kind == "location_status" and isinstance(value, dict):
         modifiers.location_status[name] = value
+    elif kind == "character_status" and isinstance(value, dict):
+        modifiers.character_status[name] = value
     elif kind == "sprite":
         if isinstance(value, dict):
             modifiers.sprites[name] = value
@@ -86,6 +88,7 @@ def _extract_state_modifiers(text: str) -> tuple[str, SceneStateModifiers]:
     Recognised modifier headers:
       PLAYER_STATUS:
       WORLD_STATUS:
+      CHARACTER_STATUS <Name>:
       LOCATION_STATUS <Name>:
       SPRITE <Name>:
       HIDDEN <Name>:
@@ -119,6 +122,10 @@ def _extract_state_modifiers(text: str) -> tuple[str, SceneStateModifiers]:
                 continue
             if upper.startswith("WORLD_STATUS ") or upper == "WORLD_STATUS":
                 current_block = ("world_status", "", [rest] if rest else [])
+                continue
+            if upper.startswith("CHARACTER_STATUS "):
+                name = header[len("CHARACTER_STATUS"):].strip()
+                current_block = ("character_status", name, [rest] if rest else [])
                 continue
             if upper.startswith("LOCATION_STATUS "):
                 name = header[len("LOCATION_STATUS"):].strip()
@@ -468,7 +475,7 @@ You are the State Modifier. Read the upcoming scene below and emit any initial m
 Allowed blocks:
 - PLAYER_STATUS: <system-page DSL json>
 - WORLD_STATUS: <system-page DSL json>
-- STATUS <CharacterName>: <system-page DSL json>
+- CHARACTER_STATUS <CharacterName>: <system-page DSL json>
 - LOCATION_STATUS <LocationName>: <system-page DSL json>
 - SPRITE <CharacterName>: {{"sprite": "hidden", "visible_to": ["ObserverName"]}}
 - HIDDEN <CharacterName>: ["ObserverName"] or true
@@ -761,7 +768,6 @@ Return ONLY the new description, with no extra headers.
             if current_status_char is not None and status_buffer:
                 joined = "\n".join(status_buffer).strip()
                 try:
-                    import json
                     character_status_updates[current_status_char] = json.loads(joined)
                 except Exception:
                     logger.debug(f"Could not parse STATUS block for {current_status_char}: {joined[:200]}")
@@ -773,7 +779,6 @@ Return ONLY the new description, with no extra headers.
             if current_override_char is not None and override_buffer:
                 joined = "\n".join(override_buffer).strip()
                 try:
-                    import json
                     parsed = json.loads(joined)
                     if isinstance(parsed, dict):
                         character_overrides[current_override_char] = {
@@ -789,7 +794,6 @@ Return ONLY the new description, with no extra headers.
             if current_anon_char is not None and anon_buffer:
                 joined = "\n".join(anon_buffer).strip()
                 try:
-                    import json
                     parsed = json.loads(joined)
                     if isinstance(parsed, dict):
                         anonymous_chars[current_anon_char] = {
@@ -981,7 +985,6 @@ Return ONLY the new description, with no extra headers.
         _flush_override()
         _flush_anon()
 
-        import json
 
         # Parse any NARRATIVE_STATE block we collected.
         if narrative_state_buffer:
