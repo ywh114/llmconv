@@ -58,6 +58,23 @@ def test_article_drop_after_preposition() -> None:
     assert tokens.expand("{title}", grammar) == "The Lord of the Rings"
 
 
+def test_article_kept_after_hates_loves() -> None:
+    # Verbs used by the parenthetical templates ("(hates {place})") take the
+    # article: "hates the Solar System", not "hates Solar System".
+    grammar = {
+        "subject": [{"value": "king"}],
+        "place": [{"value": "solar system", "article": "the"}],
+    }
+    assert (
+        tokens.expand("{subject} (hates {place})", grammar)
+        == "King (hates the Solar System)"
+    )
+    assert (
+        tokens.expand("{subject} (loves {place})", grammar)
+        == "King (loves the Solar System)"
+    )
+
+
 def test_plural_modifiers() -> None:
     grammar = {"noun": [{"value": "wolf"}]}
     assert tokens.expand("{noun:plural}", grammar) == "Wolves"

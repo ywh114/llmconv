@@ -1141,6 +1141,9 @@ _KEEP_ARTICLE_AFTER = frozenset(
         'or',
         'nor',
         'yet',
+        # Verbs used by the parenthetical templates ("(hates {place})" etc.).
+        'hates',
+        'loves',
     }
 )
 
@@ -1158,9 +1161,10 @@ def apply_articles(tokens: list[Token]) -> list[Token]:
             if isinstance(prev, Word):
                 prev_text = prev.text
             elif isinstance(prev, Literal):
-                prev_text = (
-                    prev.text.rstrip().split()[-1] if prev.text.strip() else ''
-                )
+                # Compare the trailing word only; punctuation glued to it
+                # (e.g. the "(" in " (hates ") must not break the lookup.
+                m = re.search(r"[A-Za-z']+$", prev.text.rstrip())
+                prev_text = m.group(0) if m else ''
             if prev_text.lower() in _KEEP_ARTICLE_AFTER:
                 result.append(token)
             # Otherwise drop.
