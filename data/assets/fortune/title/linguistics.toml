@@ -54,11 +54,9 @@ noun = [
     { value = "click consonant", sticky = false, prefixable = false, suffixible = false },
 ]
 entity = [
-    { value = "Panini", proper_noun = true, sticky = false },
     { value = "Sapir", proper_noun = true, sticky = false },
     { value = "Whorf", proper_noun = true, sticky = false },
     { value = "Noam Chomsky", proper_noun = true, sticky = false },
-    { value = "Sir William Jones", proper_noun = true, sticky = false },
 ]
 prefix = [
     { value = "proto" },
