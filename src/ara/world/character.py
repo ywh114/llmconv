@@ -206,7 +206,7 @@ class Character:
         If the scratch is still at its default, the previous scene's scratch
         is shown instead so the character retains continuity.
         """
-        empty = self.scratch.text == "Nothing yet!"
+        empty = self.scratch.is_empty()
         if not empty:
             user_content = (
                 "Please provide your `scratch`.\n"

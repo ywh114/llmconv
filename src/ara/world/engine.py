@@ -252,6 +252,18 @@ class Engine:
         """Miscellaneous world status not tied to the player or a location."""
         return self._free_status
 
+    def set_player_status(self, status: dict[str, Any]) -> None:
+        """Replace the player system page (scene transitions, state modifiers)."""
+        self._player_status = dict(status)
+
+    def set_free_status(self, status: dict[str, Any]) -> None:
+        """Replace the free/world status page."""
+        self._free_status = dict(status)
+
+    def set_narrative_state(self, state: dict[str, Any]) -> None:
+        """Mirror the story-level narrative state into the engine."""
+        self._story_state = dict(state)
+
     # ------------------------------------------------------------------ #
     # Status-page helpers
     # ------------------------------------------------------------------ #
@@ -407,9 +419,6 @@ class Engine:
             return EngineStepResult(
                 scene_ended=True,
                 next_scene=self._next_scene,
-                speaker=None,
-                switch_background="",
-                system_changes={},
             )
 
         ev = self._canonical_events[self._canonical_index]
@@ -515,9 +524,6 @@ class Engine:
                     enter=enter_canonical,
                     exit=exit_canonical,
                     sprite_changes=sprite_changes,
-                    switch_background="",
-                    system_changes={},
-                    output="",
                 )
             next_scene = ev.get("next_scene")
             if next_scene:
@@ -541,9 +547,6 @@ class Engine:
                 enter=enter_canonical,
                 exit=exit_canonical,
                 sprite_changes=sprite_changes,
-                switch_background="",
-                system_changes={},
-                output="",
             )
         elif event_type == "story_complete":
             return EngineStepResult(
@@ -552,9 +555,6 @@ class Engine:
                 enter=enter_canonical,
                 exit=exit_canonical,
                 sprite_changes=sprite_changes,
-                switch_background="",
-                system_changes={},
-                output="",
             )
         else:
             return EngineStepResult(
@@ -562,8 +562,6 @@ class Engine:
                 enter=enter_canonical,
                 exit=exit_canonical,
                 sprite_changes=sprite_changes,
-                switch_background="",
-                system_changes={},
                 output=output,
             )
 
@@ -1015,7 +1013,7 @@ class Engine:
             data = json.loads(args)
             note = data.get("note", "")
             if note:
-                if char.scratch.text == "Nothing yet!":
+                if char.scratch.is_empty():
                     char.scratch.text = f"[Note]: {note}"
                 else:
                     char.scratch.text += f"\n[Note]: {note}"

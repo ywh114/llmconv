@@ -28,6 +28,7 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, Callable
 
 from ara.llm.context import ConversationContext
+from ara.memory.knowledge import Scratchpad
 from ara.prompts.summarizer import summarizer_system_prompt, summarizer_user_prompt
 from ara.llm.models import GameRole
 from ara.utils.logger import get_logger
@@ -39,6 +40,11 @@ if TYPE_CHECKING:
 logger = get_logger(__name__)
 
 _BLOCK_HEADER_RE = re.compile(r"^([A-Z][A-Z0-9_]*(?:\s+\S+)?)\s*:(.*)$")
+
+# Bare words that are read as a time-of-day rather than a location description.
+_TIME_WORDS = frozenset({
+    "morning", "afternoon", "evening", "night", "dawn", "dusk", "day", "midnight",
+})
 
 
 def _parse_json_or_string(text: str) -> Any:
@@ -290,7 +296,7 @@ class Summarizer:
         # Build scratchpad section.
         scratch_lines: list[str] = []
         for name, text in request.scratchpads.items():
-            if text and text != "Nothing yet!":
+            if text and text != Scratchpad.DEFAULT_TEXT:
                 scratch_lines.append(f"--- {name}'s scratchpad ---\n{text}")
         scratch_section = "\n\n".join(scratch_lines) if scratch_lines else "(No scratchpads available.)"
 
@@ -711,21 +717,10 @@ Return ONLY the new description, with no extra headers.
         def _flush_section() -> None:
             nonlocal section, buffer, location, time, time_found
             joined = "\n".join(buffer).strip()
-            if section == "location":
-                if joined.lower() in {"morning", "afternoon", "evening", "night", "dawn", "dusk", "day", "midnight"}:
-                    time = joined
-                    time_found = True
-                else:
-                    location = joined
-            elif section == "time":
-                if joined.lower() in {"morning", "afternoon", "evening", "night", "dawn", "dusk", "day", "midnight"}:
-                    time = joined
-                    time_found = True
-                else:
-                    location = joined
-            elif section is None and joined:
-                # Unheaded trailing text: treat as location unless it looks like a time word.
-                if joined.lower() in {"morning", "afternoon", "evening", "night", "dawn", "dusk", "day", "midnight"}:
+            # LOCATION/TIME sections and unheaded trailing text share the same
+            # rule: a bare time word sets the time, anything else is a location.
+            if section in ("location", "time") or (section is None and joined):
+                if joined.lower() in _TIME_WORDS:
                     time = joined
                     time_found = True
                 else:
@@ -789,6 +784,14 @@ Return ONLY the new description, with no extra headers.
             current_anon_char = None
             anon_buffer = []
 
+        def _flush_all() -> None:
+            _flush_char()
+            _flush_section()
+            _flush_fact()
+            _flush_status()
+            _flush_override()
+            _flush_anon()
+
         for raw_line in text.splitlines():
             line = raw_line.rstrip("\n")
             stripped = line.strip()
@@ -796,12 +799,7 @@ Return ONLY the new description, with no extra headers.
 
             # SUMMARY <Name>:
             if upper.startswith("SUMMARY ") and ":" in stripped:
-                _flush_char()
-                _flush_section()
-                _flush_fact()
-                _flush_status()
-                _flush_override()
-                _flush_anon()
+                _flush_all()
                 name_part = stripped[len("SUMMARY "):stripped.rfind(":")].strip()
                 current_char = name_part
                 section = "char"
@@ -809,12 +807,7 @@ Return ONLY the new description, with no extra headers.
 
             # STATUS <Name>:
             if upper.startswith("STATUS ") and ":" in stripped:
-                _flush_char()
-                _flush_section()
-                _flush_fact()
-                _flush_status()
-                _flush_override()
-                _flush_anon()
+                _flush_all()
                 name_part = stripped[len("STATUS "):stripped.rfind(":")].strip()
                 current_status_char = name_part
                 section = "status"
@@ -822,34 +815,19 @@ Return ONLY the new description, with no extra headers.
 
             # LOCATION:
             if upper == "LOCATION:":
-                _flush_char()
-                _flush_section()
-                _flush_fact()
-                _flush_status()
-                _flush_override()
-                _flush_anon()
+                _flush_all()
                 section = "location"
                 continue
 
             # TIME:
             if upper == "TIME:":
-                _flush_char()
-                _flush_section()
-                _flush_fact()
-                _flush_status()
-                _flush_override()
-                _flush_anon()
+                _flush_all()
                 section = "time"
                 continue
 
             # TIME: <value>  (inline format)
             if upper.startswith("TIME:") and len(stripped) > 5:
-                _flush_char()
-                _flush_section()
-                _flush_fact()
-                _flush_status()
-                _flush_override()
-                _flush_anon()
+                _flush_all()
                 time = stripped[stripped.find(":") + 1:].strip()
                 time_found = True
                 section = None
@@ -857,34 +835,19 @@ Return ONLY the new description, with no extra headers.
 
             # NARRATIVE_STATE:
             if upper == "NARRATIVE_STATE:":
-                _flush_char()
-                _flush_section()
-                _flush_fact()
-                _flush_status()
-                _flush_override()
-                _flush_anon()
+                _flush_all()
                 section = "narrative_state"
                 continue
 
             # ORCHESTRATOR_NOTE:
             if upper == "ORCHESTRATOR_NOTE:":
-                _flush_char()
-                _flush_section()
-                _flush_fact()
-                _flush_status()
-                _flush_override()
-                _flush_anon()
+                _flush_all()
                 section = "orchestrator_note"
                 continue
 
             # FACT: (may have content on the same line)
             if upper.startswith("FACT") and ":" in stripped:
-                _flush_char()
-                _flush_section()
-                _flush_fact()
-                _flush_status()
-                _flush_override()
-                _flush_anon()
+                _flush_all()
                 section = "fact"
                 _start_fact()
                 fact_text = stripped[stripped.find(":") + 1:].strip()
@@ -908,12 +871,7 @@ Return ONLY the new description, with no extra headers.
 
             # CHARACTER <Name>:
             if upper.startswith("CHARACTER ") and ":" in stripped:
-                _flush_char()
-                _flush_section()
-                _flush_fact()
-                _flush_status()
-                _flush_override()
-                _flush_anon()
+                _flush_all()
                 name_part = stripped[len("CHARACTER "):stripped.rfind(":")].strip()
                 current_override_char = name_part
                 section = "override"
@@ -921,12 +879,7 @@ Return ONLY the new description, with no extra headers.
 
             # ANONYMOUS <Name>:
             if upper.startswith("ANONYMOUS ") and ":" in stripped:
-                _flush_char()
-                _flush_section()
-                _flush_fact()
-                _flush_status()
-                _flush_override()
-                _flush_anon()
+                _flush_all()
                 name_part = stripped[len("ANONYMOUS "):stripped.rfind(":")].strip()
                 current_anon_char = name_part
                 section = "anonymous"
@@ -961,12 +914,7 @@ Return ONLY the new description, with no extra headers.
                 buffer.append(line)
 
         # Final flush
-        _flush_char()
-        _flush_section()
-        _flush_fact()
-        _flush_status()
-        _flush_override()
-        _flush_anon()
+        _flush_all()
 
 
         # Parse any NARRATIVE_STATE block we collected.

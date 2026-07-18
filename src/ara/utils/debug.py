@@ -19,6 +19,15 @@ if TYPE_CHECKING:
     from ara.llm.context import ConversationContext
 
 
+# Short aliases shared by the interactive console and the agent debug bridge.
+DEBUG_COMMAND_ALIASES = {
+    "h": "help",
+    "d": "dump",
+    "i": "info",
+    "x": "exec",
+}
+
+
 class DebugConsole:
     """Lightweight REPL for inspecting engine state during a scene.
 
@@ -99,14 +108,8 @@ class DebugConsole:
         handler = getattr(self, f"_cmd_{cmd}", None)
         if handler is None:
             # Aliases
-            aliases = {
-                "h": "help",
-                "d": "dump",
-                "i": "info",
-                "x": "exec",
-            }
-            if cmd in aliases:
-                handler = getattr(self, f"_cmd_{aliases[cmd]}", None)
+            if cmd in DEBUG_COMMAND_ALIASES:
+                handler = getattr(self, f"_cmd_{DEBUG_COMMAND_ALIASES[cmd]}", None)
 
         if handler:
             try:

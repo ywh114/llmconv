@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from ara.utils.debug import _DebugState
+from ara.utils.debug import DEBUG_COMMAND_ALIASES, _DebugState
 
 
 class StructuredDebugBridge:
@@ -23,14 +23,8 @@ class StructuredDebugBridge:
         handler = getattr(self, f"_cmd_{command}", None)
         if handler is None:
             # Aliases
-            aliases = {
-                "h": "help",
-                "d": "dump",
-                "i": "info",
-                "x": "exec",
-            }
-            if command in aliases:
-                handler = getattr(self, f"_cmd_{aliases[command]}", None)
+            if command in DEBUG_COMMAND_ALIASES:
+                handler = getattr(self, f"_cmd_{DEBUG_COMMAND_ALIASES[command]}", None)
 
         if handler:
             try:

@@ -8,7 +8,7 @@ from dataclasses import dataclass, field
 from chromadb import Metadata
 from chromadb.api.types import OneOrMany
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from ara.memory.chroma import ChromaStore
 from ara.utils.logger import get_logger
@@ -36,16 +36,23 @@ class Scratchpad:
     can reference it at the start of a new scene.
     """
 
-    text: str = 'Nothing yet!'
+    DEFAULT_TEXT: ClassVar[str] = 'Nothing yet!'
+    """Content of an untouched scratchpad."""
+
+    text: str = DEFAULT_TEXT
     """Current scratch content."""
 
-    prev_text: str = 'Nothing yet!'
+    prev_text: str = DEFAULT_TEXT
     """Snapshot from the previous scene."""
+
+    def is_empty(self) -> bool:
+        """True when the scratchpad holds no user-written content."""
+        return not self.text or self.text == self.DEFAULT_TEXT
 
     def prepare_for_new_scene(self) -> None:
         """Archive the current scratch and reset to the default."""
         self.prev_text = self.text
-        self.text = 'Nothing yet!'
+        self.text = self.DEFAULT_TEXT
 
 
 class NullMemory:

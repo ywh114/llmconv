@@ -25,7 +25,7 @@ from ara.memory.story_memory import StoryMemory
 from ara.llm.models import GameRole
 from ara.world.character import Importance, create_anonymous_character
 from ara.utils.logger import get_logger
-from ara.memory.knowledge import CharacterMemory
+from ara.memory.knowledge import CharacterMemory, Scratchpad
 from ara.world.character import Character
 from ara.world.engine import Engine
 
@@ -187,6 +187,18 @@ The current round of conversation has ended.
         logger.debug(f"Stored memory summary for {char.name}")
 
 
+def _gather_scratchpads(scene: Scene, orchestrator_scratch: Scratchpad) -> dict[str, str]:
+    """Collect non-empty character scratchpads plus the orchestrator journal."""
+    scratchpads = {
+        c.name: c.scratch.text
+        for c in scene.character_pool
+        if not c.scratch.is_empty()
+    }
+    if not orchestrator_scratch.is_empty():
+        scratchpads["Orchestrator"] = orchestrator_scratch.text
+    return scratchpads
+
+
 def _finalize_orchestrator(
     scene: Scene,
     engine: Engine,
@@ -202,14 +214,7 @@ def _finalize_orchestrator(
         observer_name="Orchestrator",
     )
 
-    scratchpads = {
-        c.name: c.scratch.text
-        for c in scene.character_pool
-        if c.scratch.text and c.scratch.text != "Nothing yet!"
-    }
-    orch_scratch = engine.orchestrator.scratch.text
-    if orch_scratch and orch_scratch != "Nothing yet!":
-        scratchpads["Orchestrator"] = orch_scratch
+    scratchpads = _gather_scratchpads(scene, engine.orchestrator.scratch)
 
     scratch_section = "\n\n".join(
         f"--- {name}'s scratchpad ---\n{text}"
@@ -719,9 +724,9 @@ class Story:
 
         # Restore status pages carried over from the previous scene.
         if pt.player_status:
-            self.engine._player_status = dict(pt.player_status)
+            self.engine.set_player_status(pt.player_status)
         if pt.free_status:
-            self.engine._free_status = dict(pt.free_status)
+            self.engine.set_free_status(pt.free_status)
         if pt.location_statuses:
             for loc in scene.location_pool:
                 if loc.canonical_name in pt.location_statuses:
@@ -741,7 +746,7 @@ class Story:
             self._apply_state_modifiers(scene, initial_modifiers)
 
         # Pass narrative state to the engine/orchestrator.
-        self.engine._story_state = dict(self._narrative_state)
+        self.engine.set_narrative_state(self._narrative_state)
 
         # Load all world settings prescribed by the scene.
         self._load_world_settings(scene)
@@ -910,14 +915,7 @@ class Story:
         )
 
         # Gather scratchpads from characters in the current scene, plus the orchestrator's.
-        scratchpads = {
-            c.name: c.scratch.text
-            for c in self._current_scene.character_pool
-            if c.scratch.text and c.scratch.text != "Nothing yet!"
-        }
-        orch_scratch = self.engine.orchestrator.scratch.text
-        if orch_scratch and orch_scratch != "Nothing yet!":
-            scratchpads["Orchestrator"] = orch_scratch
+        scratchpads = _gather_scratchpads(self._current_scene, self.engine.orchestrator.scratch)
 
         # Recall relevant past-scene summaries from long-term memory.
         history_queries = [
@@ -1114,9 +1112,9 @@ class Story:
             return
 
         if modifiers.player_status:
-            self.engine._player_status = dict(modifiers.player_status)
+            self.engine.set_player_status(modifiers.player_status)
         if modifiers.world_status:
-            self.engine._free_status = dict(modifiers.world_status)
+            self.engine.set_free_status(modifiers.world_status)
 
         for name, status in modifiers.character_status.items():
             char = scene.character_by_name(name)

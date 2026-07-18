@@ -91,6 +91,7 @@ class Orchestrator:
         """
         self.client = client
         self.db = db
+        self._settings = AraSettings()
         self.wiki = WikiStore(db, client=client)
         self.registry = ToolRegistry()
         self._capture: NextRoundCapture | None = None
@@ -104,7 +105,7 @@ class Orchestrator:
         """Append *note* to the orchestrator's private journal/scratchpad."""
         if not note:
             return
-        if self.scratch.text == 'Nothing yet!':
+        if self.scratch.is_empty():
             self.scratch.text = f"[Journal]: {note}"
         else:
             self.scratch.text += f"\n[Journal]: {note}"
@@ -118,9 +119,8 @@ class Orchestrator:
         """
         lines: list[str] = []
         for char in sorted(scene.character_pool, key=lambda c: c.name):
-            text = char.scratch.text
-            if text and text != "Nothing yet!":
-                lines.append(f"--- {char.name}'s scratch ---\n{text}")
+            if not char.scratch.is_empty():
+                lines.append(f"--- {char.name}'s scratch ---\n{char.scratch.text}")
         if not lines:
             return []
         return [
@@ -226,12 +226,6 @@ class Orchestrator:
                 entering_chars=set(),
                 exiting_chars=set(),
                 switch_location=None,
-                next_scene=None,
-                switch_background='',
-                spawn_anonymous=[],
-                set_time='',
-                system_changes={},
-                response_mode='outer',
             )
         narrator = scene.narrator
         if narrator in here_chars:
@@ -242,12 +236,6 @@ class Orchestrator:
                 entering_chars=set(),
                 exiting_chars=set(),
                 switch_location=None,
-                next_scene=None,
-                switch_background='',
-                spawn_anonymous=[],
-                set_time='',
-                system_changes={},
-                response_mode='outer',
             )
         fallback = next(iter(here_chars), narrator)
         return TurnDecision(
@@ -257,12 +245,6 @@ class Orchestrator:
             entering_chars=set(),
             exiting_chars=set(),
             switch_location=None,
-            next_scene=None,
-            switch_background='',
-            spawn_anonymous=[],
-            set_time='',
-            system_changes={},
-            response_mode='outer',
         )
 
     def _spawn_anonymous_handler(self, args: str) -> str:
@@ -326,13 +308,12 @@ class Orchestrator:
         topic = data.get('topic', '')
         return self._wiki_forget(topic)
 
-    @staticmethod
-    def _anonymous_sprite_list(scene: Scene) -> str:
+    def _anonymous_sprite_list(self, scene: Scene) -> str:
         """Discover anonymous sprite pool for on-the-fly spawning.
 
         Per-story anonymous sprites take priority over the global pool.
         """
-        settings = AraSettings()
+        settings = self._settings
         story_name = getattr(scene, 'asset_story_name', '')
         story_anonymous_dir = settings.anonymous_path(story_name)
         global_anonymous_dir = settings.anonymous_path()
@@ -787,7 +768,7 @@ Recent speakers: {recent_speakers_str}
 
         if history and isinstance(history, str):
             branch.user_message(
-                'The following message containes past scene information.',
+                'The following message contains past scene information.',
                 name='System',
             )
             branch.assistant_message(str(history), name='System')
@@ -805,7 +786,7 @@ Recent speakers: {recent_speakers_str}
                 name='System',
             )
 
-        if self.scratch.text and self.scratch.text != 'Nothing yet!':
+        if not self.scratch.is_empty():
             branch.user_message(
                 'Your private journal (only you see this).',
                 name='System',
@@ -892,17 +873,21 @@ Recent speakers: {recent_speakers_str}
             attempts_for_orchestrator, history, turn_count, sprite_info,
         )
 
+        def _call() -> Any:
+            """One orchestrator LLM round against the current branch state."""
+            return self.client.complete(
+                role=GameRole.ORCHESTRATOR,
+                system_prompt=self._system_prompt(
+                    scene.player, scene.narrator, scene
+                ),
+                messages=branch.to_list(),
+                tools=tools,
+                stream=True,
+                print_stream=False,
+            )
+
         logger.debug('Control handed to orchestrator')
-        result = self.client.complete(
-            role=GameRole.ORCHESTRATOR,
-            system_prompt=self._system_prompt(
-                scene.player, scene.narrator, scene
-            ),
-            messages=branch.to_list(),
-            tools=tools,
-            stream=True,
-            print_stream=False,
-        )
+        result = _call()
 
         # Handle tool-call loops: roll/random may be called before next_round.
         max_tool_loops = 20
@@ -920,16 +905,7 @@ Recent speakers: {recent_speakers_str}
                         'Your ONLY valid response is a tool call.',
                         name='System',
                     )
-                    result = self.client.complete(
-                        role=GameRole.ORCHESTRATOR,
-                        system_prompt=self._system_prompt(
-                            scene.player, scene.narrator, scene
-                        ),
-                        messages=branch.to_list(),
-                        tools=tools,
-                        stream=True,
-                        print_stream=False,
-                    )
+                    result = _call()
                     _retries -= 1
                     continue
                 raise RuntimeError(
@@ -971,16 +947,7 @@ Recent speakers: {recent_speakers_str}
                 for tool_call_id, result_text in tool_results:
                     branch.tool_message(result_text, tool_call_id=tool_call_id)
 
-                result = self.client.complete(
-                    role=GameRole.ORCHESTRATOR,
-                    system_prompt=self._system_prompt(
-                        scene.player, scene.narrator, scene
-                    ),
-                    messages=branch.to_list(),
-                    tools=tools,
-                    stream=True,
-                    print_stream=False,
-                )
+                result = _call()
             except json.JSONDecodeError as exc:
                 logger.warning(
                     f'Orchestrator returned malformed JSON ({exc!r}). '
@@ -1003,16 +970,7 @@ Recent speakers: {recent_speakers_str}
                         'correctly formatted arguments.',
                         name='System',
                     )
-                    result = self.client.complete(
-                        role=GameRole.ORCHESTRATOR,
-                        system_prompt=self._system_prompt(
-                            scene.player, scene.narrator, scene
-                        ),
-                        messages=branch.to_list(),
-                        tools=tools,
-                        stream=True,
-                        print_stream=False,
-                    )
+                    result = _call()
                     _retries -= 1
                     continue
                 raise RuntimeError(
@@ -1168,10 +1126,6 @@ class NextRoundCapture:
                 exiting_chars=set(),
                 switch_location=None,
                 next_scene=next_scene,
-                switch_background='',
-                spawn_anonymous=[],
-                set_time='',
-                system_changes={},
             )
 
         # Validate and resolve change_sprite. The LLM may use display or
@@ -1246,11 +1200,8 @@ class NextRoundCapture:
             ),
             switch_location=switch_loc,
             edit_location=self._data.get('edit_location', ''),
-            next_scene=None,
             change_sprite=change_sprite,
             switch_background=self._data.get('switch_background', ''),
-            spawn_anonymous=[],
             set_time=self._data.get('set_time', ''),
-            system_changes={},
             response_mode=response_mode,
         )
