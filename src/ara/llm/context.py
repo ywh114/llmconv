@@ -77,6 +77,21 @@ class ConversationContext:
         """
         return self.__class__(tmp_from=self)
 
+    @staticmethod
+    def is_visible(msg: dict, observer: str) -> bool:
+        """Whether *observer* may perceive *msg* under hidden/visible_to rules.
+
+        A message marked ``_hidden`` is visible only to its sender and to
+        observers listed in its ``_visible_to`` set; every other message is
+        visible to everyone.  This is the single visibility rule used by all
+        readers (``context_of`` and the engine's branch filters).
+        """
+        if not msg.get("_hidden"):
+            return True
+        visible_to = set(msg.get("_visible_to") or [])
+        sender = msg.get("_canonical_name") or msg.get("name")
+        return observer == sender or observer in visible_to
+
     def context_of(self, entity: str) -> Context:
         """Return the sub-sequence of messages visible to *entity*.
 
@@ -101,11 +116,8 @@ class ConversationContext:
 
         cleaned: Context = []
         for msg in messages:
-            if msg.get("_hidden"):
-                visible_to = set(msg.get("_visible_to") or [])
-                sender = msg.get("_canonical_name") or msg.get("name")
-                if entity != sender and entity not in visible_to:
-                    continue
+            if not self.is_visible(msg, entity):
+                continue
             # Strip private visibility markers before returning.
             cleaned.append(
                 {k: v for k, v in msg.items() if not k.startswith("_")}
@@ -563,6 +575,45 @@ class ConversationContext:
         self.head = msg
         self.context.append(self.head)
         return self
+
+    def speech_message(
+        self,
+        content: str,
+        speaker: Any,
+        *,
+        role: str = "assistant",
+        tool_calls: list[dict] | None = None,
+        reasoning_content: str = "",
+    ) -> Self:
+        """Append a character speech message with flags derived from *speaker*.
+
+        *speaker* is any object with ``name``, ``canonical_name``, ``hidden``
+        and ``visible_to`` attributes (e.g. a character).  Every speech write
+        site should use this helper so hidden/visible_to flags stay consistent
+        (an unflagged message from a hidden character leaks to all readers).
+
+        :param content: Message text.
+        :param speaker: The speaking character.
+        :param role: ``"assistant"`` for NPC/narrator speech, ``"user"`` for
+            player input.
+        :param tool_calls: Completed tool-call descriptors (assistant only).
+        :param reasoning_content: Raw chain-of-thought text (assistant only).
+        :return: Self for chaining.
+        """
+        kwargs: dict[str, Any] = {
+            "name": speaker.name,
+            "hidden": speaker.hidden,
+            "visible_to": set(speaker.visible_to) if speaker.hidden else None,
+            "canonical_name": speaker.canonical_name,
+        }
+        if role == "user":
+            return self.user_message(content, **kwargs)
+        return self.assistant_message(
+            content,
+            tool_calls=tool_calls,
+            reasoning_content=reasoning_content,
+            **kwargs,
+        )
 
     def concat_context(self, context: Context) -> Self:
         """Replay an existing message list into this context.

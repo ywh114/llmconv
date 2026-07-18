@@ -483,24 +483,11 @@ class Engine:
                 raise RuntimeError(f"Canonical turn {self._canonical_index}: unknown speaker '{speaker_name}'")
 
             if speaker == scene.player:
-                ctx.user_message(
-                    output,
-                    name=scene.player.name,
-                    hidden=scene.player.hidden,
-                    visible_to=set(scene.player.visible_to) if scene.player.hidden else None,
-                    canonical_name=scene.player.canonical_name,
-                )
+                ctx.speech_message(output, scene.player, role="user")
                 if output.strip() and scene.player.importance >= Importance.IMPORTANT:
                     scene.player.memory.add_conversation([output.strip()])
             else:
-                ctx.assistant_message(
-                    output,
-                    tool_calls=[],
-                    name=speaker.name,
-                    hidden=speaker.hidden,
-                    visible_to=set(speaker.visible_to) if speaker.hidden else None,
-                    canonical_name=speaker.canonical_name,
-                )
+                ctx.speech_message(output, speaker, tool_calls=[])
                 if output.strip() and speaker.importance >= Importance.IMPORTANT:
                     speaker.memory.add_conversation([output.strip()])
 
@@ -688,13 +675,7 @@ class Engine:
                 )
             self._canonical_pending_choices = None
 
-        self._ctx.user_message(
-            text,
-            name=self._scene.player.name,
-            hidden=self._scene.player.hidden,
-            visible_to=set(self._scene.player.visible_to) if self._scene.player.hidden else None,
-            canonical_name=self._scene.player.canonical_name,
-        )
+        self._ctx.speech_message(text, self._scene.player, role="user")
         if text.strip() and self._scene.player.importance >= Importance.IMPORTANT:
             self._scene.player.memory.add_conversation([text.strip()])
 
@@ -758,9 +739,7 @@ class Engine:
         branch.context = [
             msg
             for msg in branch.context
-            if not msg.get("_hidden")
-            or narrator_canonical == (msg.get("_canonical_name") or msg.get("name"))
-            or narrator_canonical in set(msg.get("_visible_to") or [])
+            if ConversationContext.is_visible(msg, narrator_canonical)
         ]
         branch.concat_context(loc.scratch_context())
         branch.user_message(
@@ -781,12 +760,11 @@ class Engine:
             name=scene.narrator.name,
         )
 
-        ctx.assistant_message(
+        ctx.speech_message(
             result.content,
+            scene.narrator,
             tool_calls=[],
-            name=scene.narrator.name,
             reasoning_content=result.reasoning_content,
-            canonical_name=scene.narrator.canonical_name,
         )
         if result.content.strip() and scene.narrator.importance >= Importance.IMPORTANT:
             scene.narrator.memory.add_conversation([result.content.strip()])
@@ -818,7 +796,7 @@ class Engine:
         if hidden_from_char:
             b.context = [
                 msg for msg in b.context
-                if (msg.get("_canonical_name") or msg.get("name")) not in hidden_from_char
+                if ConversationContext.is_visible(msg, char.canonical_name)
             ]
             b.present_entities -= hidden_from_char
         # Use the curated single-assistant view so the character is the only
@@ -1054,14 +1032,11 @@ class Engine:
         # The model may chain multiple tool calls (e.g. recall → wiki_recall → attempt_action)
         # before finally producing spoken content.
         while result.tool_calls:
-            ctx.assistant_message(
+            ctx.speech_message(
                 result.content,
+                char,
                 tool_calls=result.tool_calls,
-                name=char.name,
                 reasoning_content=result.reasoning_content,
-                hidden=char.hidden,
-                visible_to=set(char.visible_to) if char.hidden else None,
-                canonical_name=char.canonical_name,
             )
             for tc in result.tool_calls:
                 name = tc["function"]["name"]
@@ -1099,14 +1074,11 @@ class Engine:
             logger.debug(f"Stored inner monologue for {char.name}: {inner!r}")
 
         if outer.strip():
-            ctx.assistant_message(
+            ctx.speech_message(
                 outer,
+                char,
                 tool_calls=[],
-                name=char.name,
                 reasoning_content=result.reasoning_content,
-                hidden=char.hidden,
-                visible_to=set(char.visible_to) if char.hidden else None,
-                canonical_name=char.canonical_name,
             )
             if char.importance >= Importance.IMPORTANT:
                 char.memory.add_conversation([outer.strip()])
@@ -1115,12 +1087,11 @@ class Engine:
             logger.debug(f"{char.name} produced an inner-only turn")
         else:
             # Empty or unparseable response: record an empty assistant turn.
-            ctx.assistant_message(
+            ctx.speech_message(
                 outer,
+                char,
                 tool_calls=[],
-                name=char.name,
                 reasoning_content=result.reasoning_content,
-                canonical_name=char.canonical_name,
             )
         return outer.strip()
 
